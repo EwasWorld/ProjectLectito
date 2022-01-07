@@ -1,0 +1,63 @@
+package com.eywa.projectlectito.database
+
+import android.app.Application
+import androidx.room.CoroutinesRoom
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.database.snippets.TextSnippetsDao
+import com.eywa.projectlectito.database.texts.Text
+import com.eywa.projectlectito.database.texts.TextsDao
+import com.eywa.projectlectito.readSentence.TempTestData
+import dagger.Module
+import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import javax.inject.Singleton
+
+
+@Module
+class DatabaseDaggerModule(application: Application) {
+    // Keep all initialisation code together in constructor
+    @Suppress("JoinDeclarationAndAssignment")
+    internal val lectitoRoomDatabase: LectitoRoomDatabase
+
+    init {
+        lectitoRoomDatabase =
+                Room.databaseBuilder(application, LectitoRoomDatabase::class.java, LectitoRoomDatabase.DATABASE_NAME)
+                        .addCallback(PopulateDatabaseCallback(MainScope()))
+                        .build()
+        /*
+         * Write ahead mode suspected of causes issues with the instrumented test,
+         * crashing suite runs with the error:
+         *      SQLiteDiskIOException: disk I/O error (code 522 SQLITE_IOERR_SHORT_READ):
+         *      , while compiling: PRAGMA journal_mode
+         * A few sources point to turning of WAL, notably: https://github.com/Tencent/wcdb/issues/243
+         * This also appears to have fixed some test failures
+         */
+        lectitoRoomDatabase.openHelper.setWriteAheadLoggingEnabled(false)
+    }
+
+    private suspend fun populateDatabase(textsDao: TextsDao, textSnippetsDao: TextSnippetsDao) {
+        // TODO Remove initial data
+        textsDao.insert(Text(1, "傭兵団の料理番"))
+        textSnippetsDao.insert(TextSnippet(1, TempTestData.text, 1, 1, 1))
+    }
+
+    private inner class PopulateDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+            scope.launch {
+                populateDatabase(lectitoRoomDatabase.textsDao(), lectitoRoomDatabase.textSnippetsDao())
+            }
+        }
+    }
+
+    @Singleton
+    @Provides
+    fun providesRoomDatabase(): LectitoRoomDatabase {
+        return lectitoRoomDatabase
+    }
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WordDefinitionDetailView">
+        <attr name="parts_of_speech" format="string" />
+        <attr name="definition" format="string" />
+        <attr name="tags" format="string" />
+        <attr name="index" format="integer" />
+    </declare-styleable>
+</resources>

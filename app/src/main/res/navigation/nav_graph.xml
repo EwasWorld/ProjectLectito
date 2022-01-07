@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/readSentenceFragment"
+    >
+
+    <fragment
+        android:id="@+id/readSentenceFragment"
+        android:name="com.eywa.projectlectito.readSentence.ReadSentenceFragment"
+        android:label="@string/read_sentence__title"
+        tools:layout="@layout/read_sentence_fragment"
+        />
+</navigation>

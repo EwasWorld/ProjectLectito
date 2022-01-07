@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">ProjectLectito</string>
+
+    <string name="a"></string>
+
+    <!-- Read Sentence -->
+    <string name="read_sentence__title">Read Sentence</string>
+    <string name="read_sentence__common">common</string>
+    <string name="read_sentence__other_forms_label">Other forms:</string>
+    <string name="read_sentence__previous_definition">Previous definition</string>
+    <string name="read_sentence__next_definition">Next definition</string>
+    <string name="read_sentence__home">Home</string>
+    <string name="read_sentence__full_text">Full text</string>
+    <string name="read_sentence__previous_sentence">Previous sentence</string>
+    <string name="read_sentence__next_sentence">Next sentence</string>
+    <string name="read_sentence__no_definition">No word selected.\nClick a word to show its definition.</string>
+
+    <string name="err_read_sentence__no_more_sentences">No more sentences</string>
+    <string name="err_read_sentence__no_more_definitions">No more definitions</string>
+
+    <!-- Misc -->
+    <string-array name="card_state_array">
+        <item>Unseen</item>
+    </string-array>
+</resources>
