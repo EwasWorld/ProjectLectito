@@ -12,17 +12,12 @@ import kotlinx.android.synthetic.main.read_sentence_fragment.*
 class ReadSentenceFragment : Fragment() {
     companion object {
         private const val japaneseListDelimiter = "・"
-        private val stringsToRemoveFromDisplay = setOf('\n')
-        private val sentenceBreakStrings = setOf("。").plus(stringsToRemoveFromDisplay.map { it.toString() })
     }
 
     // TODO Set up arguments
     // private val args: NewScoreFragmentArgs by navArgs()
 
-    private var textSnippet = ""
-    private var currentCharacter: Int? = null
-    private var currentSentenceEnd: Int? = null
-    private var previousSentenceStart: Int? = null
+    private var sentence = Sentence()
 
     private var allDefinitionsForWord: JishoReturnData? = null
     private var currentDefinitionIndex: Int? = null
@@ -42,7 +37,7 @@ class ReadSentenceFragment : Fragment() {
             displaySentence()
         })
         readSentenceViewModel.textSnippet.observe(viewLifecycleOwner, {
-            textSnippet = it?.content ?: ""
+            sentence.textSnippetContent = it?.content
             it?.let { snippet ->
                 val chapter = if (snippet.chapterId != null) "第%d章".format(snippet.chapterId) else ""
                 val page = "%dページ".format(snippet.pageReference)
@@ -51,7 +46,7 @@ class ReadSentenceFragment : Fragment() {
             displaySentence()
         })
         readSentenceViewModel.currentCharacter.observe(viewLifecycleOwner, {
-            currentCharacter = it
+            sentence.setCurrentCharacter(it)
             displaySentence()
         })
         readSentenceViewModel.textName.observe(viewLifecycleOwner, {
@@ -68,22 +63,19 @@ class ReadSentenceFragment : Fragment() {
         })
 
         button_read_sentence___next_sentence.setOnClickListener {
-            if (currentSentenceEnd == null) {
+            val nextSentenceStart = sentence.getNextSentenceStart()
+            if (nextSentenceStart == null) {
                 ToastSpamPrevention.displayToast(
                         requireContext(),
                         resources.getString(R.string.err_read_sentence__no_more_sentences)
                 )
                 return@setOnClickListener
             }
-
-            var nextSentence = currentSentenceEnd!!
-            while (sentenceBreakStrings.contains(textSnippet[nextSentence].toString())) {
-                nextSentence++
-            }
-            readSentenceViewModel.currentCharacter.postValue(nextSentence)
+            readSentenceViewModel.currentCharacter.postValue(nextSentenceStart)
         }
 
         button_read_sentence___previous_sentence.setOnClickListener {
+            val previousSentenceStart = sentence.getPreviousSentenceStart()
             if (previousSentenceStart == null) {
                 ToastSpamPrevention.displayToast(
                         requireContext(),
@@ -124,71 +116,28 @@ class ReadSentenceFragment : Fragment() {
      * TODO Span across two snippets for the start and end of a snippet
      */
     private fun displaySentence() {
-        if (textSnippet.isBlank()) {
-            hideAllSentenceContents()
+        val currentSentence = sentence.getCurrentSentence()
+
+        if (currentSentence == null) {
+            text_read_sentence__sentence.text = ""
+            text_read_sentence__context.text = ""
+            button_read_sentence___previous_sentence.isEnabled = false
+            button_read_sentence___next_sentence.isEnabled = false
             return
         }
-        val currentSentenceStart = currentCharacter ?: 0
 
-        if (currentSentenceStart < 0 || currentSentenceStart >= textSnippet.length) {
-            hideAllSentenceContents()
-            return
-        }
-
-        /*
-         * Find the start of the previous sentence
-         */
-        previousSentenceStart = null
-
-        // Ignore any sentence end characters directly before the current character
-        var previousSentenceEnd = currentSentenceStart - 1
-        while (previousSentenceEnd >= 0 && sentenceBreakStrings.contains(textSnippet[previousSentenceEnd].toString())) {
-            previousSentenceEnd--
-        }
-
-        // Search backwards for a sentence end character
-        if (previousSentenceEnd > 0) {
-            previousSentenceStart = textSnippet.substring(0, previousSentenceEnd + 1)
-                    .findLastAnyOf(sentenceBreakStrings)?.first?.plus(1) ?: 0
-            if (previousSentenceStart!! >= previousSentenceEnd) {
-                previousSentenceStart = null
-            }
-        }
-
-        if (previousSentenceStart != null) {
-            text_read_sentence__context.text = textSnippet.substring(previousSentenceStart!!, currentSentenceStart)
-                    .filterNot { stringsToRemoveFromDisplay.contains(it) }
-        }
-        else {
+        val previousSentence = sentence.getPreviousSentence()
+        if (previousSentence == null) {
             text_read_sentence__context.text = ""
         }
-        text_read_sentence__context.visibility = (previousSentenceStart != null).asVisibility()
-        button_read_sentence___previous_sentence.isEnabled = previousSentenceStart != null
-
-        /*
-         * Find the end of the current sentence
-         */
-        currentSentenceEnd = textSnippet.findAnyOf(sentenceBreakStrings, currentSentenceStart)?.first
-        button_read_sentence___next_sentence.isEnabled = currentSentenceEnd != null
-
-        val newSnippet = if (currentSentenceEnd == null) {
-            textSnippet.substring(currentSentenceStart)
-        }
         else {
-            while (sentenceBreakStrings.contains(textSnippet[currentSentenceEnd!!].toString())) {
-                currentSentenceEnd = currentSentenceEnd!! + 1
-            }
-            textSnippet.substring(currentSentenceStart, currentSentenceEnd!!)
+            text_read_sentence__context.text = previousSentence
         }
+        text_read_sentence__context.visibility = (previousSentence != null).asVisibility()
+        button_read_sentence___previous_sentence.isEnabled = previousSentence != null
 
-        text_read_sentence__sentence.text = newSnippet.filterNot { stringsToRemoveFromDisplay.contains(it) }
-    }
-
-    private fun hideAllSentenceContents() {
-        text_read_sentence__sentence.text = ""
-        text_read_sentence__context.text = ""
-        button_read_sentence___previous_sentence.isEnabled = false
-        button_read_sentence___next_sentence.isEnabled = false
+        button_read_sentence___next_sentence.isEnabled = sentence.hasNextSentence()
+        text_read_sentence__sentence.text = currentSentence
     }
 
     private fun displayDefinition() {
