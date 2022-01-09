@@ -160,14 +160,14 @@
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
             android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toTopOf="@+id/button_read_sentence___previous_definition"
+            app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
             tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___previous_definition"
+            android:id="@+id/button_read_sentence__previous_definition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -186,16 +186,16 @@
             android:id="@+id/spinner_read_sentence__state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence___previous_definition"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence___next_definition"
+            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__previous_definition"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_definition"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence___previous_definition"
-            app:layout_constraintTop_toTopOf="@id/button_read_sentence___previous_definition"
+            app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_definition"
+            app:layout_constraintTop_toTopOf="@id/button_read_sentence__previous_definition"
             tools:entries="@array/card_state_array"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___next_definition"
+            android:id="@+id/button_read_sentence__next_definition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -203,11 +203,11 @@
             android:contentDescription="@string/read_sentence__next_definition"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_next"
-            app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence___previous_definition"
+            app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@id/spinner_read_sentence__state"
-            app:layout_constraintTop_toTopOf="@+id/button_read_sentence___previous_definition"
+            app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -230,11 +230,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
             android:background="#DECFFF"
             android:paddingHorizontal="20dp"
             android:paddingVertical="5dp"
-            app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -268,6 +266,103 @@
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Ensures spacing between text_info and context when selected_word_info is not shown -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__text_info"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_read_sentence__selected_word_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="#CFE5FF"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__text_info"
+            tools:visibility="visible"
+            >
+
+            <TextView
+                android:id="@+id/text_read_sentence__selected_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__separator_1"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="RtlSymmetry"
+                tools:text="うまい"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__separator_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_read_sentence__dictionary_form"
+                app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_word"
+                tools:text="・"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__dictionary_form"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
+                app:layout_constraintStart_toEndOf="@+id/text_read_sentence__separator_1"
+                tools:text="うまく"
+                />
+
+            <Space
+                android:id="@+id/space_read_sentence_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_read_sentence__parts_of_speech"
+                app:layout_constraintStart_toEndOf="@+id/text_read_sentence__dictionary_form"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__parts_of_speech"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/text_read_sentence__pitch_accent"
+                app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
+                tools:text="V"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__pitch_accent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/text_read_sentence__parts_of_speech"
+                tools:text="1"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/text_read_sentence__context"
             android:layout_width="match_parent"
@@ -281,7 +376,6 @@
             app:layout_constraintBottom_toTopOf="@id/text_read_sentence__sentence"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__text_info"
             tools:text="しかも、八人全てが美男美女という、僕のようなフノメンには居い地の悪い空間です。"
             />
 
@@ -294,14 +388,14 @@
             android:paddingTop="5dp"
             android:paddingBottom="15dp"
             android:textSize="@dimen/large_text"
-            app:layout_constraintBottom_toTopOf="@id/button_read_sentence___home"
+            app:layout_constraintBottom_toTopOf="@id/button_read_sentence__home"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="つまり、現代の日本ではヽ普通は体験てきなレ現場に出くわしてしるわけてす。"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___home"
+            android:id="@+id/button_read_sentence__home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -310,13 +404,13 @@
             android:focusable="true"
             android:src="@drawable/ic_baseline_home"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence___full_text"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__full_text"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___full_text"
+            android:id="@+id/button_read_sentence__full_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -324,15 +418,15 @@
             android:contentDescription="@string/read_sentence__full_text"
             android:focusable="true"
             android:src="@drawable/ic_baseline_article"
-            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence___home"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence___previous_sentence"
+            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__home"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_sentence"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence___home"
-            app:layout_constraintTop_toTopOf="@id/button_read_sentence___home"
+            app:layout_constraintStart_toEndOf="@id/button_read_sentence__home"
+            app:layout_constraintTop_toTopOf="@id/button_read_sentence__home"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___previous_sentence"
+            android:id="@+id/button_read_sentence__previous_sentence"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -340,15 +434,15 @@
             android:contentDescription="@string/read_sentence__previous_sentence"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_before"
-            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence___home"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence___next_sentence"
+            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__home"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_sentence"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence___full_text"
-            app:layout_constraintTop_toTopOf="@id/button_read_sentence___home"
+            app:layout_constraintStart_toEndOf="@id/button_read_sentence__full_text"
+            app:layout_constraintTop_toTopOf="@id/button_read_sentence__home"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence___next_sentence"
+            android:id="@+id/button_read_sentence__next_sentence"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -356,11 +450,36 @@
             android:contentDescription="@string/read_sentence__next_sentence"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_next"
-            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence___home"
+            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__home"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence___previous_sentence"
-            app:layout_constraintTop_toTopOf="@id/button_read_sentence___home"
+            app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_sentence"
+            app:layout_constraintTop_toTopOf="@id/button_read_sentence__home"
+            />
+
+        <ImageView
+            android:id="@+id/image_read_sentence__parse_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/read_sentence__parse_success"
+            android:src="@drawable/ic_check"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
+            app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
+            app:tint="@color/read_sentence__success_green"
+            tools:visibility="visible"
+            />
+
+        <ImageView
+            android:id="@+id/image_read_sentence__parse_failed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/read_sentence__parse_failed"
+            android:src="@drawable/ic_warning_triangle_filled"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
+            app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
+            app:tint="@color/read_sentence__warning_orange"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

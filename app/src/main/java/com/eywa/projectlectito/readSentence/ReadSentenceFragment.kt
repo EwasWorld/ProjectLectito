@@ -63,7 +63,7 @@ class ReadSentenceFragment : Fragment() {
             displayDefinition()
         })
 
-        button_read_sentence___next_sentence.setOnClickListener {
+        button_read_sentence__next_sentence.setOnClickListener {
             sentence?.let {
                 val nextSentenceStart = it.nextSentenceStart
                 if (nextSentenceStart == null) {
@@ -77,7 +77,7 @@ class ReadSentenceFragment : Fragment() {
             }
         }
 
-        button_read_sentence___previous_sentence.setOnClickListener {
+        button_read_sentence__previous_sentence.setOnClickListener {
             sentence?.let {
                 val previousSentenceStart = it.previousSentenceStart
                 if (previousSentenceStart == null) {
@@ -91,7 +91,7 @@ class ReadSentenceFragment : Fragment() {
             }
         }
 
-        button_read_sentence___next_definition.setOnClickListener {
+        button_read_sentence__next_definition.setOnClickListener {
             val totalDefinitions = allDefinitionsForWord?.data?.size
             if (totalDefinitions == null || (currentDefinitionIndex != null && totalDefinitions <= currentDefinitionIndex!! + 1)) {
                 ToastSpamPrevention.displayToast(
@@ -103,7 +103,7 @@ class ReadSentenceFragment : Fragment() {
             readSentenceViewModel.currentDefinition.postValue(currentDefinitionIndex!! + 1)
         }
 
-        button_read_sentence___previous_definition.setOnClickListener {
+        button_read_sentence__previous_definition.setOnClickListener {
             val totalDefinitions = allDefinitionsForWord?.data?.size
             if (totalDefinitions == null || currentDefinitionIndex == null || currentDefinitionIndex!! == 0) {
                 ToastSpamPrevention.displayToast(
@@ -126,8 +126,8 @@ class ReadSentenceFragment : Fragment() {
         if (currentSentence == null) {
             text_read_sentence__sentence.text = ""
             text_read_sentence__context.text = ""
-            button_read_sentence___previous_sentence.isEnabled = false
-            button_read_sentence___next_sentence.isEnabled = false
+            button_read_sentence__previous_sentence.isEnabled = false
+            button_read_sentence__next_sentence.isEnabled = false
             return
         }
 
@@ -139,9 +139,9 @@ class ReadSentenceFragment : Fragment() {
             text_read_sentence__context.text = previousSentence
         }
         text_read_sentence__context.visibility = (previousSentence != null).asVisibility()
-        button_read_sentence___previous_sentence.isEnabled = previousSentence != null
+        button_read_sentence__previous_sentence.isEnabled = previousSentence != null
 
-        button_read_sentence___next_sentence.isEnabled = sentenceWithInfo.sentence.nextSentenceStart != null
+        button_read_sentence__next_sentence.isEnabled = sentenceWithInfo.sentence.nextSentenceStart != null
 
         sentenceWithInfo.parsedInfo?.let { it ->
             val spannedString = SpannableString(currentSentence)
@@ -160,9 +160,9 @@ class ReadSentenceFragment : Fragment() {
             text_read_sentence__sentence.text = currentSentence
         }
 
-        if (sentenceWithInfo.parseError) {
-            TODO("Parser error")
-        }
+        image_read_sentence__parse_complete.visibility =
+                (sentenceWithInfo.parsedInfo != null && !sentenceWithInfo.parseError).asVisibility()
+        image_read_sentence__parse_failed.visibility = sentenceWithInfo.parseError.asVisibility()
     }
 
     private fun displayDefinition() {
@@ -184,8 +184,8 @@ class ReadSentenceFragment : Fragment() {
             throw IllegalArgumentException("Jisho data contains no senses entries")
         }
 
-        button_read_sentence___previous_definition.isEnabled = currentDefinitionIndex != 0
-        button_read_sentence___next_definition.isEnabled =
+        button_read_sentence__previous_definition.isEnabled = currentDefinitionIndex != 0
+        button_read_sentence__next_definition.isEnabled =
                 currentDefinitionIndex!! + 1 < allDefinitionsForWord!!.data.size
 
         text_read_sentence__reading.text = currentDefinition.japanese[0].reading
