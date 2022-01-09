@@ -23,12 +23,10 @@ class ReadSentenceFragment : Fragment() {
 
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
-    private var sentence = Sentence({ displaySentence() }, {
-        // TODO Parse fail
-    })
-
     private var allDefinitionsForWord: JishoReturnData? = null
     private var currentDefinitionIndex: Int? = null
+
+    private var sentence: Sentence? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.read_sentence_fragment, container, false)
@@ -41,21 +39,16 @@ class ReadSentenceFragment : Fragment() {
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         // TODO Get from arguments
         readSentenceViewModel.textSnippetId.postValue(1)
-        readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
-            displaySentence()
-        })
         readSentenceViewModel.textSnippet.observe(viewLifecycleOwner, {
-            sentence.textSnippetContent = it?.content
             it?.let { snippet ->
                 val chapter = if (snippet.chapterId != null) "第%d章".format(snippet.chapterId) else ""
                 val page = "%dページ".format(snippet.pageReference)
                 text_read_sentence__chapter_page.text = "%s%s".format(chapter, page)
             }
-            displaySentence()
         })
-        readSentenceViewModel.currentCharacter.observe(viewLifecycleOwner, {
-            sentence.setCurrentCharacter(it)
-            displaySentence()
+        readSentenceViewModel.sentence.observe(viewLifecycleOwner, {
+            sentence = it?.sentence
+            displaySentence(it)
         })
         readSentenceViewModel.textName.observe(viewLifecycleOwner, {
             text_read_sentence__current_text_title.text = it ?: ""
@@ -71,27 +64,31 @@ class ReadSentenceFragment : Fragment() {
         })
 
         button_read_sentence___next_sentence.setOnClickListener {
-            val nextSentenceStart = sentence.nextSentenceStart
-            if (nextSentenceStart == null) {
-                ToastSpamPrevention.displayToast(
-                        requireContext(),
-                        resources.getString(R.string.err_read_sentence__no_more_sentences)
-                )
-                return@setOnClickListener
+            sentence?.let {
+                val nextSentenceStart = it.nextSentenceStart
+                if (nextSentenceStart == null) {
+                    ToastSpamPrevention.displayToast(
+                            requireContext(),
+                            resources.getString(R.string.err_read_sentence__no_more_sentences)
+                    )
+                    return@setOnClickListener
+                }
+                readSentenceViewModel.currentCharacter.postValue(nextSentenceStart)
             }
-            readSentenceViewModel.currentCharacter.postValue(nextSentenceStart)
         }
 
         button_read_sentence___previous_sentence.setOnClickListener {
-            val previousSentenceStart = sentence.previousSentenceStart
-            if (previousSentenceStart == null) {
-                ToastSpamPrevention.displayToast(
-                        requireContext(),
-                        resources.getString(R.string.err_read_sentence__no_more_sentences)
-                )
-                return@setOnClickListener
+            sentence?.let {
+                val previousSentenceStart = it.previousSentenceStart
+                if (previousSentenceStart == null) {
+                    ToastSpamPrevention.displayToast(
+                            requireContext(),
+                            resources.getString(R.string.err_read_sentence__no_more_sentences)
+                    )
+                    return@setOnClickListener
+                }
+                readSentenceViewModel.currentCharacter.postValue(previousSentenceStart)
             }
-            readSentenceViewModel.currentCharacter.postValue(previousSentenceStart)
         }
 
         button_read_sentence___next_definition.setOnClickListener {
@@ -123,8 +120,8 @@ class ReadSentenceFragment : Fragment() {
      * Calculates the starts and ends of sentences then sets [text_read_sentence__sentence] and [text_read_sentence__context].
      * TODO Span across two snippets for the start and end of a snippet
      */
-    private fun displaySentence() {
-        val currentSentence = sentence.currentSentence
+    private fun displaySentence(sentenceWithInfo: ReadSentenceViewModel.SentenceWithInfo) {
+        val currentSentence = sentenceWithInfo.sentence.currentSentence
 
         if (currentSentence == null) {
             text_read_sentence__sentence.text = ""
@@ -134,7 +131,7 @@ class ReadSentenceFragment : Fragment() {
             return
         }
 
-        val previousSentence = sentence.previousSentence
+        val previousSentence = sentenceWithInfo.sentence.previousSentence
         if (previousSentence == null) {
             text_read_sentence__context.text = ""
         }
@@ -144,11 +141,11 @@ class ReadSentenceFragment : Fragment() {
         text_read_sentence__context.visibility = (previousSentence != null).asVisibility()
         button_read_sentence___previous_sentence.isEnabled = previousSentence != null
 
-        button_read_sentence___next_sentence.isEnabled = sentence.nextSentenceStart != null
+        button_read_sentence___next_sentence.isEnabled = sentenceWithInfo.sentence.nextSentenceStart != null
 
-        sentence.parsedInfo?.let { it ->
+        sentenceWithInfo.parsedInfo?.let { it ->
             val spannedString = SpannableString(currentSentence)
-            val startIndex = sentence.currentSentenceStart
+            val startIndex = sentenceWithInfo.sentence.currentSentenceStart
             it.forEachIndexed { index, parsedInfo ->
                 if (index % 2 == 1)
                     spannedString.setSpan(
@@ -161,6 +158,10 @@ class ReadSentenceFragment : Fragment() {
             text_read_sentence__sentence.text = spannedString
         } ?: run {
             text_read_sentence__sentence.text = currentSentence
+        }
+
+        if (sentenceWithInfo.parseError) {
+            TODO("Parser error")
         }
     }
 

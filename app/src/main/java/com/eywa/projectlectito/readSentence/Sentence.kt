@@ -6,6 +6,8 @@ import com.eywa.projectlectito.database.snippets.ParsedInfo
 import kotlinx.coroutines.*
 
 class Sentence(
+        private val textSnippetContent: String?,
+        currentCharacter: Int? = 0,
         private val parserSuccessCallback: (List<ParsedInfo>) -> Unit,
         private val parserFailCallback: (Throwable) -> Unit
 ) {
@@ -17,19 +19,9 @@ class Sentence(
         private val tokenizer by lazy { Tokenizer() }
     }
 
-    var textSnippetContent: String? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                reset()
-            }
-        }
-    private var currentCharacter: Int = 0
-
-    private var hasBeenCalculated = false
     private lateinit var parseJob: Job
 
-    var currentSentenceStart: Int = 0
+    var currentSentenceStart = currentCharacter ?: 0
         private set
     var nextSentenceStart: Int? = null
         private set
@@ -41,32 +33,12 @@ class Sentence(
     var previousSentence: String? = null
         private set
 
-    var parsedInfo: List<ParsedInfo>? = null
-        private set
-
     init {
-        reset()
-    }
-
-    fun setCurrentCharacter(value: Int?) {
-        if (currentCharacter != value ?: 0) {
-            currentCharacter = value ?: 0
-            reset()
-        }
-    }
-
-    private fun reset() {
-        hasBeenCalculated = false
         initJob()
         calculateSentenceBoundaries()
-        startParse()
     }
 
     private fun initJob() {
-        if (::parseJob.isInitialized && (parseJob.isActive || parseJob.isCompleted)) {
-            parseJob.cancel(CancellationException("New job created"))
-        }
-
         parseJob = Job()
         parseJob.invokeOnCompletion {
             it?.let { e ->
@@ -82,175 +54,140 @@ class Sentence(
                 Log.e(LOG_TAG, message)
 
                 parserFailCallback(e)
-
             }
         }
     }
 
     private fun calculateSentenceBoundaries() {
-        if (hasBeenCalculated) {
+        if (textSnippetContent.isNullOrBlank()) {
             return
         }
-        currentSentenceStart = currentCharacter
-        nextSentenceStart = null
-        previousSentenceStart = null
-        currentSentence = null
-        previousSentence = null
-        parsedInfo = null
 
-        try {
-            if (textSnippetContent.isNullOrBlank()) {
-                return
-            }
+        if (currentSentenceStart < 0 || currentSentenceStart >= textSnippetContent.length) {
+            return
+        }
 
-            textSnippetContent?.let { textSnippet ->
-                if (currentSentenceStart < 0 || currentSentenceStart >= textSnippet.length) {
-                    return
-                }
+        /*
+         * Ensure the current character is the start of a sentence
+         */
+        if (sentenceBreakStrings.contains(textSnippetContent[currentSentenceStart].toString())) {
+            // We're on a sentence end character, check forwards
+            currentSentenceStart = findIndexOfFirstNonBreakChar(currentSentenceStart)
+                    // No non-break chars forwards so check backwards
+                    ?: findIndexOfLastNonBreakChar(endIndex = currentSentenceStart)
+                            // No non-break chars anywhere so fail
+                            ?: return
+        }
+        else {
+            // plus(1) because the index is that of a sentence end character
+            currentSentenceStart = findIndexOfLastBreakChar(endIndex = currentSentenceStart)?.plus(1)
+                    // If none are found, leave it where it is (we're already on a non-break char)
+                    ?: currentSentenceStart
+        }
 
-                /*
-                 * Ensure the current character is the start of a sentence
-                 */
-                if (sentenceBreakStrings.contains(textSnippet[currentSentenceStart].toString())) {
-                    // We're on a sentence end character, check forwards
-                    currentSentenceStart = findIndexOfFirstNonBreakChar(currentSentenceStart)
-                            // No non-break chars forwards so check backwards
-                            ?: findIndexOfLastNonBreakChar(endIndex = currentSentenceStart)
-                                    // No non-break chars anywhere so fail
-                                    ?: return
-                }
-                else {
-                    // plus(1) because the index is that of a sentence end character
-                    currentSentenceStart = findIndexOfLastBreakChar(endIndex = currentSentenceStart)?.plus(1)
-                            // If none are found, leave it where it is (we're already on a non-break char)
-                            ?: currentSentenceStart
-                }
+        /*
+         * Find the start of the previous sentence
+         */
+        if (currentSentenceStart != 0) {
+            // Ignore any sentence end characters directly before the current character
+            val previousSentenceEnd = findIndexOfLastNonBreakChar(endIndex = currentSentenceStart)
+            if (previousSentenceEnd != null) {
+                // plus(1) because the index is that of a sentence end character
+                previousSentenceStart = findIndexOfLastBreakChar(endIndex = previousSentenceEnd)?.plus(1) ?: 0
 
-                /*
-                 * Find the start of the previous sentence
-                 */
-                if (currentSentenceStart != 0) {
-                    // Ignore any sentence end characters directly before the current character
-                    val previousSentenceEnd = findIndexOfLastNonBreakChar(endIndex = currentSentenceStart)
-                    if (previousSentenceEnd != null) {
-                        // plus(1) because the index is that of a sentence end character
-                        previousSentenceStart = findIndexOfLastBreakChar(endIndex = previousSentenceEnd)?.plus(1) ?: 0
-
-                        previousSentence = textSnippet.substring(previousSentenceStart!!, currentSentenceStart)
-                                .filterNot { stringsToRemoveFromDisplay.contains(it) }
-                    }
-                }
-
-                /*
-                 * Find the start of the next sentence
-                 */
-                nextSentenceStart = findIndexOfFirstBreakChar(currentSentenceStart)
-
-                if (nextSentenceStart != null) {
-                    // Skip past all sentence ending characters
-                    nextSentenceStart = findIndexOfFirstNonBreakChar(nextSentenceStart)
-                }
-
-                val newSnippet: String
-                if (nextSentenceStart == null) {
-                    newSnippet = textSnippet.substring(currentSentenceStart)
-                }
-                else {
-                    newSnippet = textSnippet.substring(currentSentenceStart, nextSentenceStart!!)
-                }
-
-                currentSentence = newSnippet.filterNot { stringsToRemoveFromDisplay.contains(it) }
+                previousSentence = textSnippetContent.substring(previousSentenceStart!!, currentSentenceStart)
+                        .filterNot { stringsToRemoveFromDisplay.contains(it) }
             }
         }
-        finally {
-            hasBeenCalculated = true
+
+        /*
+         * Find the start of the next sentence
+         */
+        nextSentenceStart = findIndexOfFirstBreakChar(currentSentenceStart)
+
+        if (nextSentenceStart != null) {
+            // Skip past all sentence ending characters
+            nextSentenceStart = findIndexOfFirstNonBreakChar(nextSentenceStart)
         }
+
+        val newSnippet: String
+        if (nextSentenceStart == null) {
+            newSnippet = textSnippetContent.substring(currentSentenceStart)
+        }
+        else {
+            newSnippet = textSnippetContent.substring(currentSentenceStart, nextSentenceStart!!)
+        }
+
+        currentSentence = newSnippet.filterNot { stringsToRemoveFromDisplay.contains(it) }
     }
 
     private fun findIndexOfFirstBreakChar(startIndex: Int? = null, endIndex: Int? = null): Int? {
         require(!textSnippetContent.isNullOrBlank()) { "Content is null or blank" }
 
         val fromIndex = startIndex ?: 0
-        val toIndex = endIndex ?: textSnippetContent!!.length
+        val toIndex = endIndex ?: textSnippetContent.length
 
-        textSnippetContent?.let { snippet ->
-            val substring = snippet.substring(fromIndex, toIndex)
+        val substring = textSnippetContent.substring(fromIndex, toIndex)
 
-            val firstIndex = substring.indexOfAny(sentenceBreakStrings)
-            if (firstIndex == -1) {
-                return null
-            }
-            return firstIndex + fromIndex
+        val firstIndex = substring.indexOfAny(sentenceBreakStrings)
+        if (firstIndex == -1) {
+            return null
         }
-
-        throw IllegalStateException("Snippet is null")
+        return firstIndex + fromIndex
     }
 
     private fun findIndexOfFirstNonBreakChar(startIndex: Int? = null, endIndex: Int? = null): Int? {
         require(!textSnippetContent.isNullOrBlank()) { "Content is null or blank" }
 
         val fromIndex = startIndex ?: 0
-        val toIndex = endIndex ?: textSnippetContent!!.length
+        val toIndex = endIndex ?: textSnippetContent.length
 
-        textSnippetContent?.let { snippet ->
-            val substring = snippet.substring(fromIndex, toIndex)
+        val substring = textSnippetContent.substring(fromIndex, toIndex)
 
-            val firstIndex = substring.indexOfFirst { !sentenceBreakStrings.contains(it.toString()) }
-            if (firstIndex == -1) {
-                return null
-            }
-            return firstIndex + fromIndex
+        val firstIndex = substring.indexOfFirst { !sentenceBreakStrings.contains(it.toString()) }
+        if (firstIndex == -1) {
+            return null
         }
-
-        throw IllegalStateException("Snippet is null")
+        return firstIndex + fromIndex
     }
 
     private fun findIndexOfLastBreakChar(startIndex: Int? = null, endIndex: Int? = null): Int? {
         require(!textSnippetContent.isNullOrBlank()) { "Content is null or blank" }
 
         val fromIndex = startIndex ?: 0
-        val toIndex = endIndex ?: textSnippetContent!!.length
+        val toIndex = endIndex ?: textSnippetContent.length
 
-        textSnippetContent?.let { snippet ->
-            val substring = snippet.substring(fromIndex, toIndex)
+        val substring = textSnippetContent.substring(fromIndex, toIndex)
 
-            val lastIndex = substring.lastIndexOfAny(sentenceBreakStrings)
-            if (lastIndex == -1) {
-                return null
-            }
-            return lastIndex + fromIndex
+        val lastIndex = substring.lastIndexOfAny(sentenceBreakStrings)
+        if (lastIndex == -1) {
+            return null
         }
-
-        throw IllegalStateException("Snippet is null")
+        return lastIndex + fromIndex
     }
 
     private fun findIndexOfLastNonBreakChar(startIndex: Int? = null, endIndex: Int? = null): Int? {
         require(!textSnippetContent.isNullOrBlank()) { "Content is null or blank" }
 
         val fromIndex = startIndex ?: 0
-        val toIndex = endIndex ?: textSnippetContent!!.length
+        val toIndex = endIndex ?: textSnippetContent.length
 
-        textSnippetContent?.let { snippet ->
-            val substring = snippet.substring(fromIndex, toIndex)
+        val substring = textSnippetContent.substring(fromIndex, toIndex)
 
-            val lastIndex = substring.indexOfLast { !sentenceBreakStrings.contains(it.toString()) }
-            if (lastIndex == -1) {
-                return null
-            }
-            return lastIndex + fromIndex
+        val lastIndex = substring.indexOfLast { !sentenceBreakStrings.contains(it.toString()) }
+        if (lastIndex == -1) {
+            return null
         }
-
-        throw IllegalStateException("Snippet is null")
+        return lastIndex + fromIndex
     }
 
-    private fun startParse() {
-        if (currentSentence == null) {
-            return
-        }
-
-        // TODO Launch the coroutine from the view model
-        CoroutineScope(Dispatchers.Default + parseJob).launch {
+    suspend fun startParse() {
+        withContext(parseJob) {
             Log.d(LOG_TAG, "Parse invoked")
+
+            if (currentSentence.isNullOrBlank()) {
+                return@withContext
+            }
 
             // Can be a long operation
             val tokens = tokenizer.tokenize(currentSentence)
@@ -260,7 +197,7 @@ class Sentence(
             ensureActive()
 
             var currentIndex = currentSentenceStart
-            parsedInfo = tokens.map { token ->
+            val parsedInfo = tokens.map { token ->
                 val startIndex = currentIndex
                 val endIndex = currentIndex + token.surface.length
                 val partsOfSpeech = listOfNotNull(
@@ -281,8 +218,15 @@ class Sentence(
             }
             ensureActive()
 
-            Log.d(LOG_TAG, "Calling success callback")
-            parserSuccessCallback(parsedInfo!!)
+            Log.d(LOG_TAG, "Calling parser success callback")
+            parserSuccessCallback(parsedInfo)
+        }
+    }
+
+    fun cancelParse() {
+        // TODO Do I need this guard?
+        if (parseJob.isActive || parseJob.isCompleted) {
+            parseJob.cancel(CancellationException("New job created"))
         }
     }
 }
