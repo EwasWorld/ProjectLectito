@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.eywa.projectlectito.JishoReturnData
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
-import com.eywa.projectlectito.database.snippets.ParsedInfo
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
@@ -29,7 +28,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private val textsRepo = TextsRepo(db.textsDao())
-    private val snippetsRepo = SnippetsRepo(db.textSnippetsDao(), db.parsedInfoDao())
+    private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     val textSnippetId = MutableLiveData<Int?>(null)
     val textSnippet = textSnippetId.switchMap { id ->

@@ -4,6 +4,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
@@ -147,17 +150,57 @@ class ReadSentenceFragment : Fragment() {
             val spannedString = SpannableString(currentSentence)
             val startIndex = sentenceWithInfo.sentence.currentSentenceStart
             it.forEachIndexed { index, parsedInfo ->
+                val spanStartIndex = parsedInfo.startCharacterIndex - startIndex
+                val spanEndIndex = parsedInfo.endCharacterIndex - startIndex
+
+                val span = object : ClickableSpan() {
+                    override fun onClick(p0: View) {
+                        val originalWord = currentSentence.substring(spanStartIndex, spanEndIndex)
+                        val showDictionary = originalWord != parsedInfo.dictionaryForm
+                        text_read_sentence__selected_word.text = originalWord
+                        if (showDictionary) {
+                            text_read_sentence__dictionary_form.text = parsedInfo.dictionaryForm
+                        }
+                        text_read_sentence__dictionary_form.visibility = showDictionary.asVisibility()
+                        text_read_sentence__selected_separator_1.visibility = showDictionary.asVisibility()
+
+                        text_read_sentence__parts_of_speech.text = parsedInfo.partsOfSpeech
+                                .filterNot { it.isBlank() || it == "*" }
+                                .joinToString(japaneseListDelimiter)
+
+                        val showPitchAccent = parsedInfo.pitchAccentPattern != null
+                        if (showPitchAccent) {
+                            text_read_sentence__pitch_accent.text = parsedInfo.pitchAccentPattern.toString()
+                        }
+                        text_read_sentence__pitch_accent.visibility = showPitchAccent.asVisibility()
+                        text_read_sentence__selected_separator_2.visibility = showPitchAccent.asVisibility()
+
+                        // supplementary symbol (number, punctuation, etc.)
+                        val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
+                        if (isWord) {
+                            // TODO Find on Jisho
+                        }
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        // Don't underline or highlight the text
+                    }
+                }
+                spannedString.setSpan(span, spanStartIndex, spanEndIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+
                 if (index % 2 == 1)
                     spannedString.setSpan(
                             ForegroundColorSpan(Color.RED),
-                            parsedInfo.startCharacterIndex - startIndex,
-                            parsedInfo.endCharacterIndex - startIndex,
+                            spanStartIndex,
+                            spanEndIndex,
                             Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                     )
             }
             text_read_sentence__sentence.text = spannedString
+            text_read_sentence__sentence.movementMethod = LinkMovementMethod.getInstance()
         } ?: run {
             text_read_sentence__sentence.text = currentSentence
+            text_read_sentence__sentence.movementMethod = null
         }
 
         image_read_sentence__parse_complete.visibility =

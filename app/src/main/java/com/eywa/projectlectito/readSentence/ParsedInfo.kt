@@ -1,8 +1,5 @@
-package com.eywa.projectlectito.database.snippets
+package com.eywa.projectlectito.readSentence
 
-import androidx.room.Entity
-
-@Entity(tableName = ParsedInfo.TABLE_NAME, primaryKeys = ["startTextSnippetId", "startCharacterIndex"])
 data class ParsedInfo(
         /*
          * Which phrase this parsed info belongs to
@@ -18,9 +15,5 @@ data class ParsedInfo(
 
         val dictionaryForm: String,
         val partsOfSpeech: List<String>,
-        val pitchAccentPattern: Int
-) {
-    companion object {
-        const val TABLE_NAME = "parsed_info"
-    }
-}
+        val pitchAccentPattern: Int?
+)

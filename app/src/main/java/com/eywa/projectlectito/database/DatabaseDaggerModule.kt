@@ -1,7 +1,7 @@
 package com.eywa.projectlectito.database
 
 import android.app.Application
-import androidx.room.CoroutinesRoom
+import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -28,6 +28,9 @@ class DatabaseDaggerModule(application: Application) {
         lectitoRoomDatabase =
                 Room.databaseBuilder(application, LectitoRoomDatabase::class.java, LectitoRoomDatabase.DATABASE_NAME)
                         .addCallback(PopulateDatabaseCallback(MainScope()))
+                        .addMigrations(
+                                DatabaseMigrations.MIGRATION_1_2
+                        )
                         .build()
         /*
          * Write ahead mode suspected of causes issues with the instrumented test,
@@ -42,6 +45,7 @@ class DatabaseDaggerModule(application: Application) {
 
     private suspend fun populateDatabase(textsDao: TextsDao, textSnippetsDao: TextSnippetsDao) {
         // TODO Remove initial data
+        Log.i("Database", "Initial population of database")
         textsDao.insert(Text(1, "傭兵団の料理番"))
         textSnippetsDao.insert(TextSnippet(1, TempTestData.text, 1, 1, 1))
     }

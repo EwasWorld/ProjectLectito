@@ -2,7 +2,6 @@ package com.eywa.projectlectito.readSentence
 
 import android.util.Log
 import com.atilika.kuromoji.unidic.kanaaccent.Tokenizer
-import com.eywa.projectlectito.database.snippets.ParsedInfo
 import kotlinx.coroutines.*
 
 class Sentence(
@@ -206,7 +205,7 @@ class Sentence(
                         token.partOfSpeechLevel3,
                         token.partOfSpeechLevel4
                 )
-                var accentType: Int = -1
+                var accentType: Int? = null
                 try {
                     accentType = Integer.parseInt(token.accentType)
                 }
