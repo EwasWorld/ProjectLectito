@@ -1,6 +1,10 @@
 package com.eywa.projectlectito.readSentence
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +21,11 @@ class ReadSentenceFragment : Fragment() {
     // TODO Set up arguments
     // private val args: NewScoreFragmentArgs by navArgs()
 
-    private var sentence = Sentence()
+    private lateinit var readSentenceViewModel: ReadSentenceViewModel
+
+    private var sentence = Sentence({ displaySentence() }, {
+        // TODO Parse fail
+    })
 
     private var allDefinitionsForWord: JishoReturnData? = null
     private var currentDefinitionIndex: Int? = null
@@ -30,7 +38,7 @@ class ReadSentenceFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = resources.getString(R.string.read_sentence__title)
 
-        val readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
+        readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         // TODO Get from arguments
         readSentenceViewModel.textSnippetId.postValue(1)
         readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
@@ -63,7 +71,7 @@ class ReadSentenceFragment : Fragment() {
         })
 
         button_read_sentence___next_sentence.setOnClickListener {
-            val nextSentenceStart = sentence.getNextSentenceStart()
+            val nextSentenceStart = sentence.nextSentenceStart
             if (nextSentenceStart == null) {
                 ToastSpamPrevention.displayToast(
                         requireContext(),
@@ -75,7 +83,7 @@ class ReadSentenceFragment : Fragment() {
         }
 
         button_read_sentence___previous_sentence.setOnClickListener {
-            val previousSentenceStart = sentence.getPreviousSentenceStart()
+            val previousSentenceStart = sentence.previousSentenceStart
             if (previousSentenceStart == null) {
                 ToastSpamPrevention.displayToast(
                         requireContext(),
@@ -116,7 +124,7 @@ class ReadSentenceFragment : Fragment() {
      * TODO Span across two snippets for the start and end of a snippet
      */
     private fun displaySentence() {
-        val currentSentence = sentence.getCurrentSentence()
+        val currentSentence = sentence.currentSentence
 
         if (currentSentence == null) {
             text_read_sentence__sentence.text = ""
@@ -126,7 +134,7 @@ class ReadSentenceFragment : Fragment() {
             return
         }
 
-        val previousSentence = sentence.getPreviousSentence()
+        val previousSentence = sentence.previousSentence
         if (previousSentence == null) {
             text_read_sentence__context.text = ""
         }
@@ -136,8 +144,24 @@ class ReadSentenceFragment : Fragment() {
         text_read_sentence__context.visibility = (previousSentence != null).asVisibility()
         button_read_sentence___previous_sentence.isEnabled = previousSentence != null
 
-        button_read_sentence___next_sentence.isEnabled = sentence.hasNextSentence()
-        text_read_sentence__sentence.text = currentSentence
+        button_read_sentence___next_sentence.isEnabled = sentence.nextSentenceStart != null
+
+        sentence.parsedInfo?.let { it ->
+            val spannedString = SpannableString(currentSentence)
+            val startIndex = sentence.currentSentenceStart
+            it.forEachIndexed { index, parsedInfo ->
+                if (index % 2 == 1)
+                    spannedString.setSpan(
+                            ForegroundColorSpan(Color.RED),
+                            parsedInfo.startCharacterIndex - startIndex,
+                            parsedInfo.endCharacterIndex - startIndex,
+                            Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                    )
+            }
+            text_read_sentence__sentence.text = spannedString
+        } ?: run {
+            text_read_sentence__sentence.text = currentSentence
+        }
     }
 
     private fun displayDefinition() {

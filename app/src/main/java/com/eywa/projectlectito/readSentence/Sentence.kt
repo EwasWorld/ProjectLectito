@@ -1,33 +1,93 @@
 package com.eywa.projectlectito.readSentence
 
-class Sentence {
+import android.util.Log
+import com.atilika.kuromoji.unidic.kanaaccent.Tokenizer
+import com.eywa.projectlectito.database.snippets.ParsedInfo
+import kotlinx.coroutines.*
+
+class Sentence(
+        private val parserSuccessCallback: (List<ParsedInfo>) -> Unit,
+        private val parserFailCallback: (Throwable) -> Unit
+) {
     companion object {
+        private const val LOG_TAG = "Sentence"
         private val stringsToRemoveFromDisplay = setOf('\n')
         private val sentenceBreakStrings = setOf("。").plus(stringsToRemoveFromDisplay.map { it.toString() })
+
+        private val tokenizer by lazy { Tokenizer() }
     }
 
     var textSnippetContent: String? = null
         set(value) {
-            field = value
-            hasBeenCalculated = false
+            if (field != value) {
+                field = value
+                reset()
+            }
         }
     private var currentCharacter: Int = 0
 
     private var hasBeenCalculated = false
+    private lateinit var parseJob: Job
 
-    private var currentSentenceStart: Int = 0
-    private var nextSentenceStart: Int? = null
-    private var previousSentenceStart: Int? = null
+    var currentSentenceStart: Int = 0
+        private set
+    var nextSentenceStart: Int? = null
+        private set
+    var previousSentenceStart: Int? = null
+        private set
 
-    private var currentSentence: String? = null
-    private var previousSentence: String? = null
+    var currentSentence: String? = null
+        private set
+    var previousSentence: String? = null
+        private set
 
-    fun setCurrentCharacter(value: Int?) {
-        currentCharacter = value ?: 0
-        hasBeenCalculated = false
+    var parsedInfo: List<ParsedInfo>? = null
+        private set
+
+    init {
+        reset()
     }
 
-    private fun calculate() {
+    fun setCurrentCharacter(value: Int?) {
+        if (currentCharacter != value ?: 0) {
+            currentCharacter = value ?: 0
+            reset()
+        }
+    }
+
+    private fun reset() {
+        hasBeenCalculated = false
+        initJob()
+        calculateSentenceBoundaries()
+        startParse()
+    }
+
+    private fun initJob() {
+        if (::parseJob.isInitialized && (parseJob.isActive || parseJob.isCompleted)) {
+            parseJob.cancel(CancellationException("New job created"))
+        }
+
+        parseJob = Job()
+        parseJob.invokeOnCompletion {
+            it?.let { e ->
+                if (e is CancellationException) {
+                    Log.d(LOG_TAG, "Parse job cancelled")
+                    return@invokeOnCompletion
+                }
+
+                var message = e.message
+                if (message.isNullOrBlank()) {
+                    message = "Unknown cancellation error"
+                }
+                Log.e(LOG_TAG, message)
+
+                parserFailCallback(e)
+
+            }
+        }
+    }
+
+    private fun calculateSentenceBoundaries() {
         if (hasBeenCalculated) {
             return
         }
@@ -36,6 +96,7 @@ class Sentence {
         previousSentenceStart = null
         currentSentence = null
         previousSentence = null
+        parsedInfo = null
 
         try {
             if (textSnippetContent.isNullOrBlank()) {
@@ -182,28 +243,46 @@ class Sentence {
         throw IllegalStateException("Snippet is null")
     }
 
-    fun getCurrentSentence(): String? {
-        calculate()
-        return currentSentence
-    }
+    private fun startParse() {
+        if (currentSentence == null) {
+            return
+        }
 
-    fun getPreviousSentence(): String? {
-        calculate()
-        return previousSentence
-    }
+        // TODO Launch the coroutine from the view model
+        CoroutineScope(Dispatchers.Default + parseJob).launch {
+            Log.d(LOG_TAG, "Parse invoked")
 
-    fun hasNextSentence(): Boolean {
-        calculate()
-        return nextSentenceStart != null
-    }
+            // Can be a long operation
+            val tokens = tokenizer.tokenize(currentSentence)
+            Log.d(LOG_TAG, "Finished parsing")
 
-    fun getNextSentenceStart(): Int? {
-        calculate()
-        return nextSentenceStart
-    }
+            // Check coroutine hasn't been cancelled
+            ensureActive()
 
-    fun getPreviousSentenceStart(): Int? {
-        calculate()
-        return previousSentenceStart
+            var currentIndex = currentSentenceStart
+            parsedInfo = tokens.map { token ->
+                val startIndex = currentIndex
+                val endIndex = currentIndex + token.surface.length
+                val partsOfSpeech = listOfNotNull(
+                        token.partOfSpeechLevel1,
+                        token.partOfSpeechLevel2,
+                        token.partOfSpeechLevel3,
+                        token.partOfSpeechLevel4
+                )
+                var accentType: Int = -1
+                try {
+                    accentType = Integer.parseInt(token.accentType)
+                }
+                catch (e: NumberFormatException) {
+                }
+                currentIndex = endIndex
+
+                ParsedInfo(1, startIndex, 1, endIndex, token.writtenBaseForm, partsOfSpeech, accentType)
+            }
+            ensureActive()
+
+            Log.d(LOG_TAG, "Calling success callback")
+            parserSuccessCallback(parsedInfo!!)
+        }
     }
 }

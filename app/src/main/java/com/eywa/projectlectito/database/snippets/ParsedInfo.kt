@@ -10,6 +10,10 @@ data class ParsedInfo(
         val startTextSnippetId: Int,
         val startCharacterIndex: Int,
         val endTextSnippetId: Int,
+
+        /**
+         * Last character in the string (inclusive)
+         */
         val endCharacterIndex: Int,
 
         val dictionaryForm: String,
