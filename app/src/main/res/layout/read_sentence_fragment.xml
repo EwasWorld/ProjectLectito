@@ -124,7 +124,7 @@
                 android:paddingHorizontal="10dp"
                 >
 
-                <com.eywa.projectlectito.WordDefinitionDetailView
+                <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normal; ordinary; regular; usual; common; average"
@@ -133,7 +133,7 @@
                     app:tags="Usually written using kana alone"
                     />
 
-                <com.eywa.projectlectito.WordDefinitionDetailView
+                <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normally; ordinarily; usually; generally; commonly"
@@ -167,6 +167,22 @@
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_read_sentence__close_definition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:contentDescription="@string/read_sentence__previous_definition"
+            android:focusable="true"
+            android:src="@drawable/ic_cross"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_definition"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
+            />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_read_sentence__previous_definition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -178,14 +194,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/spinner_read_sentence__state"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/button_read_sentence__close_definition"
             app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
             />
 
+        <!-- TODO Use state spinner -->
         <Spinner
             android:id="@+id/spinner_read_sentence__state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__previous_definition"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_definition"
             app:layout_constraintHorizontal_bias="0.5"

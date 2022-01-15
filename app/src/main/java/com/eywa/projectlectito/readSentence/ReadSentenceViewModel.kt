@@ -1,16 +1,14 @@
 package com.eywa.projectlectito.readSentence
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.eywa.projectlectito.JishoReturnData
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonSyntaxException
+import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.wordDefinitions.WordDefinitionRequester
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,23 +40,33 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         textsRepo.getTextById(snippet.textId).map { it.name }
     }.distinctUntilChanged()
 
-    val definitions: LiveData<JishoReturnData>
+    val selectedWord = MutableLiveData<String>()
     val currentDefinition = MutableLiveData<Int>()
+    val definitions: LiveData<WordDefinitionsWithInfo> = object : MediatorLiveData<WordDefinitionsWithInfo>() {
+        var currentRequester: WordDefinitionRequester? = null
 
-    init {
-        // TODO Build this somewhere else
-        var finalData: JishoReturnData? = null
-        try {
-            finalData = GsonBuilder().create().fromJson(TempTestData.umakuDefinition, JishoReturnData::class.java)
-            if (finalData == null) {
-                Log.e(LOG_TAG, "Error parsing dataset")
+        init {
+            addSource(selectedWord.distinctUntilChanged()) { word ->
+                if (word.isNullOrBlank()) return@addSource
+
+                currentRequester?.cancelParse()
+                /*
+                 * `value =` does not work here:
+                 * IllegalStateException: Cannot invoke setValue on a background thread
+                 * This is presumably because requester.getDefinition() is changing the Dispatcher to IO
+                 */
+                val requester = WordDefinitionRequester(word, {
+                    postValue(WordDefinitionsWithInfo(it))
+                }, {
+                    postValue(WordDefinitionsWithInfo(error = true))
+                })
+                currentRequester = requester
+                currentDefinition.postValue(0)
+                viewModelScope.launch {
+                    requester.getDefinition()
+                }
             }
         }
-        catch (e: JsonSyntaxException) {
-            Log.e(LOG_TAG, "Invalid JSON format")
-            Log.e(LOG_TAG, e.message ?: "No message on exception")
-        }
-        definitions = MutableLiveData(finalData)
     }
 
     private inner class SentenceMediatorLiveData(
@@ -98,5 +106,10 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val sentence: Sentence,
             val parsedInfo: List<ParsedInfo>? = null,
             val parseError: Boolean = false
+    )
+
+    data class WordDefinitionsWithInfo(
+            val jishoWordDefinitions: JishoWordDefinitions? = null,
+            val error: Boolean = false
     )
 }

@@ -14,6 +14,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.eywa.projectlectito.*
+import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
 import kotlinx.android.synthetic.main.read_sentence_fragment.*
 
 class ReadSentenceFragment : Fragment() {
@@ -26,7 +28,7 @@ class ReadSentenceFragment : Fragment() {
 
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
-    private var allDefinitionsForWord: JishoReturnData? = null
+    private var allDefinitionsForWord: JishoWordDefinitions? = null
     private var currentDefinitionIndex: Int? = null
 
     private var sentence: Sentence? = null
@@ -58,7 +60,9 @@ class ReadSentenceFragment : Fragment() {
         })
 
         readSentenceViewModel.definitions.observe(viewLifecycleOwner, {
-            allDefinitionsForWord = it
+            // TODO Handle loading
+            // TODO Handle error
+            allDefinitionsForWord = it?.jishoWordDefinitions
             displayDefinition()
         })
         readSentenceViewModel.currentDefinition.observe(viewLifecycleOwner, {
@@ -116,6 +120,10 @@ class ReadSentenceFragment : Fragment() {
                 return@setOnClickListener
             }
             readSentenceViewModel.currentDefinition.postValue(currentDefinitionIndex!! - 1)
+        }
+
+        button_read_sentence__close_definition.setOnClickListener {
+            // TODO
         }
     }
 
@@ -178,7 +186,7 @@ class ReadSentenceFragment : Fragment() {
                         // supplementary symbol (number, punctuation, etc.)
                         val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
                         if (isWord) {
-                            // TODO Find on Jisho
+                            readSentenceViewModel.selectedWord.postValue(parsedInfo.dictionaryForm)
                         }
                     }
 

@@ -78,6 +78,7 @@ dependencies {
 
     // HTTP requests
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
 
     // JSON Parser
     implementation 'com.google.code.gson:gson:2.8.6'

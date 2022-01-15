@@ -1,11 +1,12 @@
-package com.eywa.projectlectito
+package com.eywa.projectlectito.wordDefinitions
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.eywa.projectlectito.R
+import com.eywa.projectlectito.asVisibility
 
 class WordDefinitionDetailView : ConstraintLayout {
     private lateinit var definitionTextView: TextView
@@ -58,11 +59,8 @@ class WordDefinitionDetailView : ConstraintLayout {
     }
 
     fun updateTags(value: String) {
-        if (value.isBlank()) {
-            tagsTextView.visibility = View.GONE
-        }
-        else {
-            tagsTextView.visibility = View.VISIBLE
+        tagsTextView.visibility = value.isNotBlank().asVisibility()
+        if (value.isNotBlank()) {
             tagsTextView.text = value
         }
         invalidate()
@@ -70,8 +68,10 @@ class WordDefinitionDetailView : ConstraintLayout {
     }
 
     fun updatePartsOfSpeech(value: String) {
-        require(value.isNotBlank()) {"Parts of speech cannot be blank"}
-        partsOfSpeechTextView.text = value
+        partsOfSpeechTextView.visibility = value.isNotBlank().asVisibility()
+        if (value.isNotBlank()) {
+            partsOfSpeechTextView.text = value
+        }
         invalidate()
         requestLayout()
     }

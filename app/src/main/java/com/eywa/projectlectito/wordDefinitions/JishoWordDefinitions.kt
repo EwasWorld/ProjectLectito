@@ -1,6 +1,6 @@
-package com.eywa.projectlectito
+package com.eywa.projectlectito.wordDefinitions
 
-data class JishoReturnData(
+data class JishoWordDefinitions(
         val meta: JishoMetadataDetail,
         val data: List<JishoEntry>
 ) {
