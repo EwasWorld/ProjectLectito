@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fab_container_read_sentence"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clipToPadding="false"
+    >
+
+    <ImageButton
+        android:id="@+id/fab_read_sentence__select_mode_auto"
+        style="@style/FloatingActionButton.Mini"
+        android:layout_marginVertical="@dimen/activity_vertical_margin"
+        android:contentDescription="@string/read_sentence__select_mode_auto"
+        android:src="@drawable/ic_auto_fix"
+        app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_select"
+        app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+        app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+        tools:ignore="DuplicateSpeakableTextCheck"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__select_mode_auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/read_sentence__select_mode_auto"
+        app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_auto"
+        app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_auto"
+        app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_auto"
+        style="@style/FloatingActionButtonText"
+        android:visibility="gone"
+        />
+
+    <ImageButton
+        android:id="@+id/fab_read_sentence__select_mode_select"
+        style="@style/FloatingActionButton.Mini"
+        android:layout_marginVertical="@dimen/activity_vertical_margin"
+        android:contentDescription="@string/read_sentence__select_mode_select"
+        android:src="@drawable/ic_touch"
+        app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_type"
+        app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+        app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+        tools:ignore="DuplicateSpeakableTextCheck"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__select_mode_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/read_sentence__select_mode_select"
+        app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_select"
+        app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_select"
+        app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_select"
+        style="@style/FloatingActionButtonText"
+        android:visibility="gone"
+        />
+
+    <ImageButton
+        android:id="@+id/fab_read_sentence__select_mode_type"
+        style="@style/FloatingActionButton.Mini"
+        android:layout_marginVertical="@dimen/activity_vertical_margin"
+        android:contentDescription="@string/read_sentence__select_mode_type"
+        android:src="@drawable/ic_text_fields"
+        app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_main"
+        app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+        app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+        tools:ignore="DuplicateSpeakableTextCheck"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__select_mode_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/read_sentence__select_mode_type"
+        app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_type"
+        app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_type"
+        app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_type"
+        style="@style/FloatingActionButtonText"
+        android:visibility="gone"
+        />
+
+    <!-- Content description set in code -->
+    <ImageButton
+        android:id="@+id/fab_read_sentence__select_mode_main"
+        style="@style/FloatingActionButton"
+        android:contentDescription="@null"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@drawable/ic_auto_fix"
+        tools:ignore="SpeakableTextPresentCheck"
+        android:focusableInTouchMode="false"
+        android:focusable="true"
+        />
+    <!--        android:focusable="true"-->
+</androidx.constraintlayout.widget.ConstraintLayout>

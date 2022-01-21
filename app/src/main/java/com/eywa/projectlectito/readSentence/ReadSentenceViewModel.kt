@@ -2,6 +2,7 @@ package com.eywa.projectlectito.readSentence
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
@@ -25,29 +26,48 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         (application as App).appComponent.inject(this)
     }
 
+    /*
+     * Repos
+     */
     private val textsRepo = TextsRepo(db.textsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
+    /*
+     * Current sentence info
+     */
     val textSnippetId = MutableLiveData<Int?>(null)
+
+    // Want it to be non-nullable
+    @Suppress("RemoveExplicitTypeArguments")
+    val wordSelectMode = MutableLiveData<WordSelectMode>(WordSelectMode.AUTO)
     val textSnippet = textSnippetId.switchMap { id ->
         if (id != null) snippetsRepo.getTextSnippetById(id) else MutableLiveData()
     }.distinctUntilChanged()
     val currentCharacter = MutableLiveData<Int>()
     val sentence: LiveData<SentenceWithInfo> =
-            SentenceMediatorLiveData(textSnippet, currentCharacter.distinctUntilChanged())
+            SentenceMediatorLiveData(textSnippet, currentCharacter.distinctUntilChanged(), wordSelectMode)
 
+    /*
+     * Extra text info
+     */
     val textName = textSnippet.switchMap { snippet ->
         textsRepo.getTextById(snippet.textId).map { it.name }
     }.distinctUntilChanged()
 
-    val selectedWord = MutableLiveData<String>()
+    /*
+     * Word definitions
+     */
+    val selectedWord = MutableLiveData<String?>()
     val currentDefinition = MutableLiveData<Int>()
-    val definitions: LiveData<WordDefinitionsWithInfo> = object : MediatorLiveData<WordDefinitionsWithInfo>() {
+    val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
         var currentRequester: WordDefinitionRequester? = null
 
         init {
             addSource(selectedWord.distinctUntilChanged()) { word ->
-                if (word.isNullOrBlank()) return@addSource
+                if (word.isNullOrBlank()) {
+                    postValue(null)
+                    return@addSource
+                }
 
                 currentRequester?.cancelParse()
                 /*
@@ -71,7 +91,8 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     private inner class SentenceMediatorLiveData(
             private val textSnippet: LiveData<TextSnippet>,
-            private val currentCharacter: LiveData<Int>
+            private val currentCharacter: LiveData<Int>,
+            private val wordSelectMode: LiveData<WordSelectMode>
     ) : MediatorLiveData<SentenceWithInfo>() {
         init {
             addSource(textSnippet) {
@@ -79,6 +100,18 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             }
             addSource(currentCharacter) {
                 generateNewSentence()
+            }
+            addSource(wordSelectMode) { newWordSelectMode ->
+                if (value == null) {
+                    return@addSource
+                }
+
+                if (newWordSelectMode == WordSelectMode.AUTO && value?.parseError != true && value?.parsedInfo == null) {
+                    viewModelScope.launch {
+                        value?.sentence?.startParse()
+                    }
+                    return@addSource
+                }
             }
         }
 
@@ -96,8 +129,10 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                     }
             )
             value = SentenceWithInfo(sentence)
-            viewModelScope.launch {
-                sentence.startParse()
+            if (wordSelectMode.value == WordSelectMode.AUTO) {
+                viewModelScope.launch {
+                    sentence.startParse()
+                }
             }
         }
     }
@@ -112,4 +147,10 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val jishoWordDefinitions: JishoWordDefinitions? = null,
             val error: Boolean = false
     )
+
+    enum class WordSelectMode(val iconId: Int, val iconDescriptionId: Int) {
+        AUTO(R.drawable.ic_auto_fix, R.string.read_sentence__select_mode_auto),
+        SELECT(R.drawable.ic_touch, R.string.read_sentence__select_mode_select),
+        TYPE(R.drawable.ic_text_fields, R.string.read_sentence__select_mode_type)
+    }
 }

@@ -1,5 +1,7 @@
 package com.eywa.projectlectito.wordDefinitions
 
+import com.eywa.projectlectito.database.word.StudyingWord
+
 data class JishoWordDefinitions(
         val meta: JishoMetadataDetail,
         val data: List<JishoEntry>
@@ -19,7 +21,7 @@ data class JishoWordDefinitions(
     )
 
     data class JishoJapaneseDetail(
-            val word: String,
+            val word: String?,
             val reading: String
     )
 
@@ -31,13 +33,18 @@ data class JishoWordDefinitions(
             val restrictions: List<String>,
             val see_also: List<String>,
             val antonyms: List<String>,
-            val source: List<String>,
+            val source: List<JishoSourceDetail>,
             val info: List<String>
     )
 
     data class JishoLinkDetail(
             val text: String,
             val url: String
+    )
+
+    data class JishoSourceDetail(
+            val language: String,
+            val word: String
     )
 
     data class JishoAttributionDetail(

@@ -13,9 +13,15 @@
     <string name="read_sentence__full_text">Full text</string>
     <string name="read_sentence__previous_sentence">Previous sentence</string>
     <string name="read_sentence__next_sentence">Next sentence</string>
-    <string name="read_sentence__no_definition">No word selected.\nClick a word to show its definition.</string>
+    <string name="read_sentence__no_definition">No word selected.\n%s</string>
+    <string name="read_sentence__no_definition_auto">Click on a word to show its definition.</string>
+    <string name="read_sentence__no_definition_select">Select a word and click the arrow to show its definition.</string>
+    <string name="read_sentence__no_definition_type">Type in a word and click the arrow to show its definition.</string>
     <string name="read_sentence__parse_success">Sentence parsed succeeded</string>
     <string name="read_sentence__parse_failed">Sentence parse failed</string>
+    <string name="read_sentence__select_mode_auto">Auto</string>
+    <string name="read_sentence__select_mode_select">Select</string>
+    <string name="read_sentence__select_mode_type">Type</string>
 
     <string name="err_read_sentence__no_more_sentences">No more sentences</string>
     <string name="err_read_sentence__no_more_definitions">No more definitions</string>

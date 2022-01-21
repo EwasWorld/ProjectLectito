@@ -228,4 +228,8 @@ class Sentence(
             parseJob.cancel(CancellationException("New job created"))
         }
     }
+
+    fun substring(start: Int, end: Int): String? {
+        return currentSentence?.substring(start, end)
+    }
 }

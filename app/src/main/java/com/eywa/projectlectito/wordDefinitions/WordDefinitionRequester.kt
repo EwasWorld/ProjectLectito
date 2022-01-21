@@ -69,7 +69,7 @@ class WordDefinitionRequester(
                 successCallback(finalData)
             }
             catch (e: JsonSyntaxException) {
-                throw IllegalStateException("Invalid JSON format")
+                throw IllegalStateException("Invalid JSON format: ${e.message}")
             }
         }
     }
