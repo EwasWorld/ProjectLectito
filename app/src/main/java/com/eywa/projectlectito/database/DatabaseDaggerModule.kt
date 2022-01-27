@@ -47,7 +47,9 @@ class DatabaseDaggerModule(application: Application) {
         // TODO Remove initial data
         Log.i("Database", "Initial population of database")
         textsDao.insert(Text(1, "傭兵団の料理番"))
-        textSnippetsDao.insert(TextSnippet(1, TempTestData.text, 1, 1, 1))
+        textSnippetsDao.insert(TextSnippet(1, TempTestData.page5Text, 1, 5, 1))
+        textSnippetsDao.insert(TextSnippet(2, TempTestData.page6Text, 1, 6, 1))
+        textSnippetsDao.insert(TextSnippet(3, TempTestData.page7Text, 1, 7, 1))
     }
 
     private inner class PopulateDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {

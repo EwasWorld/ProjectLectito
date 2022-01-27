@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
         tableName = TextSnippet.TABLE_NAME,
         // Force uniqueness on certain fields to simulate a composite key
         // Using an ID as the primary key as many other tables reference this ID
-        indices = [Index(value = ["textId", "chapterId", "pageReference", "ordinal"], unique = true)]
+        indices = [Index(value = ["textId", "pageReference", "ordinal"], unique = true)]
 )
 data class TextSnippet(
         @PrimaryKey(autoGenerate = true)
@@ -24,19 +24,19 @@ data class TextSnippet(
          */
         val textId: Int,
         /**
-         * 1-indexed
+         * Can be negative as some books include pages using roman numerals before page 1
          */
         val pageReference: Int,
         /**
-         * 1-indexed
+         * Can be negative as some books include prefixes or prologues before chapter 1
          */
-        val chapterId: Int? = 1,
+        val chapterId: Int? = null,
 
         /**
          * Extra field in case there are multiple snippets for a single page reference.
          * 1-indexed
          */
-        val ordinal: Int? = 1,
+        val ordinal: Int = 1,
 ) {
     companion object {
         const val TABLE_NAME = "text_snippets"

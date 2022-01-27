@@ -8,6 +8,7 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -43,16 +44,18 @@ class ReadSentenceFragment : Fragment() {
         activity?.title = resources.getString(R.string.read_sentence__title)
 
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
+        readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
+            val test = it
+            Log.d("ReadSentenceFragment", test.size.toString())
+        })
+
         // TODO Get from arguments
         readSentenceViewModel.textSnippetId.postValue(1)
-        readSentenceViewModel.textSnippet.observe(viewLifecycleOwner, {
-            it?.let { snippet ->
-                val chapter = if (snippet.chapterId != null) "第%d章".format(snippet.chapterId) else ""
-                val page = "%dページ".format(snippet.pageReference)
-                text_read_sentence__chapter_page.text = "%s%s".format(chapter, page)
-            }
+        readSentenceViewModel.currentSnippetInfo.observe(viewLifecycleOwner, {
+            text_read_sentence__chapter_page.text = it ?: ""
         })
         readSentenceViewModel.sentence.observe(viewLifecycleOwner, {
+
             sentence = it
             displaySentence(it)
         })
@@ -102,7 +105,7 @@ class ReadSentenceFragment : Fragment() {
                     )
                     return@setOnClickListener
                 }
-                readSentenceViewModel.currentCharacter.postValue(nextSentenceStart)
+                readSentenceViewModel.updateCurrentCharacter(nextSentenceStart)
             }
         }
 
@@ -116,7 +119,7 @@ class ReadSentenceFragment : Fragment() {
                     )
                     return@setOnClickListener
                 }
-                readSentenceViewModel.currentCharacter.postValue(previousSentenceStart)
+                readSentenceViewModel.updateCurrentCharacter(previousSentenceStart)
             }
         }
 
@@ -200,16 +203,16 @@ class ReadSentenceFragment : Fragment() {
 
     /**
      * Calculates the starts and ends of sentences then sets [text_read_sentence__sentence] and [text_read_sentence__context].
-     * TODO Span across two snippets for the start and end of a snippet
      */
-    private fun displaySentence(sentenceWithInfo: ReadSentenceViewModel.SentenceWithInfo) {
-        val currentSentence = sentenceWithInfo.sentence.currentSentence
+    private fun displaySentence(sentenceWithInfo: ReadSentenceViewModel.SentenceWithInfo?) {
+        val currentSentence = sentenceWithInfo?.sentence?.currentSentence
 
         if (currentSentence == null) {
             text_read_sentence__sentence.text = ""
             text_read_sentence__context.text = ""
             button_read_sentence__previous_sentence.isEnabled = false
             button_read_sentence__next_sentence.isEnabled = false
+            // TODO Clear selected word bar
             return
         }
 
@@ -230,8 +233,7 @@ class ReadSentenceFragment : Fragment() {
         if (wordSelectMode == ReadSentenceViewModel.WordSelectMode.AUTO) {
             text_read_sentence__sentence.setTextIsSelectable(false)
             sentenceWithInfo.parsedInfo?.let { it ->
-                text_read_sentence__sentence.text =
-                        it.getAsSpannedString(currentSentence, sentenceWithInfo.sentence.currentSentenceStart)
+                text_read_sentence__sentence.text = it.getAsSpannedString(currentSentence)
                 text_read_sentence__sentence.movementMethod = LinkMovementMethod.getInstance()
                 isSentenceSet = true
             }
@@ -266,11 +268,11 @@ class ReadSentenceFragment : Fragment() {
         }
     }
 
-    private fun List<ParsedInfo>.getAsSpannedString(currentSentence: String, startIndex: Int): SpannableString {
+    private fun List<ParsedInfo>.getAsSpannedString(currentSentence: String): SpannableString {
         val spannedString = SpannableString(currentSentence)
         this.forEachIndexed { index, parsedInfo ->
-            val spanStartIndex = parsedInfo.startCharacterIndex - startIndex
-            val spanEndIndex = parsedInfo.endCharacterIndex - startIndex
+            val spanStartIndex = parsedInfo.startCharacterIndex
+            val spanEndIndex = parsedInfo.endCharacterIndex
 
             val span = object : ClickableSpan() {
                 override fun onClick(p0: View) {

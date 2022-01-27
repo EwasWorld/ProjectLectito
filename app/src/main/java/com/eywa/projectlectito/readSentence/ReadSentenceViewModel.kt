@@ -1,6 +1,7 @@
 package com.eywa.projectlectito.readSentence
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
@@ -10,6 +11,7 @@ import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
 import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionRequester
+import kotlinx.android.synthetic.main.read_sentence_fragment.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +19,8 @@ import javax.inject.Inject
 class ReadSentenceViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val LOG_TAG = "ReadSentenceViewModel"
+
+        private const val SURROUNDING_SNIPPETS_TO_RETRIEVE = 1
     }
 
     @Inject
@@ -31,26 +35,47 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      */
     private val textsRepo = TextsRepo(db.textsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
+    val allSnippets = snippetsRepo.allSnippets
+
+    /*
+     * Snippets info
+     */
+    val textSnippetId = MutableLiveData<Int?>(null)
+    private val currentCharacter = MutableLiveData<Int>(329)
+    private val currentSnippet: LiveData<TextSnippet?> = textSnippetId.switchMap { id ->
+        if (id == null) return@switchMap MutableLiveData(null)
+        snippetsRepo.getTextSnippetById(id) as LiveData<TextSnippet?>
+    }.distinctUntilChanged()
+    private val previousSnippets = currentSnippet.switchMap { currentSnippet ->
+        if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
+        snippetsRepo.getPreviousSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
+    }
+    private val nextSnippets = currentSnippet.switchMap { currentSnippet ->
+        if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
+        snippetsRepo.getNextSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
+    }
 
     /*
      * Current sentence info
      */
-    val textSnippetId = MutableLiveData<Int?>(null)
-
-    // Want it to be non-nullable
-    @Suppress("RemoveExplicitTypeArguments")
+    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
     val wordSelectMode = MutableLiveData<WordSelectMode>(WordSelectMode.AUTO)
-    val textSnippet = textSnippetId.switchMap { id ->
-        if (id != null) snippetsRepo.getTextSnippetById(id) else MutableLiveData()
-    }.distinctUntilChanged()
-    val currentCharacter = MutableLiveData<Int>()
-    val sentence: LiveData<SentenceWithInfo> =
-            SentenceMediatorLiveData(textSnippet, currentCharacter.distinctUntilChanged(), wordSelectMode)
-
-    /*
-     * Extra text info
-     */
-    val textName = textSnippet.switchMap { snippet ->
+    val sentence: LiveData<SentenceWithInfo?> =
+            SentenceMediatorLiveData(
+                    currentSnippet,
+                    previousSnippets,
+                    nextSnippets,
+                    currentCharacter.distinctUntilChanged(),
+                    wordSelectMode
+            )
+    val currentSnippetInfo = currentSnippet.map { snippet ->
+        if (snippet == null) return@map ""
+        val chapter = if (snippet.chapterId != null) "第%d章".format(snippet.chapterId) else ""
+        val page = "%dページ".format(snippet.pageReference)
+        return@map "%s%s".format(chapter, page)
+    }
+    val textName = currentSnippet.switchMap { snippet ->
+        if (snippet == null) return@switchMap MutableLiveData("")
         textsRepo.getTextById(snippet.textId).map { it.name }
     }.distinctUntilChanged()
 
@@ -89,15 +114,35 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
+        val snippet = when (indexInfo.snippet) {
+            Sentence.SnippetLocation.PREVIOUS -> previousSnippets.value?.lastOrNull()
+            Sentence.SnippetLocation.CURRENT -> currentSnippet.value
+            Sentence.SnippetLocation.NEXT -> nextSnippets.value?.firstOrNull()
+        } ?: return false
+        currentCharacter.postValue(indexInfo.index)
+        textSnippetId.postValue(snippet.id)
+        return true
+    }
+
     private inner class SentenceMediatorLiveData(
-            private val textSnippet: LiveData<TextSnippet>,
+            private val currentSnippet: LiveData<TextSnippet?>,
+            private val previousSnippets: LiveData<List<TextSnippet>>,
+            private val nextSnippets: LiveData<List<TextSnippet>>,
             private val currentCharacter: LiveData<Int>,
             private val wordSelectMode: LiveData<WordSelectMode>
-    ) : MediatorLiveData<SentenceWithInfo>() {
+    ) : MediatorLiveData<SentenceWithInfo?>() {
         init {
-            addSource(textSnippet) {
+            addSource(currentSnippet) {
                 generateNewSentence()
             }
+            addSource(previousSnippets) {
+                generateNewSentence()
+            }
+            addSource(nextSnippets) {
+                generateNewSentence()
+            }
+            // Previous and next will only change when textSnippet changes
             addSource(currentCharacter) {
                 generateNewSentence()
             }
@@ -118,16 +163,25 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         private fun generateNewSentence() {
             value?.sentence?.cancelParse()
             var sentence: Sentence? = null
-            sentence = Sentence(
-                    textSnippet.value?.content,
-                    currentCharacter.value,
-                    {
-                        value = SentenceWithInfo(sentence!!, it)
-                    },
-                    {
-                        value = SentenceWithInfo(sentence!!, parseError = true)
-                    }
-            )
+            try {
+                sentence = Sentence(
+                        currentSnippet.value?.content,
+                        currentCharacter.value,
+                        previousSnippets.value?.lastOrNull()?.content,
+                        nextSnippets.value?.firstOrNull()?.content,
+                        parserSuccessCallback = {
+                            value = SentenceWithInfo(sentence!!, it)
+                        },
+                        parserFailCallback = {
+                            value = SentenceWithInfo(sentence!!, parseError = true)
+                        }
+                )
+            }
+            catch (e: Exception) {
+                value = null
+                return
+            }
+            Log.d(LOG_TAG, "Current sentence start index: ${sentence.currentSentenceStart.index}")
             value = SentenceWithInfo(sentence)
             if (wordSelectMode.value == WordSelectMode.AUTO) {
                 viewModelScope.launch {
