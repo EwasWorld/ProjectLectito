@@ -2,21 +2,26 @@ package com.eywa.projectlectito.readSentence
 
 import android.util.Log
 import com.atilika.kuromoji.unidic.kanaaccent.Tokenizer
+import com.eywa.projectlectito.database.snippets.TextSnippet
 import kotlinx.coroutines.*
+import kotlin.math.abs
 
 class Sentence(
-        private val textSnippetContent: String?,
+        private val currentSnippet: TextSnippet?,
         /**
-         * Current location in [textSnippetContent]
+         * Current location in [currentSnippet]
          */
         currentCharacter: Int? = 0,
-        private val previousSnippet: String? = "",
-        private val nextSnippet: String? = "",
+        private val previousSnippets: List<TextSnippet>? = null,
+        private val nextSnippets: List<TextSnippet>? = null,
         private val parserSuccessCallback: (List<ParsedInfo>) -> Unit,
         private val parserFailCallback: (Throwable) -> Unit
 ) {
     companion object {
         private const val LOG_TAG = "Sentence"
+
+        private const val CURRENT_SNIPPET_RELATIVE_ID = 0
+
         private val nonDisplayCharacters = setOf('\n')
 
         /**
@@ -42,23 +47,13 @@ class Sentence(
 
     private lateinit var parseJob: Job
 
-    /**
-     * Can be in any [SnippetLocation]
-     */
-    var currentSentenceStart = IndexInfo(currentCharacter ?: 0, SnippetLocation.CURRENT)
-        private set
+    private var currentSentenceStart = RelativeIndexInfo(currentCharacter ?: 0, CURRENT_SNIPPET_RELATIVE_ID)
+    private var nextSentenceStart: RelativeIndexInfo? = null
+    private var previousSentenceStart: RelativeIndexInfo? = null
 
-    /**
-     * Must be in [SnippetLocation.CURRENT] or [SnippetLocation.NEXT]
-     */
-    var nextSentenceStart: IndexInfo? = null
-        private set
-
-    /**
-     * Must be in [SnippetLocation.CURRENT] or [SnippetLocation.PREVIOUS]
-     */
-    var previousSentenceStart: IndexInfo? = null
-        private set
+    fun getCurrentSentenceStart() = currentSentenceStart.toIndexInfo()
+    fun getNextSentenceStart() = nextSentenceStart?.toIndexInfo()
+    fun getPreviousSentenceStart() = previousSentenceStart?.toIndexInfo()
 
     var currentSentence: String? = null
         private set
@@ -91,12 +86,12 @@ class Sentence(
     }
 
     private fun calculateSentenceBoundaries() {
-        require(!textSnippetContent.isNullOrBlank()) { "Content is null or blank" }
+        require(currentSnippet != null) { "Current snippet is blank" }
 
         // Calculate boundaries
         setCurrentSentenceStart()
         setPreviousSentenceStart()
-        nextSentenceStart = findNextSentenceStart(currentSentenceStart)
+        nextSentenceStart = findNextSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.index)
 
         // Set sentences
         previousSentenceStart?.let { prevStart ->
@@ -110,25 +105,26 @@ class Sentence(
      *
      * Searches backwards unless:
      * - [currentSentenceStart] is currently on a [sentenceStops]
-     * - [textSnippetContent] is empty
-     * - [currentSentenceStart] is larger than [textSnippetContent.length]
+     * - [currentSnippet] is empty
+     * - [currentSentenceStart] is larger than [currentSnippet.length]
      *
      * Throws an error if:
-     * - [currentSentenceStart] != [SnippetLocation.CURRENT]
+     * - [currentSentenceStart] != [CURRENT_SNIPPET_RELATIVE_ID]
      * - [currentSentenceStart] < 0
      * - No non-stop characters on or after [currentSentenceStart]
      */
     private fun setCurrentSentenceStart() {
-        require(currentSentenceStart.snippet == SnippetLocation.CURRENT) {
-            "Current start must be in current snippet"
+        require(currentSentenceStart.relativeSnippet == CURRENT_SNIPPET_RELATIVE_ID) {
+            "Initial start must be in current snippet"
         }
         require(currentSentenceStart.index >= 0) { "Sentence start cannot be < 0" }
 
-        if (!textSnippetContent.isNullOrBlank() && currentSentenceStart.index < textSnippetContent.length
-                && !sentenceStops.contains(textSnippetContent[currentSentenceStart.index])
+        val currentSnippetContent = currentSnippet?.content
+        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.index < currentSnippetContent.length
+                && !sentenceStops.contains(currentSnippetContent[currentSentenceStart.index])
         ) {
             currentSentenceStart =
-                    findPreviousSentenceStart(currentSentenceStart.snippet, currentSentenceStart.index)
+                    findPreviousSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.index)
                             ?: currentSentenceStart
             return
         }
@@ -136,45 +132,49 @@ class Sentence(
         /*
          * Check forwards if currently on a sentence end char
          */
-        if (!textSnippetContent.isNullOrBlank() && currentSentenceStart.index < textSnippetContent.length) {
+        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.index < currentSnippetContent.length) {
             val startIndex = FindType.FIRST_NON_STOP.find(currentSentenceStart.index)
             if (startIndex != null) {
-                currentSentenceStart = IndexInfo(startIndex, SnippetLocation.CURRENT)
+                currentSentenceStart = RelativeIndexInfo(startIndex, CURRENT_SNIPPET_RELATIVE_ID)
                 return
             }
         }
 
         // No non-stop chars so check the next snippet
-        var snippet = currentSentenceStart.snippet.getNext()
-        while (snippet != null) {
-            val startIndex = FindType.FIRST_NON_STOP.find(snippetLocation = snippet)
-            if (startIndex != null) {
-                currentSentenceStart = IndexInfo(startIndex, SnippetLocation.NEXT)
+        var snippet = currentSentenceStart.relativeSnippet + 1
+        while (true) {
+            val snippetContent = snippet.getSnippetFromId()?.content ?: break
+            if (snippetContent.isBlank()) {
+                snippet += 1
+                continue
             }
-            snippet = snippet.getNext()
+            val startIndex = FindType.FIRST_NON_STOP.find(relativeSnippetId = snippet)
+            if (startIndex != null) {
+                currentSentenceStart = RelativeIndexInfo(startIndex, snippet + 1)
+            }
+            snippet += 1
         }
         throw IllegalArgumentException("No non-stop chars after current character")
     }
 
-    private fun findPreviousSentenceStart(snippetLocation: SnippetLocation?, endIndex: Int? = null): IndexInfo? {
-        if (snippetLocation == null) return null
-
-        if (snippetLocation.get().isNullOrBlank()) {
-            return findPreviousSentenceStart(snippetLocation.getPrevious())
+    private fun findPreviousSentenceStart(relativeSnippetId: Int, endIndex: Int? = null): RelativeIndexInfo? {
+        val currentContent = relativeSnippetId.getSnippetFromId()?.content ?: return null
+        if (currentContent.isBlank()) {
+            return findPreviousSentenceStart(relativeSnippetId - 1)
         }
 
         // Check that this has non-stop characters
         var lastNonStopChar: Int? = FindType.LAST_NON_STOP.find(
                 endIndex = endIndex?.plus(1),
-                snippetLocation = snippetLocation
-        ) ?: return findPreviousSentenceStart(snippetLocation.getPrevious())
+                relativeSnippetId = relativeSnippetId
+        ) ?: return findPreviousSentenceStart(relativeSnippetId - 1)
 
         // Is there a hard stop?
         var hardStop = FindType.LAST_STOP.find(
                 startIndex = lastNonStopChar,
                 endIndex = endIndex?.plus(1),
                 stopChars = hardSentenceStops,
-                snippetLocation = snippetLocation
+                relativeSnippetId = relativeSnippetId
         )
         if (hardStop != null) {
             return null
@@ -183,119 +183,116 @@ class Sentence(
         // Find the last stop character
         val lastStopCharacter = FindType.LAST_STOP.find(
                 endIndex = lastNonStopChar,
-                snippetLocation = snippetLocation
-        ) ?: return findPreviousSentenceStart(snippetLocation.getPrevious())
-                ?: IndexInfo(0, snippetLocation)
+                relativeSnippetId = relativeSnippetId
+        ) ?: return findPreviousSentenceStart(relativeSnippetId - 1)
+                ?: RelativeIndexInfo(0, relativeSnippetId)
 
         // Is that the last stop character in the string?
         lastNonStopChar = FindType.LAST_NON_STOP.find(
                 endIndex = lastStopCharacter,
-                snippetLocation = snippetLocation
+                relativeSnippetId = relativeSnippetId
         )
         if (lastNonStopChar != null) {
-            return IndexInfo(lastStopCharacter + 1, snippetLocation)
+            return RelativeIndexInfo(lastStopCharacter + 1, relativeSnippetId)
         }
 
         // Is there a hard stop?
         hardStop = FindType.LAST_STOP.find(
                 endIndex = lastStopCharacter + 1,
                 stopChars = hardSentenceStops,
-                snippetLocation = snippetLocation
+                relativeSnippetId = relativeSnippetId
         )
         if (hardStop != null) {
-            return IndexInfo(lastStopCharacter + 1, snippetLocation)
+            return RelativeIndexInfo(lastStopCharacter + 1, relativeSnippetId)
         }
 
-        return findPreviousSentenceStart(snippetLocation.getPrevious())
-                ?: IndexInfo(lastStopCharacter + 1, snippetLocation)
+        return findPreviousSentenceStart(relativeSnippetId - 1)
+                ?: RelativeIndexInfo(lastStopCharacter + 1, relativeSnippetId)
     }
 
     private fun setPreviousSentenceStart() {
-        val previousEnd = previousSentenceEnd(currentSentenceStart.snippet, currentSentenceStart.index - 1)
+        val previousEnd = previousSentenceEnd(currentSentenceStart.relativeSnippet, currentSentenceStart.index - 1)
                 ?: return
-        previousSentenceStart = findPreviousSentenceStart(previousEnd.snippet, previousEnd.index)
+        previousSentenceStart = findPreviousSentenceStart(previousEnd.relativeSnippet, previousEnd.index)
     }
 
-    private fun previousSentenceEnd(snippet: SnippetLocation?, index: Int? = null): IndexInfo? {
-        if (snippet == null) return null
+    private fun previousSentenceEnd(relativeSnippetId: Int, index: Int? = null): RelativeIndexInfo? {
+        val currentContent = relativeSnippetId.getSnippetFromId()?.content ?: return null
 
-        if (index != null && index < 0) {
-            return previousSentenceEnd(snippet.getPrevious())
-        }
-        if (snippet.get().isNullOrBlank()) {
-            return previousSentenceEnd(snippet.getPrevious())
+        if (currentContent.isBlank() || (index != null && index < 0)) {
+            return previousSentenceEnd(relativeSnippetId - 1)
         }
 
         val lastNonStop = FindType.LAST_NON_STOP.find(
                 endIndex = index,
-                snippetLocation = snippet
-        ) ?: return previousSentenceEnd(snippet.getPrevious())
+                relativeSnippetId = relativeSnippetId
+        ) ?: return previousSentenceEnd(relativeSnippetId - 1)
 
-        return IndexInfo(lastNonStop, snippet)
+        return RelativeIndexInfo(lastNonStop, relativeSnippetId)
     }
 
-    private fun findNextSentenceStart(searchForwardFrom: IndexInfo): IndexInfo? {
-        val nextSnippet = searchForwardFrom.snippet.getNext()
+    private fun findNextSentenceStart(relativeSnippetId: Int, index: Int? = null): RelativeIndexInfo? {
+        val currentContent = relativeSnippetId.getSnippetFromId()?.content ?: return null
+        if (currentContent.isBlank()) {
+            return findNextSentenceStart(relativeSnippetId + 1)
+        }
 
         // Check that not at the end of snippet
-        if (searchForwardFrom.index >= searchForwardFrom.snippet.get()?.length ?: -1) {
-            if (nextSnippet == null) return null
-            return findNextSentenceStart(IndexInfo(0, nextSnippet))
+        if (index != null && index >= currentContent.length) {
+            return findNextSentenceStart(relativeSnippetId + 1)
         }
 
         // Find the end of the current sentence
         val sentenceEnd = FindType.FIRST_STOP.find(
-                startIndex = searchForwardFrom.index,
-                snippetLocation = searchForwardFrom.snippet
-        )
-        if (sentenceEnd == null) {
-            if (nextSnippet == null) return null
-            return findNextSentenceStart(IndexInfo(0, nextSnippet))
-        }
+                startIndex = index,
+                relativeSnippetId = relativeSnippetId
+        ) ?: return findNextSentenceStart(relativeSnippetId + 1)
 
         val nextSentenceStart = FindType.FIRST_NON_STOP.find(
                 startIndex = sentenceEnd,
-                snippetLocation = searchForwardFrom.snippet
+                relativeSnippetId = relativeSnippetId
         )
         if (nextSentenceStart != null) {
-            return IndexInfo(nextSentenceStart, searchForwardFrom.snippet)
+            return RelativeIndexInfo(nextSentenceStart, relativeSnippetId)
         }
 
         // No more non stops in this snippet, check for hard stop
-        val hardStop = FindType.FIRST_STOP.find(
+        FindType.FIRST_STOP.find(
                 startIndex = sentenceEnd,
                 stopChars = hardSentenceStops,
-                snippetLocation = searchForwardFrom.snippet
-        )
-        if (hardStop == null) {
-            if (nextSnippet == null) return null
-            return findNextSentenceStart(IndexInfo(0, nextSnippet))
-        }
-        return findFirstNonStopCharacter(nextSnippet)
+                relativeSnippetId = relativeSnippetId
+        ) ?: return findNextSentenceStart(relativeSnippetId + 1)
+
+        return findFirstNonStopCharacter(relativeSnippetId + 1)
     }
 
-    private fun findFirstNonStopCharacter(snippet: SnippetLocation?): IndexInfo? {
-        if (snippet == null) return null
+    private fun findFirstNonStopCharacter(relativeSnippetId: Int?): RelativeIndexInfo? {
+        val currentContent = relativeSnippetId?.getSnippetFromId()?.content ?: return null
+        if (currentContent.isBlank()) return findFirstNonStopCharacter(relativeSnippetId + 1)
         val firstNonStop = FindType.FIRST_NON_STOP.find(
                 startIndex = 0,
-                snippetLocation = snippet
-        ) ?: return findFirstNonStopCharacter(snippet.getNext())
-        return IndexInfo(firstNonStop, snippet)
+                relativeSnippetId = relativeSnippetId
+        ) ?: return findFirstNonStopCharacter(relativeSnippetId + 1)
+        return RelativeIndexInfo(firstNonStop, relativeSnippetId)
     }
 
-    private fun extractSentence(start: IndexInfo, end: IndexInfo?): String {
-        if (end != null && start.snippet == end.snippet) {
-            return start.snippet.get()!!.substring(start.index, end.index).prepareForDisplay()
+    private fun extractSentence(start: RelativeIndexInfo, end: RelativeIndexInfo?): String {
+        if (end != null && start.relativeSnippet == end.relativeSnippet) {
+            return start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.index, end.index)
+                    .prepareForDisplay()
         }
 
-        var tempSentence = start.snippet.get()!!.substring(start.index).prepareForDisplay()
-        var middleSnippet = start.snippet.getNext()
-        while (middleSnippet != null && middleSnippet != end?.snippet) {
-            tempSentence += middleSnippet.get()?.prepareForDisplay() ?: ""
-            middleSnippet = middleSnippet.getNext()
+        var tempSentence =
+                start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.index).prepareForDisplay()
+        var middleSnippet = start.relativeSnippet + 1
+        while (middleSnippet != end?.relativeSnippet) {
+            val middleSnippetContent = middleSnippet.getSnippetFromId()?.content ?: break
+            tempSentence += middleSnippetContent.prepareForDisplay()
+            middleSnippet++
         }
         if (end != null) {
-            tempSentence += end.snippet.get()!!.substring(0, end.index).prepareForDisplay()
+            tempSentence += end.relativeSnippet.getSnippetFromId()?.content!!.substring(0, end.index)
+                    .prepareForDisplay()
         }
         return tempSentence
     }
@@ -306,9 +303,9 @@ class Sentence(
             startIndex: Int? = null,
             endIndex: Int? = null,
             stopChars: Set<Char> = sentenceStops,
-            snippetLocation: SnippetLocation = SnippetLocation.CURRENT
+            relativeSnippetId: Int = CURRENT_SNIPPET_RELATIVE_ID
     ): Int? {
-        val snippet = snippetLocation.get()
+        val snippet = relativeSnippetId.getSnippetFromId()?.content
 
         require(!snippet.isNullOrBlank()) { "Content is null or blank" }
         require(startIndex == null || startIndex >= 0 && startIndex < snippet.length) {
@@ -380,30 +377,15 @@ class Sentence(
         return currentSentence?.substring(start, end)
     }
 
-    private fun SnippetLocation.get(): String? {
-        return when (this) {
-            SnippetLocation.CURRENT -> textSnippetContent
-            SnippetLocation.PREVIOUS -> previousSnippet
-            SnippetLocation.NEXT -> nextSnippet
-        }
-    }
+    private data class RelativeIndexInfo(val index: Int, val relativeSnippet: Int)
 
-    data class IndexInfo(val index: Int, val snippet: SnippetLocation)
+    private fun RelativeIndexInfo.toIndexInfo() = IndexInfo(index, relativeSnippet.getSnippetFromId()!!.id)
+    data class IndexInfo(val index: Int, val textSnippetId: Int)
 
-    enum class SnippetLocation {
-        PREVIOUS, CURRENT, NEXT;
-
-        fun getPrevious() = when (this) {
-            PREVIOUS -> null
-            CURRENT -> PREVIOUS
-            NEXT -> CURRENT
-        }
-
-        fun getNext() = when (this) {
-            PREVIOUS -> CURRENT
-            CURRENT -> NEXT
-            NEXT -> null
-        }
+    private fun Int.getSnippetFromId() = when {
+        this == CURRENT_SNIPPET_RELATIVE_ID -> currentSnippet
+        this < CURRENT_SNIPPET_RELATIVE_ID -> previousSnippets?.reversed()?.elementAtOrNull(abs(this) - 1)
+        else -> nextSnippets?.elementAtOrNull(this - 1)
     }
 
     private enum class FindType(val findFunction: (String, Set<Char>) -> Int) {

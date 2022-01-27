@@ -97,7 +97,7 @@ class ReadSentenceFragment : Fragment() {
 
         button_read_sentence__next_sentence.setOnClickListener {
             sentence?.let {
-                val nextSentenceStart = it.sentence.nextSentenceStart
+                val nextSentenceStart = it.sentence.getNextSentenceStart()
                 if (nextSentenceStart == null) {
                     ToastSpamPrevention.displayToast(
                             requireContext(),
@@ -111,7 +111,7 @@ class ReadSentenceFragment : Fragment() {
 
         button_read_sentence__previous_sentence.setOnClickListener {
             sentence?.let {
-                val previousSentenceStart = it.sentence.previousSentenceStart
+                val previousSentenceStart = it.sentence.getPreviousSentenceStart()
                 if (previousSentenceStart == null) {
                     ToastSpamPrevention.displayToast(
                             requireContext(),
@@ -226,7 +226,7 @@ class ReadSentenceFragment : Fragment() {
         text_read_sentence__context.visibility = (previousSentence != null).asVisibility()
         button_read_sentence__previous_sentence.isEnabled = previousSentence != null
 
-        button_read_sentence__next_sentence.isEnabled = sentenceWithInfo.sentence.nextSentenceStart != null
+        button_read_sentence__next_sentence.isEnabled = sentenceWithInfo.sentence.getNextSentenceStart() != null
 
         var isSentenceSet = false
         text_read_sentence__sentence.text = ""

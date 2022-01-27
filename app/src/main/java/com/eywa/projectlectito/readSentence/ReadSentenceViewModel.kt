@@ -41,7 +41,11 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Snippets info
      */
     val textSnippetId = MutableLiveData<Int?>(null)
-    private val currentCharacter = MutableLiveData<Int>(329)
+
+    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
+    private val currentCharacter = MutableLiveData<Int>(0)
+
+    @Suppress("unchecked_cast") // Explicit cast required else compiler error
     private val currentSnippet: LiveData<TextSnippet?> = textSnippetId.switchMap { id ->
         if (id == null) return@switchMap MutableLiveData(null)
         snippetsRepo.getTextSnippetById(id) as LiveData<TextSnippet?>
@@ -115,13 +119,8 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
-        val snippet = when (indexInfo.snippet) {
-            Sentence.SnippetLocation.PREVIOUS -> previousSnippets.value?.lastOrNull()
-            Sentence.SnippetLocation.CURRENT -> currentSnippet.value
-            Sentence.SnippetLocation.NEXT -> nextSnippets.value?.firstOrNull()
-        } ?: return false
         currentCharacter.postValue(indexInfo.index)
-        textSnippetId.postValue(snippet.id)
+        textSnippetId.postValue(indexInfo.textSnippetId)
         return true
     }
 
@@ -142,7 +141,6 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             addSource(nextSnippets) {
                 generateNewSentence()
             }
-            // Previous and next will only change when textSnippet changes
             addSource(currentCharacter) {
                 generateNewSentence()
             }
@@ -165,10 +163,10 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             var sentence: Sentence? = null
             try {
                 sentence = Sentence(
-                        currentSnippet.value?.content,
+                        currentSnippet.value,
                         currentCharacter.value,
-                        previousSnippets.value?.lastOrNull()?.content,
-                        nextSnippets.value?.firstOrNull()?.content,
+                        previousSnippets.value,
+                        nextSnippets.value,
                         parserSuccessCallback = {
                             value = SentenceWithInfo(sentence!!, it)
                         },
@@ -181,7 +179,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 value = null
                 return
             }
-            Log.d(LOG_TAG, "Current sentence start index: ${sentence.currentSentenceStart.index}")
+            Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().index}")
             value = SentenceWithInfo(sentence)
             if (wordSelectMode.value == WordSelectMode.AUTO) {
                 viewModelScope.launch {
