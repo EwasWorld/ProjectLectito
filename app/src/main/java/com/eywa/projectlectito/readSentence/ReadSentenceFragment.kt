@@ -12,6 +12,8 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
 import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
@@ -21,10 +23,22 @@ import kotlinx.android.synthetic.main.read_sentence_fragment.*
 class ReadSentenceFragment : Fragment() {
     companion object {
         private const val japaneseListDelimiter = "・"
+
+        fun navigateTo(
+                navController: NavController,
+                textId: Int,
+                currentSnippetId: Int? = null,
+                currentCharacter: Int? = null
+        ) {
+            val bundle = Bundle()
+            bundle.putInt("textId", textId)
+            currentSnippetId?.let { bundle.putInt("currentSnippetId", it) }
+            currentCharacter?.let { bundle.putInt("currentCharacter", it) }
+            navController.navigate(R.id.readSentenceFragment, bundle)
+        }
     }
 
-    // TODO Set up arguments
-    // private val args: NewScoreFragmentArgs by navArgs()
+    private val args: ReadSentenceFragmentArgs by navArgs()
 
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
@@ -46,11 +60,22 @@ class ReadSentenceFragment : Fragment() {
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
             val test = it
-            Log.d("ReadSentenceFragment", test.size.toString())
+            Log.d("ReadSentenceFragment", "Text snippets found: ${test.size}")
         })
 
-        // TODO Get from arguments
-        readSentenceViewModel.textSnippetId.postValue(1)
+        if (args.currentSnippetId != -1) {
+            readSentenceViewModel.updateCurrentCharacter(
+                    Sentence.IndexInfo(
+                            if (args.currentCharacter != -1) args.currentCharacter else 0,
+                            args.currentSnippetId
+                    )
+            )
+        }
+        else {
+            readSentenceViewModel.getFirstSnippetForText(args.textId).observe(viewLifecycleOwner, { firstSnippetId ->
+                readSentenceViewModel.updateCurrentCharacter(Sentence.IndexInfo(0, firstSnippetId))
+            })
+        }
         readSentenceViewModel.currentSnippetInfo.observe(viewLifecycleOwner, {
             text_read_sentence__chapter_page.text = it ?: ""
         })

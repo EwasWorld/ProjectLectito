@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/readSentenceFragment"
+    app:startDestination="@id/viewTextsFragment"
     >
 
     <fragment
@@ -11,7 +11,22 @@
         android:name="com.eywa.projectlectito.readSentence.ReadSentenceFragment"
         android:label="@string/read_sentence__title"
         tools:layout="@layout/read_sentence_fragment"
-        />
+        >
+        <argument
+            android:name="textId"
+            app:argType="integer"
+            />
+        <argument
+            android:name="currentSnippetId"
+            app:argType="integer"
+            android:defaultValue="-1"
+            />
+        <argument
+            android:name="currentCharacter"
+            app:argType="integer"
+            android:defaultValue="-1"
+            />
+    </fragment>
 
     <fragment
         android:id="@+id/viewTextsFragment"

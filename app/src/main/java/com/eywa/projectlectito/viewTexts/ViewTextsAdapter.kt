@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.texts.Text
+import com.eywa.projectlectito.readSentence.ReadSentenceFragment
 import kotlin.math.roundToInt
 
 class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapter.TextViewHolder>(
@@ -57,6 +59,15 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
             itemView.findViewById<TextView>(R.id.text_view_texts_item__current).text =
                     item.currentSnippet?.getChapterPageString()
                             ?: itemView.resources.getString(R.string.view_texts__not_started)
+
+            itemView.setOnClickListener {
+                ReadSentenceFragment.navigateTo(
+                        itemView.findNavController(),
+                        item.text.id,
+                        item.text.currentSnippetId,
+                        item.text.currentCharacterIndex
+                )
+            }
         }
     }
 }

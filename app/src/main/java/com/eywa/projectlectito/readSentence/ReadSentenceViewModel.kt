@@ -40,7 +40,8 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     /*
      * Snippets info
      */
-    val textSnippetId = MutableLiveData<Int?>(null)
+    private val textSnippetId = MutableLiveData<Int?>(null)
+    fun getFirstSnippetForText(textId: Int) = snippetsRepo.getFirstSnippetId(textId)
 
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
     private val currentCharacter = MutableLiveData<Int>(0)
@@ -114,6 +115,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
+        // TODO Mediator will update twice, only want it to update once
         currentCharacter.postValue(indexInfo.index)
         textSnippetId.postValue(indexInfo.textSnippetId)
         return true
