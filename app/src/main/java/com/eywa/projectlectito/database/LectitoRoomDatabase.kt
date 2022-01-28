@@ -23,7 +23,7 @@ abstract class LectitoRoomDatabase : RoomDatabase() {
     abstract fun textSnippetsDao(): TextSnippetsDao
 
     companion object {
-        const val DATABASE_NAME = "scores_database"
+        const val DATABASE_NAME = "lectito_database"
     }
 
     class Converters {

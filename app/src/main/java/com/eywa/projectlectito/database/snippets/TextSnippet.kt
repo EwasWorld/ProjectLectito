@@ -38,6 +38,13 @@ data class TextSnippet(
          */
         val ordinal: Int = 1,
 ) {
+
+    fun getChapterPageString(): String {
+        val chapter = if (chapterId != null) "第%d章".format(chapterId) else ""
+        val page = "%dページ".format(pageReference)
+        return "%s%s".format(chapter, page)
+    }
+
     companion object {
         const val TABLE_NAME = "text_snippets"
     }

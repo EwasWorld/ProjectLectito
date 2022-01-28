@@ -7,6 +7,14 @@ class TextsRepo(private val textsDao: TextsDao) {
         return textsDao.getTextById(textId)
     }
 
+    fun getAllTexts(): LiveData<List<Text>> {
+        return textsDao.getAllTexts()
+    }
+
+    fun getAllTextsWithSnippetInfo(): LiveData<List<Text.WithCurrentSnippetInfo>> {
+        return textsDao.getAllTextsWithSnippetInfo()
+    }
+
     suspend fun insert(item: Text) {
         textsDao.insert(item)
     }

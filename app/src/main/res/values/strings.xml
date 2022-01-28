@@ -3,6 +3,10 @@
 
     <string name="a"></string>
 
+    <!-- View Texts -->
+    <string name="view_texts__title">All Texts</string>
+    <string name="view_texts__not_started">Not started</string>
+
     <!-- Read Sentence -->
     <string name="read_sentence__title">Read Sentence</string>
     <string name="read_sentence__common">common</string>

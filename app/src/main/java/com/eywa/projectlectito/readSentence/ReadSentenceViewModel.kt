@@ -72,12 +72,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                     currentCharacter.distinctUntilChanged(),
                     wordSelectMode
             )
-    val currentSnippetInfo = currentSnippet.map { snippet ->
-        if (snippet == null) return@map ""
-        val chapter = if (snippet.chapterId != null) "第%d章".format(snippet.chapterId) else ""
-        val page = "%dページ".format(snippet.pageReference)
-        return@map "%s%s".format(chapter, page)
-    }
+    val currentSnippetInfo = currentSnippet.map { it?.getChapterPageString() ?: "" }
     val textName = currentSnippet.switchMap { snippet ->
         if (snippet == null) return@switchMap MutableLiveData("")
         textsRepo.getTextById(snippet.textId).map { it.name }

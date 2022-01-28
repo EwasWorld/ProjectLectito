@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:layout_margin="3dp"
+    android:background="@color/teal_light"
+    >
+
+    <TextView
+        android:id="@+id/text_view_texts_item__title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="傭兵団の料理番"
+        />
+
+    <TextView
+        android:id="@+id/text_view_texts_item__progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/text_view_texts_item__jp_delim"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="78%"
+        />
+
+    <TextView
+        android:id="@+id/text_view_texts_item__jp_delim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/text_view_texts_item__current"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="・"
+        tools:ignore="HardcodedText"
+        />
+
+    <TextView
+        android:id="@+id/text_view_texts_item__current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="第２章３０ページ"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

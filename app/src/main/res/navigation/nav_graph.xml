@@ -12,4 +12,11 @@
         android:label="@string/read_sentence__title"
         tools:layout="@layout/read_sentence_fragment"
         />
+
+    <fragment
+        android:id="@+id/viewTextsFragment"
+        android:name="com.eywa.projectlectito.viewTexts.ViewTextsFragment"
+        android:label="ViewTextsFragment"
+        tools:layout="@layout/view_texts_fragment"
+        />
 </navigation>

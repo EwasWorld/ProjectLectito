@@ -71,7 +71,8 @@ dependencies {
     def androidRoomVersion = "2.3.0"
     implementation "androidx.room:room-ktx:$androidRoomVersion"
     kapt "androidx.room:room-compiler:$androidRoomVersion"
-//    androidTestImplementation "androidx.room:room-testing:$androidRoomVersion"
+    androidTestImplementation "androidx.room:room-testing:$androidRoomVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0" // InstantTaskExecutorRule
 
     // Japanese tokenizer
     implementation 'com.atilika.kuromoji:kuromoji-unidic-kanaaccent:0.9.0'
