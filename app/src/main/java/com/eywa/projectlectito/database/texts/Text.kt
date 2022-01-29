@@ -1,5 +1,6 @@
 package com.eywa.projectlectito.database.texts
 
+import androidx.annotation.VisibleForTesting
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -28,8 +29,9 @@ data class Text(
     data class WithCurrentSnippetInfo(
             @Embedded(prefix = "txt_") val text: Text,
             @Embedded val currentSnippet: TextSnippet? = null,
-            private val totalSnippets: Int,
-            private val readSnippets: Int
+            val totalSnippets: Int,
+            @VisibleForTesting
+            val readSnippets: Int
     ) {
         val percentageRead: Double
             get() {

@@ -14,13 +14,13 @@
         android:background="@color/read_sentence__definition_background"
         android:gravity="center"
         android:paddingVertical="20dp"
-        tools:text="No word selected.\nClick on a word to show its definition."
         android:textSize="@dimen/small_text"
         app:layout_constraintBottom_toTopOf="@id/layout_read_sentence__jisho_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread_inside"
+        tools:text="No word selected.\nClick on a word to show its definition."
         tools:visibility="gone"
         />
 
@@ -235,26 +235,12 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/placeholder_read_sentence__select_mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__jisho_info"
         >
-
-        <View
-            android:id="@+id/overlay_read_sentence_2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@color/white"
-            android:alpha="0.7"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:elevation="7dp"
-            android:visibility="gone"
-            />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_read_sentence__text_info"
@@ -304,8 +290,8 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:background="#CFE5FF"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="5dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="12dp"
             app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -328,26 +314,31 @@
                 android:id="@+id/input_text_read_sentence__selected_simple_word"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:hint="@string/view_texts__type_word_hint"
+                android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLines="1"
-                android:ellipsize="end"
+                android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/space_read_sentence__selected_simple_word"
+                app:layout_constraintEnd_toStartOf="@id/button_read_sentence__submit_word"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="うまい"
-                android:textSize="@dimen/small_text"
                 />
 
-            <Space
-                android:id="@+id/space_read_sentence__selected_simple_word"
-                android:layout_width="35dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/input_text_read_sentence__selected_simple_word"
-                app:layout_constraintTop_toTopOf="parent"
+            <ImageButton
+                android:id="@+id/button_read_sentence__submit_word"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:background="@null"
+                android:contentDescription="@string/view_texts__submit_description"
+                android:src="@drawable/ic_narrow_arrow_right"
+                app:layout_constraintBottom_toBottomOf="@id/layout_read_sentence__selected_word_simple_info"
+                app:layout_constraintEnd_toEndOf="@id/layout_read_sentence__selected_word_simple_info"
+                app:layout_constraintTop_toTopOf="@id/layout_read_sentence__selected_word_simple_info"
+                app:tint="@color/grey_1"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -359,12 +350,12 @@
             android:layout_marginBottom="10dp"
             android:background="#CFE5FF"
             android:paddingHorizontal="20dp"
+            android:visibility="gone"
             android:paddingVertical="5dp"
             app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__text_info"
-            android:visibility="gone"
             >
 
             <TextView
@@ -399,13 +390,13 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
+                app:layout_constraintEnd_toStartOf="@id/space_read_sentence__parsed_word_spreader"
                 app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_1"
                 tools:text="うまく"
                 />
 
             <Space
-                android:id="@+id/space_read_sentence_1"
+                android:id="@+id/space_read_sentence__parsed_word_spreader"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -420,7 +411,7 @@
                 android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/text_read_sentence__selected_separator_2"
-                app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
+                app:layout_constraintStart_toEndOf="@+id/space_read_sentence__parsed_word_spreader"
                 tools:text="V"
                 />
 
@@ -450,18 +441,6 @@
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
-            android:id="@+id/button_read_sentence__submit_word"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/ic_narrow_arrow_right"
-            app:layout_constraintEnd_toEndOf="@id/layout_read_sentence__selected_word_simple_info"
-            app:layout_constraintTop_toTopOf="@id/layout_read_sentence__selected_word_simple_info"
-            app:layout_constraintBottom_toBottomOf="@id/layout_read_sentence__selected_word_simple_info"
-            android:background="@null"
-            app:tint="@color/grey_1"
-            />
-
         <TextView
             android:id="@+id/text_read_sentence__context"
             android:layout_width="match_parent"
@@ -487,82 +466,10 @@
             android:paddingTop="5dp"
             android:paddingBottom="15dp"
             android:textSize="@dimen/large_text"
-            app:layout_constraintBottom_toTopOf="@id/placeholder_read_sentence__select_mode"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="つまり、現代の日本ではヽ普通は体験てきなレ現場に出くわしてしるわけてす。"
-            />
-
-        <com.eywa.projectlectito.readSentence.ReadSentenceSelectModeView
-            android:id="@+id/button_read_sentence__select_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/placeholder_read_sentence__select_mode"
-            app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
-            android:elevation="10dp"
-            android:focusableInTouchMode="false"
-            />
-        <!--            android:focusable="true"-->
-
-        <Space
-            android:id="@+id/placeholder_read_sentence__select_mode"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginBottom="25dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__full_text"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__full_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__full_text"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_article"
-            app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_sentence"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/placeholder_read_sentence__select_mode"
-            app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
-            />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__previous_sentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__previous_sentence"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_navigate_before"
-            app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_sentence"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence__full_text"
-            app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
-            />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__next_sentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__next_sentence"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_navigate_next"
-            app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_sentence"
-            app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
             />
 
         <ImageView
@@ -592,16 +499,91 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:id="@+id/overlay_read_sentence_1"
+        android:id="@+id/placeholder_read_sentence__select_mode"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_read_sentence__full_text"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        style="@style/FloatingActionButton"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__full_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__full_text"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_article"
+        app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
+        app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_sentence"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/placeholder_read_sentence__select_mode"
+        app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__previous_sentence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__previous_sentence"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_navigate_before"
+        app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
+        app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_sentence"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/button_read_sentence__full_text"
+        app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__next_sentence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__next_sentence"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_navigate_next"
+        app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_sentence"
+        app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
+        />
+
+    <View
+        android:id="@+id/overlay_read_sentence__select_mode"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/white"
         android:alpha="0.7"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/layout_read_sentence__jisho_info"
-        android:elevation="0dp"
+        android:background="@color/white"
+        android:elevation="10dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.eywa.projectlectito.readSentence.ReadSentenceSelectModeView
+        android:id="@+id/button_read_sentence__select_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
+        app:layout_constraintStart_toStartOf="@id/placeholder_read_sentence__select_mode"
+        tools:visibility="gone"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

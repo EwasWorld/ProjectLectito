@@ -6,6 +6,10 @@
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
     <string name="view_texts__not_started">Not started</string>
+    <string name="view_texts__no_content">No content</string>
+    <string name="view_texts__submit_description">Search for word</string>
+    <string name="view_texts__type_word_hint">Search for a word</string>
+    <string name="view_texts__select_word_hint">Select a word</string>
 
     <!-- Read Sentence -->
     <string name="read_sentence__title">Read Sentence</string>
@@ -24,6 +28,7 @@
     <string name="read_sentence__parse_success">Sentence parsed succeeded</string>
     <string name="read_sentence__parse_failed">Sentence parse failed</string>
     <string name="read_sentence__select_mode_auto">Auto</string>
+    <string name="read_sentence__select_mode_auto_with_colour">Auto (coloured)</string>
     <string name="read_sentence__select_mode_select">Select</string>
     <string name="read_sentence__select_mode_type">Type</string>
 

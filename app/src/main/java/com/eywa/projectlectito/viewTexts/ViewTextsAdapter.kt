@@ -46,20 +46,6 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
         fun bind(item: Text.WithCurrentSnippetInfo) {
             itemView.findViewById<TextView>(R.id.text_view_texts_item__title).text = item.text.name
 
-            val progressView = itemView.findViewById<TextView>(R.id.text_view_texts_item__progress)
-            val isTextStarted = item.percentageRead != 0.0
-            progressView.visibility = isTextStarted.asVisibility()
-            itemView.findViewById<TextView>(R.id.text_view_texts_item__jp_delim).visibility =
-                    isTextStarted.asVisibility()
-            if (isTextStarted) {
-                @SuppressLint("SetTextI18n") // Literal only used for a symbol
-                progressView.text = (item.percentageRead * 100).roundToInt().toString() + "%"
-            }
-
-            itemView.findViewById<TextView>(R.id.text_view_texts_item__current).text =
-                    item.currentSnippet?.getChapterPageString()
-                            ?: itemView.resources.getString(R.string.view_texts__not_started)
-
             itemView.setOnClickListener {
                 ReadSentenceFragment.navigateTo(
                         itemView.findNavController(),
@@ -68,6 +54,29 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
                         item.text.currentCharacterIndex
                 )
             }
+
+            val progressView = itemView.findViewById<TextView>(R.id.text_view_texts_item__progress)
+            val currentView = itemView.findViewById<TextView>(R.id.text_view_texts_item__current)
+            val delimView = itemView.findViewById<TextView>(R.id.text_view_texts_item__jp_delim)
+
+            // No snippets
+            if (item.totalSnippets == 0) {
+                currentView.text = itemView.resources.getString(R.string.view_texts__no_content)
+                progressView.visibility = false.asVisibility()
+                delimView.visibility = false.asVisibility()
+                return
+            }
+
+            val isTextStarted = item.percentageRead != 0.0
+            progressView.visibility = isTextStarted.asVisibility()
+            delimView.visibility = isTextStarted.asVisibility()
+
+            if (isTextStarted) {
+                @SuppressLint("SetTextI18n") // Literal only used for a symbol
+                progressView.text = (item.percentageRead * 100).roundToInt().toString() + "%"
+            }
+            currentView.text = item.currentSnippet?.getChapterPageString()
+                    ?: itemView.resources.getString(R.string.view_texts__not_started)
         }
     }
 }

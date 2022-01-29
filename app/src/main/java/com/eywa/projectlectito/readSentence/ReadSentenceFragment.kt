@@ -92,6 +92,8 @@ class ReadSentenceFragment : Fragment() {
                 text_read_sentence__sentence.setTextIsSelectable(isInSelectionMode)
                 if (isInSelectionMode) {
                     text_read_sentence__sentence.clearFocus()
+                    text_read_sentence__selected_simple_word.text =
+                            resources.getString(R.string.view_texts__select_word_hint)
                 }
                 button_read_sentence__select_mode.setInitialState(selectMode)
                 displayDefinition()
@@ -111,7 +113,7 @@ class ReadSentenceFragment : Fragment() {
             displayDefinition()
         })
 
-        button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence_1, overlay_read_sentence_2)
+        button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence__select_mode)
         button_read_sentence__select_mode.selectModeChangedListener = {
             readSentenceViewModel.wordSelectMode.postValue(it)
             readSentenceViewModel.selectedWord.postValue(null)
@@ -195,7 +197,8 @@ class ReadSentenceFragment : Fragment() {
 
         text_read_sentence__sentence.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-                text_read_sentence__selected_simple_word.text = getSelectedText() ?: ""
+                text_read_sentence__selected_simple_word.text = getSelectedText()
+                        ?: resources.getString(R.string.view_texts__select_word_hint)
                 return true
             }
 
@@ -255,7 +258,7 @@ class ReadSentenceFragment : Fragment() {
 
         var isSentenceSet = false
         text_read_sentence__sentence.text = ""
-        if (wordSelectMode == ReadSentenceViewModel.WordSelectMode.AUTO) {
+        if (wordSelectMode?.isAuto == true) {
             text_read_sentence__sentence.setTextIsSelectable(false)
             sentenceWithInfo.parsedInfo?.let { it ->
                 text_read_sentence__sentence.text = it.getAsSpannedString(currentSentence)
@@ -276,7 +279,7 @@ class ReadSentenceFragment : Fragment() {
     }
 
     private fun showSelectedWordInfoViews() {
-        val isAutoSelect = wordSelectMode == ReadSentenceViewModel.WordSelectMode.AUTO
+        val isAutoSelect = wordSelectMode?.isAuto == true
 
         // Parsed info
         layout_read_sentence__selected_word_parsed_info.visibility = isAutoSelect.asVisibility()
@@ -334,14 +337,15 @@ class ReadSentenceFragment : Fragment() {
             }
             spannedString.setSpan(span, spanStartIndex, spanEndIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
 
-            // TODO Remove colouring
-            if (index % 2 == 1)
-                spannedString.setSpan(
-                        ForegroundColorSpan(Color.RED),
-                        spanStartIndex,
-                        spanEndIndex,
-                        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                )
+            if (wordSelectMode == ReadSentenceViewModel.WordSelectMode.AUTO_WITH_COLOUR) {
+                if (index % 2 == 1)
+                    spannedString.setSpan(
+                            ForegroundColorSpan(Color.RED),
+                            spanStartIndex,
+                            spanEndIndex,
+                            Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                    )
+            }
         }
         return spannedString
     }
@@ -419,14 +423,8 @@ class ReadSentenceFragment : Fragment() {
 
         if (!isDisplayed) {
             val toShowDefinition = resources.getString(
-                    when (wordSelectMode) {
-                        ReadSentenceViewModel.WordSelectMode.AUTO -> R.string.read_sentence__no_definition_auto
-                        ReadSentenceViewModel.WordSelectMode.SELECT -> R.string.read_sentence__no_definition_select
-                        ReadSentenceViewModel.WordSelectMode.TYPE -> R.string.read_sentence__no_definition_type
-                        null -> R.string.read_sentence__no_definition_select
-                    }
+                    wordSelectMode?.noDefinitionStringId ?: R.string.read_sentence__no_definition_select
             )
-
             text_read_sentence__no_definition.text =
                     resources.getString(R.string.read_sentence__no_definition).format(toShowDefinition)
         }

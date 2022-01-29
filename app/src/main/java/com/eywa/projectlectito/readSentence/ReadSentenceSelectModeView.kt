@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.asVisibility
@@ -15,6 +17,8 @@ class ReadSentenceSelectModeView : ConstraintLayout {
             field = value
             setMenuOpen(value)
         }
+    private lateinit var buttons: List<ModeButton>
+
     var overlays: List<View>? = null
         set(value) {
             field = value
@@ -51,6 +55,29 @@ class ReadSentenceSelectModeView : ConstraintLayout {
         (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
                 .inflate(R.layout.read_sentence_select_mode_view, this, true) as ConstraintLayout
 
+        buttons = listOf(
+                ModeButton(
+                        fab_read_sentence__select_mode_auto,
+                        text_read_sentence__select_mode_auto,
+                        ReadSentenceViewModel.WordSelectMode.AUTO
+                ),
+                ModeButton(
+                        fab_read_sentence__select_mode_auto_with_colour,
+                        text_read_sentence__select_mode_auto_with_colour,
+                        ReadSentenceViewModel.WordSelectMode.AUTO_WITH_COLOUR
+                ),
+                ModeButton(
+                        fab_read_sentence__select_mode_select,
+                        text_read_sentence__select_mode_select,
+                        ReadSentenceViewModel.WordSelectMode.SELECT
+                ),
+                ModeButton(
+                        fab_read_sentence__select_mode_type,
+                        text_read_sentence__select_mode_type,
+                        ReadSentenceViewModel.WordSelectMode.TYPE
+                )
+        )
+
         fab_read_sentence__select_mode_main.setOnClickListener {
             isOpen = !isOpen
             if (isOpen) {
@@ -58,23 +85,9 @@ class ReadSentenceSelectModeView : ConstraintLayout {
             }
         }
 
-        fab_read_sentence__select_mode_auto.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.AUTO)
-        }
-        fab_read_sentence__select_mode_select.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.SELECT)
-        }
-        fab_read_sentence__select_mode_type.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.TYPE)
-        }
-        text_read_sentence__select_mode_auto.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.AUTO)
-        }
-        text_read_sentence__select_mode_select.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.SELECT)
-        }
-        text_read_sentence__select_mode_type.setOnClickListener {
-            onButtonPressed(ReadSentenceViewModel.WordSelectMode.TYPE)
+        buttons.forEach { button ->
+            button.fab.setOnClickListener { onButtonPressed(button.mode) }
+            button.text.setOnClickListener { onButtonPressed(button.mode) }
         }
     }
 
@@ -99,15 +112,19 @@ class ReadSentenceSelectModeView : ConstraintLayout {
             return
         }
 
-        fab_read_sentence__select_mode_auto.visibility = isMenuOpen.asVisibility()
-        fab_read_sentence__select_mode_select.visibility = isMenuOpen.asVisibility()
-        fab_read_sentence__select_mode_type.visibility = isMenuOpen.asVisibility()
-        text_read_sentence__select_mode_auto.visibility = isMenuOpen.asVisibility()
-        text_read_sentence__select_mode_select.visibility = isMenuOpen.asVisibility()
-        text_read_sentence__select_mode_type.visibility = isMenuOpen.asVisibility()
+        buttons.forEach { button ->
+            button.fab.visibility = isMenuOpen.asVisibility()
+            button.text.visibility = isMenuOpen.asVisibility()
+        }
 
         overlays?.forEach {
             it.visibility = isMenuOpen.asVisibility()
         }
     }
+
+    data class ModeButton(
+            val fab: ImageButton,
+            val text: TextView,
+            val mode: ReadSentenceViewModel.WordSelectMode
+    )
 }
