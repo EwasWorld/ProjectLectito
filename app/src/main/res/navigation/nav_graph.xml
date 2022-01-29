@@ -34,4 +34,15 @@
         android:label="ViewTextsFragment"
         tools:layout="@layout/view_texts_fragment"
         />
+    <fragment
+        android:id="@+id/addSnippetFragment"
+        android:name="com.eywa.projectlectito.addSnippet.AddSnippetFragment"
+        android:label="AddSnippetFragment"
+        tools:layout="@layout/add_snippet_fragment"
+        >
+        <argument
+            android:name="textId"
+            app:argType="integer"
+            />
+    </fragment>
 </navigation>

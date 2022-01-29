@@ -25,6 +25,7 @@ class DatabaseDaggerModule(application: Application) {
     internal val lectitoRoomDatabase: LectitoRoomDatabase
 
     init {
+//        application.deleteDatabase(LectitoRoomDatabase.DATABASE_NAME)
         lectitoRoomDatabase =
                 Room.databaseBuilder(application, LectitoRoomDatabase::class.java, LectitoRoomDatabase.DATABASE_NAME)
                         .addCallback(PopulateDatabaseCallback(MainScope()))
@@ -47,6 +48,7 @@ class DatabaseDaggerModule(application: Application) {
         // TODO Remove initial data
         Log.i("Database", "Initial population of database")
         textsDao.insert(Text(1, "傭兵団の料理番"))
+        textsDao.insert(Text(2, "Test Text"))
         textSnippetsDao.insert(TextSnippet(1, TempTestData.page5Text, 1, 5, 1))
         textSnippetsDao.insert(TextSnippet(2, TempTestData.page6Text, 1, 6, 1))
         textSnippetsDao.insert(TextSnippet(3, TempTestData.page7Text, 1, 7, 1))

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    >
+
+    <TextView
+        android:id="@+id/text_add_snippet__text_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp"
+        android:textSize="@dimen/medium_text"
+        app:layout_constraintBottom_toTopOf="@+id/table_add_snippet__info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="傭兵団の料理番"
+        />
+
+    <TableLayout
+        android:id="@+id/table_add_snippet__info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_add_snippet__text_name"
+        >
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_snippet__chapter"
+                android:textAlignment="viewEnd"
+                android:textSize="@dimen/medium_text"
+                />
+
+            <EditText
+                android:id="@+id/text_add_snippet__chapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:hint="1"
+                android:inputType="number"
+                android:minWidth="@dimen/touch_target"
+                tools:ignore="HardcodedText"
+                />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_snippet__page"
+                android:textAlignment="viewEnd"
+                android:textSize="@dimen/medium_text"
+                />
+
+            <EditText
+                android:id="@+id/text_add_snippet__page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:hint="1"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                tools:ignore="HardcodedText"
+                />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/text_add_snippet__duplicate_page_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_snippet__duplicate_page_warning"
+        android:textColor="@color/read_sentence__warning_red"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/table_add_snippet__info"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/text_add_snippet__missing_field_warning"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_add_snippet__duplicate_page_warning"
+        >
+
+        <EditText
+            android:id="@+id/text_add_snippet__snippet_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:hint="@string/add_snippet__snippet_content_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:minWidth="@dimen/touch_target"
+            />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/text_add_snippet__missing_field_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="@string/add_snippet__required_fields_warning"
+        android:textColor="@color/read_sentence__warning_red"
+        app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="10dp"
+        android:paddingTop="5dp"
+        android:visibility="invisible"
+        />
+
+    <Button
+        android:id="@+id/button_add_snippet__submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_snippet__submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <Button
+        android:id="@+id/button_add_snippet__submit_and_another"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_snippet__submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

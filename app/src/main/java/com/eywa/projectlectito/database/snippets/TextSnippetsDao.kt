@@ -87,15 +87,11 @@ interface TextSnippetsDao {
             """
                 SELECT *
                 FROM ${TextSnippet.TABLE_NAME} 
-                WHERE 
-                        textId = :textId AND pageReference = :pageReference 
-                        AND chapterId = :chapterId AND ordinal = :ordinal
+                WHERE textId = :textId AND pageReference = :pageReference 
             """
     )
     fun getTextSnippetEntry(
             textId: Int,
-            pageReference: Int,
-            chapterId: Int? = 1,
-            ordinal: Int? = 1
-    ): LiveData<TextSnippet>
+            pageReference: Int
+    ): LiveData<List<TextSnippet>>
 }

@@ -14,4 +14,5 @@
     <color name="read_sentence__definition_background">#D6D6D6</color>
     <color name="read_sentence__success_green">#4CAF50</color>
     <color name="read_sentence__warning_orange">#FF9800</color>
+    <color name="read_sentence__warning_red">#FF5722</color>
 </resources>

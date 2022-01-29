@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.ToastSpamPrevention
+import com.eywa.projectlectito.addSnippet.AddSnippetFragment
 import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.readSentence.ReadSentenceFragment
@@ -47,12 +49,23 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
             itemView.findViewById<TextView>(R.id.text_view_texts_item__title).text = item.text.name
 
             itemView.setOnClickListener {
+                if (item.totalSnippets == 0) {
+                    ToastSpamPrevention.displayToast(
+                            itemView.context,
+                            itemView.resources.getString(R.string.view_texts__no_content_error)
+                    )
+                    return@setOnClickListener
+                }
                 ReadSentenceFragment.navigateTo(
                         itemView.findNavController(),
                         item.text.id,
                         item.text.currentSnippetId,
                         item.text.currentCharacterIndex
                 )
+            }
+            itemView.setOnLongClickListener {
+                AddSnippetFragment.navigateTo(itemView.findNavController(), item.text.id)
+                return@setOnLongClickListener true
             }
 
             val progressView = itemView.findViewById<TextView>(R.id.text_view_texts_item__progress)

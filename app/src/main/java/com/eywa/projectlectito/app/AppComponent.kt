@@ -1,6 +1,7 @@
 package com.eywa.projectlectito.app
 
 import android.app.Application
+import com.eywa.projectlectito.addSnippet.AddSnippetViewModel
 import com.eywa.projectlectito.database.DatabaseDaggerModule
 import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
 import com.eywa.projectlectito.viewTexts.ViewTextsViewModel
@@ -25,6 +26,7 @@ interface AppComponent {
     // TODO Move these into their own module(s)?
     fun inject(viewModel: ReadSentenceViewModel)
     fun inject(viewModel: ViewTextsViewModel)
+    fun inject(viewModel: AddSnippetViewModel)
 
     @Component.Builder
     interface Builder {

@@ -7,9 +7,23 @@
     <string name="view_texts__title">All Texts</string>
     <string name="view_texts__not_started">Not started</string>
     <string name="view_texts__no_content">No content</string>
+    <string name="view_texts__no_content_error">Entry has no content, long press to add text</string>
     <string name="view_texts__submit_description">Search for word</string>
     <string name="view_texts__type_word_hint">Search for a word</string>
     <string name="view_texts__select_word_hint">Select a word</string>
+
+    <!-- Add Snippet -->
+    <string name="add_snippet__title">Add page</string>
+    <string name="add_snippet__chapter">Chapter:</string>
+    <string name="add_snippet__page">Page:</string>
+    <string name="add_snippet__snippet_content_hint">Page text</string>
+    <string name="add_snippet__duplicate_page_warning">Warning: there is already an entry with this page number</string>
+    <string name="add_snippet__required_fields_warning">Error: required fields: %s</string>
+    <string name="add_snippet__missing_field_content">page text</string>
+    <string name="add_snippet__missing_field_page">page number</string>
+    <string name="add_snippet__submit">Add</string>
+    <string name="add_snippet__submit_and_another">Add and add another</string>
+    <string name="add_snippet__no_title">Unknown Text</string>
 
     <!-- Read Sentence -->
     <string name="read_sentence__title">Read Sentence</string>
