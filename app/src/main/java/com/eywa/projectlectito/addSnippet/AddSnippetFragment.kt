@@ -3,7 +3,6 @@ package com.eywa.projectlectito.addSnippet
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,10 +40,6 @@ class AddSnippetFragment : Fragment() {
 
         viewModel.textName.observe(viewLifecycleOwner, {
             text_add_snippet__text_name.text = it ?: resources.getString(R.string.add_snippet__no_title)
-        })
-        viewModel.existingPagesOrdinals.observe(viewLifecycleOwner, {
-            val ordinals = it
-            Log.i("tag", ordinals.joinToString(","))
         })
         viewModel.pageExists.observe(viewLifecycleOwner, {
             text_add_snippet__duplicate_page_warning.visibility = it.asVisibility(true)
@@ -94,6 +89,8 @@ class AddSnippetFragment : Fragment() {
                     )
             return false
         }
+
+        // TODO POLISH Warn the user when the content length is < 40 chars? We're expecting a page of text
 
         viewModel.insert(content.toString(), pageReference!!, text_add_snippet__chapter.text.asInt())
         return true

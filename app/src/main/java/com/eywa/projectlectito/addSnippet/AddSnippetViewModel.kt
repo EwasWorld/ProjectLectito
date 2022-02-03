@@ -31,7 +31,7 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     val pageReference = MutableLiveData<Int?>(null)
-    val existingPagesOrdinals = object : MediatorLiveData<List<Int>>() {
+    private val existingPagesOrdinals = object : MediatorLiveData<List<Int>>() {
         init {
             addSource(textId) { checkExists() }
             addSource(pageReference) { checkExists() }
@@ -54,6 +54,7 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     val pageExists = existingPagesOrdinals.map { !it.isNullOrEmpty() }
 
     fun insert(content: String, pageReference: Int, chapter: Int?) {
+        require(content.isNotBlank()) { "Content cannot be blank" }
         val textId = textId.value ?: throw IllegalArgumentException("No text id")
         val nextOrdinal = existingPagesOrdinals.value?.maxOrNull()?.plus(1) ?: 1
 

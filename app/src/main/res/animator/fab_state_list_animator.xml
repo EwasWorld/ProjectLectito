@@ -1,4 +1,4 @@
-<!-- TODO Implement animation https://stackoverflow.com/questions/35375153/android-floatingactionbutton-speed-dial -->
+<!-- TODO STRETCH implement animation https://stackoverflow.com/questions/35375153/android-floatingactionbutton-speed-dial -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_pressed="true"

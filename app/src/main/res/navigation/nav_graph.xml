@@ -19,12 +19,10 @@
         <argument
             android:name="currentSnippetId"
             app:argType="integer"
-            android:defaultValue="-1"
             />
         <argument
             android:name="currentCharacter"
             app:argType="integer"
-            android:defaultValue="-1"
             />
     </fragment>
 
@@ -42,6 +40,25 @@
         >
         <argument
             android:name="textId"
+            app:argType="integer"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/editSnippetFragment"
+        android:name="com.eywa.projectlectito.editSnippet.EditSnippetFragment"
+        android:label="EditSnippetFragment"
+        tools:layout="@layout/edit_snippet_fragment"
+        >
+        <argument
+            android:name="snippetId"
+            app:argType="integer"
+            />
+        <argument
+            android:name="startCharacter"
+            app:argType="integer"
+            />
+        <argument
+            android:name="endCharacterExclusive"
             app:argType="integer"
             />
     </fragment>

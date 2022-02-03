@@ -3,7 +3,6 @@ package com.eywa.projectlectito.readSentence
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
@@ -15,7 +14,6 @@ import kotlinx.android.synthetic.main.read_sentence_fragment.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// TODO Don't expose mutable data
 class ReadSentenceViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val LOG_TAG = "ReadSentenceViewModel"
@@ -116,7 +114,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
         // TODO Mediator will update twice, only want it to update once
-        currentCharacter.postValue(indexInfo.index)
+        currentCharacter.postValue(indexInfo.startIndex)
         textSnippetId.postValue(indexInfo.textSnippetId)
         return true
     }
@@ -176,7 +174,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 value = null
                 return
             }
-            Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().index}")
+            Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().startIndex}")
             value = SentenceWithInfo(sentence)
             if (wordSelectMode.value!!.isAuto) {
                 viewModelScope.launch {
@@ -196,36 +194,4 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val jishoWordDefinitions: JishoWordDefinitions? = null,
             val error: Boolean = false
     )
-
-    enum class WordSelectMode(
-            val iconId: Int,
-            val iconDescriptionId: Int,
-            val noDefinitionStringId: Int,
-            val isAuto: Boolean
-    ) {
-        AUTO(
-                R.drawable.ic_auto_fix,
-                R.string.read_sentence__select_mode_auto,
-                R.string.read_sentence__no_definition_auto,
-                true
-        ),
-        AUTO_WITH_COLOUR(
-                R.drawable.ic_auto_fix,
-                R.string.read_sentence__select_mode_auto_with_colour,
-                R.string.read_sentence__no_definition_auto,
-                true
-        ),
-        SELECT(
-                R.drawable.ic_touch,
-                R.string.read_sentence__select_mode_select,
-                R.string.read_sentence__no_definition_select,
-                false
-        ),
-        TYPE(
-                R.drawable.ic_text_fields,
-                R.string.read_sentence__select_mode_type,
-                R.string.read_sentence__no_definition_type,
-                false
-        )
-    }
 }

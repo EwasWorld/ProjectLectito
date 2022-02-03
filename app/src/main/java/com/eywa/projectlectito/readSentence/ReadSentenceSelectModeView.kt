@@ -29,7 +29,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
                 }
             }
         }
-    var selectModeChangedListener: ((ReadSentenceViewModel.WordSelectMode) -> Unit)? = null
+    var selectModeChangedListener: ((WordSelectMode) -> Unit)? = null
     var selectMenuOpenedListener: (() -> Unit)? = null
 
     constructor(context: Context) : super(context) {
@@ -59,22 +59,22 @@ class ReadSentenceSelectModeView : ConstraintLayout {
                 ModeButton(
                         fab_read_sentence__select_mode_auto,
                         text_read_sentence__select_mode_auto,
-                        ReadSentenceViewModel.WordSelectMode.AUTO
+                        WordSelectMode.AUTO
                 ),
                 ModeButton(
                         fab_read_sentence__select_mode_auto_with_colour,
                         text_read_sentence__select_mode_auto_with_colour,
-                        ReadSentenceViewModel.WordSelectMode.AUTO_WITH_COLOUR
+                        WordSelectMode.AUTO_WITH_COLOUR
                 ),
                 ModeButton(
                         fab_read_sentence__select_mode_select,
                         text_read_sentence__select_mode_select,
-                        ReadSentenceViewModel.WordSelectMode.SELECT
+                        WordSelectMode.SELECT
                 ),
                 ModeButton(
                         fab_read_sentence__select_mode_type,
                         text_read_sentence__select_mode_type,
-                        ReadSentenceViewModel.WordSelectMode.TYPE
+                        WordSelectMode.TYPE
                 )
         )
 
@@ -91,14 +91,14 @@ class ReadSentenceSelectModeView : ConstraintLayout {
         }
     }
 
-    fun setInitialState(selectMode: ReadSentenceViewModel.WordSelectMode) {
+    fun setInitialState(selectMode: WordSelectMode) {
         if (fab_read_sentence__select_mode_main.contentDescription.isNullOrBlank()) {
             fab_read_sentence__select_mode_main.setImageResource(selectMode.iconId)
             fab_read_sentence__select_mode_main.contentDescription = resources.getString(selectMode.iconDescriptionId)
         }
     }
 
-    private fun onButtonPressed(selectMode: ReadSentenceViewModel.WordSelectMode) {
+    private fun onButtonPressed(selectMode: WordSelectMode) {
         fab_read_sentence__select_mode_main.setImageResource(selectMode.iconId)
         fab_read_sentence__select_mode_main.contentDescription = resources.getString(selectMode.iconDescriptionId)
         isOpen = false
@@ -125,6 +125,6 @@ class ReadSentenceSelectModeView : ConstraintLayout {
     data class ModeButton(
             val fab: ImageButton,
             val text: TextView,
-            val mode: ReadSentenceViewModel.WordSelectMode
+            val mode: WordSelectMode
     )
 }

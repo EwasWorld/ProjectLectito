@@ -51,6 +51,51 @@ class Sentence(
     private var nextSentenceStart: RelativeIndexInfo? = null
     private var previousSentenceStart: RelativeIndexInfo? = null
 
+    /**
+     * Details of the snippets in this sentence
+     * Triple<start char in first snippet, end char in last snippet (null for entire last snippet), all snippet ids)
+     */
+    val snippetsInCurrentSentence: List<SnippetInfo>
+        get() {
+            var currentRelativeId = currentSentenceStart.relativeSnippet
+            val allSnippets = mutableListOf<SnippetInfo>()
+            var currentSentenceIndex = 0
+            do {
+                val snippet = currentRelativeId++.getSnippetFromId() ?: break
+                val actualId = snippet.id
+
+                val start = currentSentenceIndex
+                currentSentenceIndex += if (allSnippets.isNotEmpty()) {
+                    snippet.content
+                }
+                else {
+                    snippet.content.substring(currentSentenceStart.startIndex)
+                }.prepareForDisplay().length
+
+                var end = currentSentenceIndex
+                if (end > currentSentence!!.length) {
+                    end = currentSentence!!.length
+                }
+
+                allSnippets.add(SnippetInfo(actualId, start, end, null, null))
+            } while (nextSentenceStart?.relativeSnippet != null && currentRelativeId <= nextSentenceStart?.relativeSnippet!!)
+
+            if (allSnippets.isNotEmpty()) {
+                allSnippets.first().snippetStartIndex = currentSentenceStart.startIndex
+                allSnippets.last().snippetEndIndex = nextSentenceStart?.startIndex
+            }
+
+            return allSnippets
+        }
+
+    data class SnippetInfo(
+            val snippetId: Int,
+            val currentSentenceStartIndex: Int,
+            val currentSentenceEndIndex: Int,
+            var snippetStartIndex: Int?,
+            var snippetEndIndex: Int?
+    )
+
     fun getCurrentSentenceStart() = currentSentenceStart.toIndexInfo()
     fun getNextSentenceStart() = nextSentenceStart?.toIndexInfo()
     fun getPreviousSentenceStart() = previousSentenceStart?.toIndexInfo()
@@ -91,7 +136,7 @@ class Sentence(
         // Calculate boundaries
         setCurrentSentenceStart()
         setPreviousSentenceStart()
-        nextSentenceStart = findNextSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.index)
+        nextSentenceStart = findNextSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.startIndex)
 
         // Set sentences
         previousSentenceStart?.let { prevStart ->
@@ -117,14 +162,14 @@ class Sentence(
         require(currentSentenceStart.relativeSnippet == CURRENT_SNIPPET_RELATIVE_ID) {
             "Initial start must be in current snippet"
         }
-        require(currentSentenceStart.index >= 0) { "Sentence start cannot be < 0" }
+        require(currentSentenceStart.startIndex >= 0) { "Sentence start cannot be < 0" }
 
         val currentSnippetContent = currentSnippet?.content
-        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.index < currentSnippetContent.length
-                && !sentenceStops.contains(currentSnippetContent[currentSentenceStart.index])
+        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.startIndex < currentSnippetContent.length
+                && !sentenceStops.contains(currentSnippetContent[currentSentenceStart.startIndex])
         ) {
             currentSentenceStart =
-                    findPreviousSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.index)
+                    findPreviousSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.startIndex)
                             ?: currentSentenceStart
             return
         }
@@ -132,8 +177,8 @@ class Sentence(
         /*
          * Check forwards if currently on a sentence end char
          */
-        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.index < currentSnippetContent.length) {
-            val startIndex = FindType.FIRST_NON_STOP.find(currentSentenceStart.index)
+        if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.startIndex < currentSnippetContent.length) {
+            val startIndex = FindType.FIRST_NON_STOP.find(currentSentenceStart.startIndex)
             if (startIndex != null) {
                 currentSentenceStart = RelativeIndexInfo(startIndex, CURRENT_SNIPPET_RELATIVE_ID)
                 return
@@ -211,9 +256,9 @@ class Sentence(
     }
 
     private fun setPreviousSentenceStart() {
-        val previousEnd = previousSentenceEnd(currentSentenceStart.relativeSnippet, currentSentenceStart.index - 1)
+        val previousEnd = previousSentenceEnd(currentSentenceStart.relativeSnippet, currentSentenceStart.startIndex - 1)
                 ?: return
-        previousSentenceStart = findPreviousSentenceStart(previousEnd.relativeSnippet, previousEnd.index)
+        previousSentenceStart = findPreviousSentenceStart(previousEnd.relativeSnippet, previousEnd.startIndex)
     }
 
     private fun previousSentenceEnd(relativeSnippetId: Int, index: Int? = null): RelativeIndexInfo? {
@@ -278,12 +323,12 @@ class Sentence(
 
     private fun extractSentence(start: RelativeIndexInfo, end: RelativeIndexInfo?): String {
         if (end != null && start.relativeSnippet == end.relativeSnippet) {
-            return start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.index, end.index)
+            return start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.startIndex, end.startIndex)
                     .prepareForDisplay()
         }
 
         var tempSentence =
-                start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.index).prepareForDisplay()
+                start.relativeSnippet.getSnippetFromId()?.content!!.substring(start.startIndex).prepareForDisplay()
         var middleSnippet = start.relativeSnippet + 1
         while (middleSnippet != end?.relativeSnippet) {
             val middleSnippetContent = middleSnippet.getSnippetFromId()?.content ?: break
@@ -291,7 +336,7 @@ class Sentence(
             middleSnippet++
         }
         if (end != null) {
-            tempSentence += end.relativeSnippet.getSnippetFromId()?.content!!.substring(0, end.index)
+            tempSentence += end.relativeSnippet.getSnippetFromId()?.content!!.substring(0, end.startIndex)
                     .prepareForDisplay()
         }
         return tempSentence
@@ -367,7 +412,7 @@ class Sentence(
     }
 
     fun cancelParse() {
-        // TODO Do I need this guard?
+        // TODO CLEANUP Do I need this guard?
         if (parseJob.isActive || parseJob.isCompleted) {
             parseJob.cancel(CancellationException("New job created"))
         }
@@ -377,10 +422,10 @@ class Sentence(
         return currentSentence?.substring(start, end)
     }
 
-    private data class RelativeIndexInfo(val index: Int, val relativeSnippet: Int)
+    private data class RelativeIndexInfo(val startIndex: Int, val relativeSnippet: Int)
 
-    private fun RelativeIndexInfo.toIndexInfo() = IndexInfo(index, relativeSnippet.getSnippetFromId()!!.id)
-    data class IndexInfo(val index: Int, val textSnippetId: Int)
+    private fun RelativeIndexInfo.toIndexInfo() = IndexInfo(startIndex, relativeSnippet.getSnippetFromId()!!.id)
+    data class IndexInfo(val startIndex: Int, val textSnippetId: Int)
 
     private fun Int.getSnippetFromId() = when {
         this == CURRENT_SNIPPET_RELATIVE_ID -> currentSnippet

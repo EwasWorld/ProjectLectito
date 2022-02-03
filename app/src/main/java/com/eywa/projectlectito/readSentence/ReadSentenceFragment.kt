@@ -10,11 +10,14 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
+import com.eywa.projectlectito.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
 import kotlinx.android.synthetic.main.read_sentence_fragment.*
@@ -32,8 +35,8 @@ class ReadSentenceFragment : Fragment() {
         ) {
             val bundle = Bundle()
             bundle.putInt("textId", textId)
-            currentSnippetId?.let { bundle.putInt("currentSnippetId", it) }
-            currentCharacter?.let { bundle.putInt("currentCharacter", it) }
+            bundle.putInt("currentSnippetId", currentSnippetId ?: -1)
+            bundle.putInt("currentCharacter", currentCharacter ?: -1)
             navController.navigate(R.id.readSentenceFragment, bundle)
         }
     }
@@ -47,7 +50,7 @@ class ReadSentenceFragment : Fragment() {
 
     private var sentence: ReadSentenceViewModel.SentenceWithInfo? = null
     private var currentSelectionStart: Int? = null
-    private var wordSelectMode: ReadSentenceViewModel.WordSelectMode? = null
+    private var wordSelectMode: WordSelectMode? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.read_sentence_fragment, container, false)
@@ -80,15 +83,15 @@ class ReadSentenceFragment : Fragment() {
             text_read_sentence__chapter_page.text = it ?: ""
         })
         readSentenceViewModel.sentence.observe(viewLifecycleOwner, {
-
             sentence = it
             displaySentence(it)
+            button_read_sentence__edit_sentence.isEnabled = it?.sentence?.currentSentence != null
         })
         readSentenceViewModel.wordSelectMode.observe(viewLifecycleOwner, { selectMode ->
             if (selectMode != wordSelectMode) {
                 wordSelectMode = selectMode
                 sentence?.let { displaySentence(it) }
-                val isInSelectionMode = selectMode == ReadSentenceViewModel.WordSelectMode.SELECT
+                val isInSelectionMode = selectMode == WordSelectMode.SELECT
                 text_read_sentence__sentence.setTextIsSelectable(isInSelectionMode)
                 if (isInSelectionMode) {
                     text_read_sentence__sentence.clearFocus()
@@ -182,18 +185,20 @@ class ReadSentenceFragment : Fragment() {
             // TODO Sanitise
             @Suppress("non_exhaustive_when")
             when (wordSelectMode) {
-                ReadSentenceViewModel.WordSelectMode.SELECT -> {
+                WordSelectMode.SELECT -> {
                     getSelectedText()?.let { text ->
                         readSentenceViewModel.selectedWord.postValue(text)
                     }
                 }
-                ReadSentenceViewModel.WordSelectMode.TYPE -> {
+                WordSelectMode.TYPE -> {
                     val text = input_text_read_sentence__selected_simple_word.text?.toString()
                     if (text.isNullOrBlank()) return@setOnClickListener
                     readSentenceViewModel.selectedWord.postValue(text)
                 }
             }
         }
+
+        button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
 
         text_read_sentence__sentence.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
@@ -217,7 +222,7 @@ class ReadSentenceFragment : Fragment() {
     }
 
     fun getSelectedText(): String? {
-        if (wordSelectMode != ReadSentenceViewModel.WordSelectMode.SELECT) return null
+        if (wordSelectMode != WordSelectMode.SELECT) return null
         if (!text_read_sentence__sentence.hasSelection()) return null
 
         val start = text_read_sentence__sentence.selectionStart
@@ -261,15 +266,14 @@ class ReadSentenceFragment : Fragment() {
         if (wordSelectMode?.isAuto == true) {
             text_read_sentence__sentence.setTextIsSelectable(false)
             sentenceWithInfo.parsedInfo?.let { it ->
-                text_read_sentence__sentence.text = it.getAsSpannedString(currentSentence)
-                text_read_sentence__sentence.movementMethod = LinkMovementMethod.getInstance()
+                text_read_sentence__sentence.setTextSpans(it.getAsSpannedString(currentSentence))
                 isSentenceSet = true
             }
         }
         if (!isSentenceSet) {
             text_read_sentence__sentence.text = currentSentence
-            text_read_sentence__sentence.movementMethod = null
-            text_read_sentence__sentence.setTextIsSelectable(wordSelectMode == ReadSentenceViewModel.WordSelectMode.SELECT)
+            text_read_sentence__sentence.clearTextSpans()
+            text_read_sentence__sentence.setTextIsSelectable(wordSelectMode == WordSelectMode.SELECT)
         }
         showSelectedWordInfoViews()
 
@@ -290,9 +294,9 @@ class ReadSentenceFragment : Fragment() {
 
         if (!isAutoSelect) {
             input_text_read_sentence__selected_simple_word.visibility =
-                    (wordSelectMode == ReadSentenceViewModel.WordSelectMode.TYPE).asVisibility()
+                    (wordSelectMode == WordSelectMode.TYPE).asVisibility()
             text_read_sentence__selected_simple_word.visibility =
-                    (wordSelectMode == ReadSentenceViewModel.WordSelectMode.SELECT).asVisibility()
+                    (wordSelectMode == WordSelectMode.SELECT).asVisibility()
         }
     }
 
@@ -337,14 +341,15 @@ class ReadSentenceFragment : Fragment() {
             }
             spannedString.setSpan(span, spanStartIndex, spanEndIndex, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
 
-            if (wordSelectMode == ReadSentenceViewModel.WordSelectMode.AUTO_WITH_COLOUR) {
-                if (index % 2 == 1)
+            if (wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR) {
+                if (index % 2 == 1) {
                     spannedString.setSpan(
                             ForegroundColorSpan(Color.RED),
                             spanStartIndex,
                             spanEndIndex,
                             Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                     )
+                }
             }
         }
         return spannedString
@@ -428,5 +433,84 @@ class ReadSentenceFragment : Fragment() {
             text_read_sentence__no_definition.text =
                     resources.getString(R.string.read_sentence__no_definition).format(toShowDefinition)
         }
+    }
+
+    private fun editSentenceButtonAction() {
+        if (!overlay_read_sentence__sentence.hasOnClickListeners()) {
+            overlay_read_sentence__sentence.setOnClickListener {
+                displaySentence(sentence)
+                overlay_read_sentence__sentence.visibility = false.asVisibility()
+            }
+        }
+
+        sentence?.sentence?.let { currentSentence ->
+            val snippets = currentSentence.snippetsInCurrentSentence
+
+            if (snippets.isEmpty()) {
+                return
+            }
+            if (snippets.size == 1) {
+                EditSnippetFragment.navigateTo(
+                        requireView().findNavController(),
+                        snippets.first().snippetId,
+                        snippets.first().snippetStartIndex ?: 0,
+                        snippets.first().snippetEndIndex,
+                )
+                return
+            }
+
+            /*
+             * Setup select snippet spans
+             */
+            currentSentence.currentSentence ?: return
+
+            text_read_sentence__sentence.text = ""
+            text_read_sentence__sentence.setTextIsSelectable(false)
+            val spannableString = SpannableString(currentSentence.currentSentence)
+            snippets.forEachIndexed { index, snippetInfo -> spannableString.setSpan(index, snippetInfo) }
+            text_read_sentence__sentence.setTextSpans(spannableString)
+
+            overlay_read_sentence__sentence.visibility = true.asVisibility()
+        }
+    }
+
+    private fun SpannableString.setSpan(index: Int, snippetInfo: Sentence.SnippetInfo) {
+        if (index % 2 == 1) {
+            this.setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    snippetInfo.currentSentenceStartIndex,
+                    snippetInfo.currentSentenceEndIndex,
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        this.setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(p0: View) {
+                        EditSnippetFragment.navigateTo(
+                                requireView().findNavController(),
+                                snippetInfo.snippetId,
+                                snippetInfo.snippetStartIndex ?: 0,
+                                snippetInfo.snippetEndIndex
+                        )
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        // Don't underline or highlight the text
+                    }
+                },
+                snippetInfo.currentSentenceStartIndex,
+                snippetInfo.currentSentenceEndIndex,
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+    }
+
+    private fun TextView.setTextSpans(spannableString: SpannableString) {
+        this.text = spannableString
+        this.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun TextView.clearTextSpans() {
+        this.movementMethod = null
     }
 }

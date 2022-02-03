@@ -6,4 +6,9 @@
         <attr name="tags" format="string" />
         <attr name="index" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="HighlightOverlay">
+        <attr name="view_to_frame_id" format="reference" />
+        <attr name="overlay_color" format="color" />
+    </declare-styleable>
 </resources>

@@ -3,6 +3,9 @@
 
     <string name="a"></string>
 
+    <string name="complete">Complete</string>
+    <string name="cancel">Cancel</string>
+
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
     <string name="view_texts__not_started">Not started</string>
@@ -48,6 +51,11 @@
 
     <string name="err_read_sentence__no_more_sentences">No more sentences</string>
     <string name="err_read_sentence__no_more_definitions">No more definitions</string>
+
+    <!-- Edit Snippet -->
+    <string name="edit_snippet__title">Edit sentence</string>
+    <string name="edit_snippet__input_hint">New sentence</string>
+
 
     <!-- Misc -->
     <string-array name="card_state_array">
