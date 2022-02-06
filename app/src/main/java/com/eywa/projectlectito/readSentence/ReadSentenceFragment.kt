@@ -20,7 +20,12 @@ import com.eywa.projectlectito.*
 import com.eywa.projectlectito.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
-import kotlinx.android.synthetic.main.read_sentence_fragment.*
+import kotlinx.android.synthetic.main.rs_frag.*
+import kotlinx.android.synthetic.main.rs_frag.layout_read_sentence__jisho_info
+import kotlinx.android.synthetic.main.rs_frag.layout_read_sentence__selected_word_parsed_info
+import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
+import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
+import kotlinx.android.synthetic.main.rs_word_definition.*
 
 
 class ReadSentenceFragment : Fragment() {
@@ -53,7 +58,7 @@ class ReadSentenceFragment : Fragment() {
     private var wordSelectMode: WordSelectMode? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.read_sentence_fragment, container, false)
+        return inflater.inflate(R.layout.rs_frag, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,6 +66,8 @@ class ReadSentenceFragment : Fragment() {
         activity?.title = resources.getString(R.string.read_sentence__title)
 
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
+        layout_read_sentence__selected_word_simple_info.setLifecycleInfo(this, this)
+
         readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
             val test = it
             Log.d("ReadSentenceFragment", "Text snippets found: ${test.size}")
@@ -119,7 +126,7 @@ class ReadSentenceFragment : Fragment() {
         button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence__select_mode)
         button_read_sentence__select_mode.selectModeChangedListener = {
             readSentenceViewModel.wordSelectMode.postValue(it)
-            readSentenceViewModel.selectedWord.postValue(null)
+            readSentenceViewModel.searchWord.postValue(null)
         }
         button_read_sentence__select_mode.selectMenuOpenedListener = {
             text_read_sentence__sentence.clearFocus()
@@ -178,32 +185,14 @@ class ReadSentenceFragment : Fragment() {
         }
 
         button_read_sentence__close_definition.setOnClickListener {
-            readSentenceViewModel.selectedWord.postValue(null)
-        }
-
-        button_read_sentence__submit_word.setOnClickListener {
-            // TODO Sanitise
-            @Suppress("non_exhaustive_when")
-            when (wordSelectMode) {
-                WordSelectMode.SELECT -> {
-                    getSelectedText()?.let { text ->
-                        readSentenceViewModel.selectedWord.postValue(text)
-                    }
-                }
-                WordSelectMode.TYPE -> {
-                    val text = input_text_read_sentence__selected_simple_word.text?.toString()
-                    if (text.isNullOrBlank()) return@setOnClickListener
-                    readSentenceViewModel.selectedWord.postValue(text)
-                }
-            }
+            readSentenceViewModel.searchWord.postValue(null)
         }
 
         button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
 
         text_read_sentence__sentence.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
-                text_read_sentence__selected_simple_word.text = getSelectedText()
-                        ?: resources.getString(R.string.view_texts__select_word_hint)
+                readSentenceViewModel.selectedWord.postValue(getSelectedText())
                 return true
             }
 
@@ -287,17 +276,6 @@ class ReadSentenceFragment : Fragment() {
 
         // Parsed info
         layout_read_sentence__selected_word_parsed_info.visibility = isAutoSelect.asVisibility()
-
-        // Simple word display and submit
-        layout_read_sentence__selected_word_simple_info.visibility = (!isAutoSelect).asVisibility()
-        button_read_sentence__submit_word.visibility = (!isAutoSelect).asVisibility()
-
-        if (!isAutoSelect) {
-            input_text_read_sentence__selected_simple_word.visibility =
-                    (wordSelectMode == WordSelectMode.TYPE).asVisibility()
-            text_read_sentence__selected_simple_word.visibility =
-                    (wordSelectMode == WordSelectMode.SELECT).asVisibility()
-        }
     }
 
     private fun List<ParsedInfo>.getAsSpannedString(currentSentence: String): SpannableString {
@@ -331,7 +309,7 @@ class ReadSentenceFragment : Fragment() {
                     // supplementary symbol (number, punctuation, etc.)
                     val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
                     if (isWord) {
-                        readSentenceViewModel.selectedWord.postValue(parsedInfo.dictionaryForm)
+                        readSentenceViewModel.searchWord.postValue(parsedInfo.dictionaryForm)
                     }
                 }
 

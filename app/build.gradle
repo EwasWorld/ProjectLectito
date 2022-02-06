@@ -40,6 +40,19 @@ android {
         // Exclude documentation files from the packaging
         exclude 'META-INF/*'
     }
+
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src/main/res',
+                        'src/main/res/read_sentence_res'
+            }
+        }
+    }
+
+    buildFeatures {
+        dataBinding true
+    }
 }
 
 dependencies {

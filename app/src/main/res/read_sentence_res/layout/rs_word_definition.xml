@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_read_sentence__jisho_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/read_sentence__definition_background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="15dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHeight_default="wrap"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    >
+
+    <TextView
+        android:id="@+id/text_read_sentence__reading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__word"
+        app:layout_constraintEnd_toEndOf="@id/text_read_sentence__word"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/text_read_sentence__word"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="ふつう"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/large_text"
+        app:layout_constraintBottom_toTopOf="@+id/layout_read_sentence__english_definitions_scroll"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__reading"
+        tools:text="普通"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__is_common"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="5dp"
+        android:text="@string/read_sentence__common"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintEnd_toStartOf="@id/text_read_sentence__jlpt"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__jlpt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="N4"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_read_sentence__jlpt"
+        tools:text="wanikani31"
+        />
+
+    <ScrollView
+        android:id="@+id/layout_read_sentence__english_definitions_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginVertical="10dp"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__word"
+        >
+
+        <LinearLayout
+            android:id="@+id/layout_read_sentence__english_definitions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            >
+
+            <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:definition="normal; ordinary; regular; usual; common; average"
+                app:index="1"
+                app:parts_of_speech="Na-adjective"
+                app:tags="Usually written using kana alone"
+                />
+
+            <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:definition="normally; ordinarily; usually; generally; commonly"
+                app:index="2"
+                app:parts_of_speech="Adverb (fukushi)"
+                app:tags=""
+                />
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/text_read_sentence__other_forms_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/read_sentence__other_forms_label"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__other_forms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
+        tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__close_definition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__previous_definition"
+        android:focusable="true"
+        android:src="@drawable/ic_cross"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_definition"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__previous_definition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__previous_definition"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_navigate_before"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/spinner_read_sentence__state"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/button_read_sentence__close_definition"
+        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
+        />
+
+    <!-- TODO Implement learning state -->
+    <Spinner
+        android:id="@+id/spinner_read_sentence__state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__previous_definition"
+        app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_definition"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_definition"
+        app:layout_constraintTop_toTopOf="@id/button_read_sentence__previous_definition"
+        tools:entries="@array/card_state_array"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_read_sentence__next_definition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:contentDescription="@string/read_sentence__next_definition"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_navigate_next"
+        app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/spinner_read_sentence__state"
+        app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

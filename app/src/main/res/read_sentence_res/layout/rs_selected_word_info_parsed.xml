@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_read_sentence__selected_word_parsed_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/rs_selected_word_background"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="5dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    >
+
+    <TextView
+        android:id="@+id/text_read_sentence__selected_parsed_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="うまい"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__selected_separator_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="・"
+        android:textSize="@dimen/small_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_read_sentence__dictionary_form"
+        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_parsed_word"
+        tools:ignore="HardcodedText"
+        tools:visibility="visible"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__dictionary_form"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
+        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_1"
+        tools:text="うまく"
+        />
+
+    <Space
+        android:id="@+id/space_read_sentence_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_read_sentence__parts_of_speech"
+        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__dictionary_form"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__parts_of_speech"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_read_sentence__selected_separator_2"
+        app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
+        tools:text="V"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__selected_separator_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="・"
+        android:textSize="@dimen/small_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_read_sentence__pitch_accent"
+        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__parts_of_speech"
+        tools:ignore="HardcodedText"
+        tools:visibility="visible"
+        />
+
+    <TextView
+        android:id="@+id/text_read_sentence__pitch_accent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/small_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_2"
+        tools:text="1"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

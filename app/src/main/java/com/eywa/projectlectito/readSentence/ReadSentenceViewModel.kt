@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.eywa.projectlectito.app.App
+import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
@@ -81,12 +82,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Word definitions
      */
     val selectedWord = MutableLiveData<String?>()
+    val searchWord = MutableLiveData<String?>()
     val currentDefinition = MutableLiveData<Int>()
     val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
         var currentRequester: WordDefinitionRequester? = null
 
         init {
-            addSource(selectedWord.distinctUntilChanged()) { word ->
+            addSource(searchWord.distinctUntilChanged()) { word ->
                 if (word.isNullOrBlank()) {
                     postValue(null)
                     return@addSource
@@ -194,4 +196,17 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val jishoWordDefinitions: JishoWordDefinitions? = null,
             val error: Boolean = false
     )
+
+    /*
+     * Data binding states
+     */
+    val selectedWordSimpleViewState = SelectedWordInfoSimpleViewState()
+
+    inner class SelectedWordInfoSimpleViewState {
+        val showView: LiveData<Int> = wordSelectMode.map {
+            (it == WordSelectMode.SELECT || it == WordSelectMode.TYPE).asVisibility()
+        }
+        val selectVisibility: LiveData<Int> = wordSelectMode.map { (it == WordSelectMode.SELECT).asVisibility() }
+        val typeVisibility: LiveData<Int> = wordSelectMode.map { (it == WordSelectMode.TYPE).asVisibility() }
+    }
 }
