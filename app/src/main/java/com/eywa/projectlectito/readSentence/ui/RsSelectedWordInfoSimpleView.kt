@@ -63,7 +63,7 @@ class RsSelectedWordInfoSimpleView : ConstraintLayout {
         readSentenceViewModel.selectedWord.observe(layout.lifecycleOwner!!, { newWord ->
             selectedWord = newWord
             val selectedWordIndicatorText = if (newWord.isNullOrBlank()) {
-                resources.getString(R.string.view_texts__select_word_hint)
+                resources.getString(R.string.read_sentence__select_word_hint)
             }
             else {
                 newWord

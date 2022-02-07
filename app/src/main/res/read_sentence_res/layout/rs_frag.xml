@@ -107,9 +107,8 @@
             tools:visibility="gone"
             />
 
-        <include
+        <com.eywa.projectlectito.readSentence.ui.RsSelectedWordInfoParsedView
             android:id="@+id/layout_read_sentence__selected_word_parsed_info"
-            layout="@layout/rs_selected_word_info_parsed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

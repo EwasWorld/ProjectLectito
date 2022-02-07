@@ -3,8 +3,8 @@ package com.eywa.projectlectito.readSentence
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.eywa.projectlectito.JAPANESE_LIST_DELIMINATOR
 import com.eywa.projectlectito.app.App
-import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
@@ -12,6 +12,7 @@ import com.eywa.projectlectito.database.texts.TextsRepo
 import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionRequester
 import kotlinx.android.synthetic.main.read_sentence_fragment.*
+import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -63,7 +64,9 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Current sentence info
      */
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    val wordSelectMode = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
+    private val wordSelectModeMutable = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
+    val wordSelectMode: LiveData<WordSelectMode> = wordSelectModeMutable.distinctUntilChanged()
+    val selectedParsedInfo = MutableLiveData<ParsedInfo?>(null)
     val sentence: LiveData<SentenceWithInfo?> =
             SentenceMediatorLiveData(
                     currentSnippet,
@@ -81,8 +84,8 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     /*
      * Word definitions
      */
-    val selectedWord = MutableLiveData<String?>()
-    val searchWord = MutableLiveData<String?>()
+    val selectedWord = MutableLiveData<String?>(null)
+    val searchWord = MutableLiveData<String?>(null)
     val currentDefinition = MutableLiveData<Int>()
     val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
         var currentRequester: WordDefinitionRequester? = null
@@ -112,6 +115,12 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 }
             }
         }
+    }
+
+    fun updateWordSelectMode(wordSelectMode: WordSelectMode) {
+        wordSelectModeMutable.postValue(wordSelectMode)
+        selectedWord.postValue(null)
+        searchWord.postValue(null)
     }
 
     fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
@@ -201,12 +210,41 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Data binding states
      */
     val selectedWordSimpleViewState = SelectedWordInfoSimpleViewState()
+    val selectedWordParsedViewState = SelectedWordInfoParsedViewState()
 
     inner class SelectedWordInfoSimpleViewState {
-        val showView: LiveData<Int> = wordSelectMode.map {
-            (it == WordSelectMode.SELECT || it == WordSelectMode.TYPE).asVisibility()
+        val showView: LiveData<Boolean> = wordSelectMode.map {
+            it == WordSelectMode.SELECT || it == WordSelectMode.TYPE
         }
-        val selectVisibility: LiveData<Int> = wordSelectMode.map { (it == WordSelectMode.SELECT).asVisibility() }
-        val typeVisibility: LiveData<Int> = wordSelectMode.map { (it == WordSelectMode.TYPE).asVisibility() }
+        val selectVisibility: LiveData<Boolean> = wordSelectMode.map { it == WordSelectMode.SELECT }
+        val typeVisibility: LiveData<Boolean> = wordSelectMode.map { it == WordSelectMode.TYPE }
     }
+
+    inner class SelectedWordInfoParsedViewState(
+            val showView: LiveData<Boolean> = wordSelectMode.map { it.isAuto },
+            val originalWord: LiveData<String?> = selectedWord,
+            val dictionaryForm: LiveData<String?> = object : MediatorLiveData<String?>() {
+                init {
+                    addSource(selectedParsedInfo) { update() }
+                    addSource(originalWord) { update() }
+                }
+
+                private fun update() {
+                    val parsedInfo = selectedParsedInfo.value
+                    if (parsedInfo == null || parsedInfo.dictionaryForm == originalWord.value) {
+                        postValue(null)
+                        return
+                    }
+                    postValue(parsedInfo.dictionaryForm)
+                }
+            },
+            val partsOfSpeech: LiveData<String?> = selectedParsedInfo.map { parsedInfo ->
+                parsedInfo?.partsOfSpeech
+                        ?.filterNot { it.isBlank() || it == "*" }
+                        ?.joinToString(JAPANESE_LIST_DELIMINATOR)
+            },
+            val pitchAccent: LiveData<String?> = selectedParsedInfo.map { parsedInfo ->
+                parsedInfo?.pitchAccentPattern?.toString()
+            },
+    )
 }

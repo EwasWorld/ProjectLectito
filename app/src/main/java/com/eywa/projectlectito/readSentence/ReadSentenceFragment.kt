@@ -22,7 +22,6 @@ import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
 import kotlinx.android.synthetic.main.rs_frag.*
 import kotlinx.android.synthetic.main.rs_frag.layout_read_sentence__jisho_info
-import kotlinx.android.synthetic.main.rs_frag.layout_read_sentence__selected_word_parsed_info
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
 import kotlinx.android.synthetic.main.rs_word_definition.*
@@ -67,6 +66,7 @@ class ReadSentenceFragment : Fragment() {
 
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         layout_read_sentence__selected_word_simple_info.setLifecycleInfo(this, this)
+        layout_read_sentence__selected_word_parsed_info.setLifecycleInfo(this, this)
 
         readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
             val test = it
@@ -102,8 +102,6 @@ class ReadSentenceFragment : Fragment() {
                 text_read_sentence__sentence.setTextIsSelectable(isInSelectionMode)
                 if (isInSelectionMode) {
                     text_read_sentence__sentence.clearFocus()
-                    text_read_sentence__selected_simple_word.text =
-                            resources.getString(R.string.view_texts__select_word_hint)
                 }
                 button_read_sentence__select_mode.setInitialState(selectMode)
                 displayDefinition()
@@ -125,8 +123,7 @@ class ReadSentenceFragment : Fragment() {
 
         button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence__select_mode)
         button_read_sentence__select_mode.selectModeChangedListener = {
-            readSentenceViewModel.wordSelectMode.postValue(it)
-            readSentenceViewModel.searchWord.postValue(null)
+            readSentenceViewModel.updateWordSelectMode(it)
         }
         button_read_sentence__select_mode.selectMenuOpenedListener = {
             text_read_sentence__sentence.clearFocus()
@@ -286,25 +283,13 @@ class ReadSentenceFragment : Fragment() {
 
             val span = object : ClickableSpan() {
                 override fun onClick(p0: View) {
-                    val originalWord = currentSentence.substring(spanStartIndex, spanEndIndex)
-                    val showDictionary = originalWord != parsedInfo.dictionaryForm
-                    text_read_sentence__selected_parsed_word.text = originalWord
-                    if (showDictionary) {
-                        text_read_sentence__dictionary_form.text = parsedInfo.dictionaryForm
-                    }
-                    text_read_sentence__dictionary_form.visibility = showDictionary.asVisibility()
-                    text_read_sentence__selected_separator_1.visibility = showDictionary.asVisibility()
-
-                    text_read_sentence__parts_of_speech.text = parsedInfo.partsOfSpeech
-                            .filterNot { it.isBlank() || it == "*" }
-                            .joinToString(japaneseListDelimiter)
-
-                    val showPitchAccent = parsedInfo.pitchAccentPattern != null
-                    if (showPitchAccent) {
-                        text_read_sentence__pitch_accent.text = parsedInfo.pitchAccentPattern.toString()
-                    }
-                    text_read_sentence__pitch_accent.visibility = showPitchAccent.asVisibility()
-                    text_read_sentence__selected_separator_2.visibility = showPitchAccent.asVisibility()
+                    readSentenceViewModel.selectedWord.postValue(
+                            currentSentence.substring(
+                                    spanStartIndex,
+                                    spanEndIndex
+                            )
+                    )
+                    readSentenceViewModel.selectedParsedInfo.postValue(parsedInfo)
 
                     // supplementary symbol (number, punctuation, etc.)
                     val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"

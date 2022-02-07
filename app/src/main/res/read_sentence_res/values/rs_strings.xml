@@ -2,6 +2,8 @@
 <resources>
     <string name="read_sentence__"></string>
 
+    <string name="read_sentence__select_word_hint">Select a word</string>
+
     <string name="read_sentence__simple_selected__submit_bad_type">Internal error</string>
     <string name="read_sentence__simple_selected__submit_no_word_select">No word selected</string>
     <string name="read_sentence__simple_selected__submit_no_word_type">No word entered</string>

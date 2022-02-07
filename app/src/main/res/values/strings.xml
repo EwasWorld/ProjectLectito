@@ -13,7 +13,6 @@
     <string name="view_texts__no_content_error">Entry has no content, long press to add text</string>
     <string name="view_texts__submit_description">Search for word</string>
     <string name="view_texts__type_word_hint">Search for a word</string>
-    <string name="view_texts__select_word_hint">Select a word</string>
 
     <!-- Add Snippet -->
     <string name="add_snippet__title">Add page</string>

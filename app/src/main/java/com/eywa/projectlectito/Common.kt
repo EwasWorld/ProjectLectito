@@ -19,5 +19,7 @@ fun Resources.getColorByTheme(colourResourceId: Int, theme: Resources.Theme): In
     }
 }
 
+const val JAPANESE_LIST_DELIMINATOR = "・"
+
 class Common {
 }
