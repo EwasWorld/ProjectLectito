@@ -18,10 +18,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
 import com.eywa.projectlectito.editSnippet.EditSnippetFragment
-import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
 import kotlinx.android.synthetic.main.rs_frag.*
-import kotlinx.android.synthetic.main.rs_frag.layout_read_sentence__jisho_info
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
 import kotlinx.android.synthetic.main.rs_word_definition.*
@@ -29,8 +26,6 @@ import kotlinx.android.synthetic.main.rs_word_definition.*
 
 class ReadSentenceFragment : Fragment() {
     companion object {
-        private const val japaneseListDelimiter = "・"
-
         fun navigateTo(
                 navController: NavController,
                 textId: Int,
@@ -49,9 +44,6 @@ class ReadSentenceFragment : Fragment() {
 
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
-    private var allDefinitionsForWord: JishoWordDefinitions? = null
-    private var currentDefinitionIndex: Int? = null
-
     private var sentence: ReadSentenceViewModel.SentenceWithInfo? = null
     private var currentSelectionStart: Int? = null
     private var wordSelectMode: WordSelectMode? = null
@@ -67,6 +59,7 @@ class ReadSentenceFragment : Fragment() {
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         layout_read_sentence__selected_word_simple_info.setLifecycleInfo(this, this)
         layout_read_sentence__selected_word_parsed_info.setLifecycleInfo(this, this)
+        layout_read_sentence__word_definition.setLifecycleInfo(this, this)
 
         readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
             val test = it
@@ -104,21 +97,10 @@ class ReadSentenceFragment : Fragment() {
                     text_read_sentence__sentence.clearFocus()
                 }
                 button_read_sentence__select_mode.setInitialState(selectMode)
-                displayDefinition()
             }
         })
         readSentenceViewModel.textName.observe(viewLifecycleOwner, {
             text_read_sentence__current_text_title.text = it ?: ""
-        })
-
-        readSentenceViewModel.definitions.observe(viewLifecycleOwner, {
-            // TODO Handle loading and errors
-            allDefinitionsForWord = it?.jishoWordDefinitions
-            displayDefinition()
-        })
-        readSentenceViewModel.currentDefinition.observe(viewLifecycleOwner, {
-            currentDefinitionIndex = it
-            displayDefinition()
         })
 
         button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence__select_mode)
@@ -155,34 +137,6 @@ class ReadSentenceFragment : Fragment() {
                 }
                 readSentenceViewModel.updateCurrentCharacter(previousSentenceStart)
             }
-        }
-
-        button_read_sentence__next_definition.setOnClickListener {
-            val totalDefinitions = allDefinitionsForWord?.data?.size
-            if (totalDefinitions == null || (currentDefinitionIndex != null && totalDefinitions <= currentDefinitionIndex!! + 1)) {
-                ToastSpamPrevention.displayToast(
-                        requireContext(),
-                        resources.getString(R.string.err_read_sentence__no_more_definitions)
-                )
-                return@setOnClickListener
-            }
-            readSentenceViewModel.currentDefinition.postValue(currentDefinitionIndex!! + 1)
-        }
-
-        button_read_sentence__previous_definition.setOnClickListener {
-            val totalDefinitions = allDefinitionsForWord?.data?.size
-            if (totalDefinitions == null || currentDefinitionIndex == null || currentDefinitionIndex!! == 0) {
-                ToastSpamPrevention.displayToast(
-                        requireContext(),
-                        resources.getString(R.string.err_read_sentence__no_more_definitions)
-                )
-                return@setOnClickListener
-            }
-            readSentenceViewModel.currentDefinition.postValue(currentDefinitionIndex!! - 1)
-        }
-
-        button_read_sentence__close_definition.setOnClickListener {
-            readSentenceViewModel.searchWord.postValue(null)
         }
 
         button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
@@ -316,86 +270,6 @@ class ReadSentenceFragment : Fragment() {
             }
         }
         return spannedString
-    }
-
-    private fun displayDefinition() {
-        if (allDefinitionsForWord == null) {
-            showWordDefinition(false)
-            return
-        }
-        if (currentDefinitionIndex == null) {
-            currentDefinitionIndex = 0
-        }
-
-        val currentDefinition = allDefinitionsForWord!!.data[currentDefinitionIndex!!]
-        if (currentDefinition.japanese.isNullOrEmpty()) {
-            showWordDefinition(false)
-            throw IllegalArgumentException("Jisho data contains no japanese entries")
-        }
-        if (currentDefinition.japanese.isNullOrEmpty()) {
-            showWordDefinition(false)
-            throw IllegalArgumentException("Jisho data contains no senses entries")
-        }
-
-        button_read_sentence__previous_definition.isEnabled = currentDefinitionIndex != 0
-        button_read_sentence__next_definition.isEnabled =
-                currentDefinitionIndex!! + 1 < allDefinitionsForWord!!.data.size
-
-        var word = currentDefinition.japanese[0].word
-        if (word.isNullOrBlank()) {
-            word = currentDefinition.slug
-        }
-        var reading: String? = currentDefinition.japanese[0].reading
-        if (reading == word) {
-            reading = null
-        }
-        text_read_sentence__word.text = word
-        if (reading != null) {
-            text_read_sentence__reading.text = reading
-        }
-        text_read_sentence__reading.visibility = (reading != null).asVisibility()
-
-        text_read_sentence__is_common.visibility = currentDefinition.is_common.asVisibility()
-        text_read_sentence__jlpt.text = currentDefinition.jlpt.joinToString(",")
-        text_read_sentence__tags.text = currentDefinition.tags.joinToString(", ")
-
-        layout_read_sentence__english_definitions.removeAllViews()
-        for (indexedItem in currentDefinition.senses.withIndex()) {
-            val item = indexedItem.value
-
-            val wordDefinitionView = WordDefinitionDetailView(requireContext())
-            layout_read_sentence__english_definitions.addView(wordDefinitionView)
-
-            wordDefinitionView.updateDefinition(item.english_definitions.joinToString("; "))
-            wordDefinitionView.updatePartsOfSpeech(item.parts_of_speech.joinToString("; "))
-            wordDefinitionView.updateTags(item.tags.joinToString("; "))
-            wordDefinitionView.updateIndex(indexedItem.index + 1)
-        }
-
-        // First item is used when displaying the main word
-        val hasOtherForms = currentDefinition.japanese.size > 1
-        if (hasOtherForms) {
-            text_read_sentence__other_forms.text = currentDefinition.japanese
-                    .subList(1, currentDefinition.japanese.size)
-                    .joinToString(japaneseListDelimiter) { "${it.word}[${it.reading}]" }
-        }
-        text_read_sentence__other_forms_label.visibility = hasOtherForms.asVisibility()
-        text_read_sentence__other_forms.visibility = hasOtherForms.asVisibility()
-
-        showWordDefinition(true)
-    }
-
-    private fun showWordDefinition(isDisplayed: Boolean) {
-        text_read_sentence__no_definition.visibility = (!isDisplayed).asVisibility()
-        layout_read_sentence__jisho_info.visibility = isDisplayed.asVisibility()
-
-        if (!isDisplayed) {
-            val toShowDefinition = resources.getString(
-                    wordSelectMode?.noDefinitionStringId ?: R.string.read_sentence__no_definition_select
-            )
-            text_read_sentence__no_definition.text =
-                    resources.getString(R.string.read_sentence__no_definition).format(toShowDefinition)
-        }
     }
 
     private fun editSentenceButtonAction() {

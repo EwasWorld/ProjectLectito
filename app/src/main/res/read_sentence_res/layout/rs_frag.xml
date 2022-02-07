@@ -7,37 +7,17 @@
     android:layout_height="match_parent"
     >
 
-    <TextView
-        android:id="@+id/text_read_sentence__no_definition"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/read_sentence__definition_background"
-        android:gravity="center"
-        android:paddingVertical="20dp"
-        android:textSize="@dimen/small_text"
-        app:layout_constraintBottom_toTopOf="@id/layout_read_sentence__jisho_info"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread_inside"
-        tools:text="No word selected.\nClick on a word to show its definition."
-        tools:visibility="gone"
-        />
-
-    <include
-        android:id="@+id/layout_read_sentence__jisho_info"
-        layout="@layout/rs_word_definition"
+    <com.eywa.projectlectito.readSentence.ui.RsWordDefinitionView
+        android:id="@+id/layout_read_sentence__word_definition"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/layout_read_sentence__text_contents"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="wrap"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_read_sentence__no_definition"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread_inside"
-        tools:visibility="visible"
         />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jisho_info"
+        app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__word_definition"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout

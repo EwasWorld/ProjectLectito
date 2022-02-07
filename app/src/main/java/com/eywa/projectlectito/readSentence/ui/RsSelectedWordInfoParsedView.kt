@@ -11,7 +11,6 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectedWordInfoParsedBinding
 import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
 import com.eywa.projectlectito.readSentence.WordSelectMode
-import kotlinx.android.synthetic.main.rs_selected_word_info_simple.view.*
 
 class RsSelectedWordInfoParsedView : ConstraintLayout {
     companion object {
@@ -53,6 +52,7 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
         setupListeners()
     }
 
+    // TODO Remove
     private fun setupListeners() {
         readSentenceViewModel.selectedWord.observe(layout.lifecycleOwner!!, { newWord ->
             selectedWord = newWord

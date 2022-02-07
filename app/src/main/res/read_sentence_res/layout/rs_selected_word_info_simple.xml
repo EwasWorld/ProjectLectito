@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel"
+            name="viewState"
+            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel.SelectedWordInfoSimpleViewState"
             />
     </data>
 
@@ -19,7 +19,7 @@
         android:background="@color/rs_selected_word_background"
         android:paddingStart="20dp"
         android:paddingEnd="15dp"
-        app:visibleOrGone="@{viewModel.selectedWordSimpleViewState.showView}"
+        app:visibleOrGone="@{viewState.showView}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewModel.selectedWordSimpleViewState.selectVisibility}"
+            app:visibleOrGone="@{viewState.selectVisibility}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -49,7 +49,7 @@
             android:inputType="text"
             android:maxLines="1"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewModel.selectedWordSimpleViewState.typeVisibility}"
+            app:visibleOrGone="@{viewState.typeVisibility}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__submit_word"
             app:layout_constraintHorizontal_chainStyle="spread_inside"

@@ -50,7 +50,7 @@ class RsSelectedWordInfoSimpleView : ConstraintLayout {
     fun setLifecycleInfo(viewModelStoreOwner: ViewModelStoreOwner, lifecycleOwner: LifecycleOwner) {
         readSentenceViewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
-        layout.viewModel = readSentenceViewModel
+        layout.viewState = readSentenceViewModel.selectedWordSimpleViewState
 
         setupListeners()
     }
