@@ -9,7 +9,9 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
@@ -71,5 +73,27 @@ object BindingAdapters {
     @JvmStatic
     fun View.setEnabled(enabled: Any?) {
         isEnabled = enabled != null
+    }
+
+    @BindingAdapter("android:src")
+    @JvmStatic
+    fun ImageButton.setSrc(@DrawableRes resId: Int?) {
+        if (resId == null || resId == ResourcesCompat.ID_NULL) {
+            setImageResource(android.R.color.transparent)
+        }
+        else {
+            setImageResource(resId)
+        }
+    }
+
+    @BindingAdapter("android:contentDescription")
+    @JvmStatic
+    fun ImageButton.setContentDescription(@StringRes resId: Int?) {
+        if (resId == null || resId == ResourcesCompat.ID_NULL) {
+            contentDescription = ""
+        }
+        else {
+            contentDescription = resources.getString(resId)
+        }
     }
 }

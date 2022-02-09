@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.wordDefinitions
+package com.eywa.projectlectito.readSentence.wordDefinitions
 
 import com.eywa.projectlectito.database.word.StudyingWord
 
@@ -18,7 +18,28 @@ data class JishoWordDefinitions(
             val japanese: List<JishoJapaneseDetail>,
             val senses: List<JishoSensesDetail>,
             val attribution: JishoAttributionDetail
-    )
+    ) {
+        private constructor(jishoEntry: JishoEntry, sensesIndex: Int) : this(
+                jishoEntry.slug,
+                jishoEntry.is_common,
+                jishoEntry.tags,
+                jishoEntry.jlpt,
+                jishoEntry.japanese,
+                listOf(jishoEntry.senses[sensesIndex]),
+                jishoEntry.attribution
+        )
+
+        fun toStudyingWord(senseIndex: Int): StudyingWord {
+            return StudyingWord(
+                    0,
+                    slug,
+                    is_common,
+                    jlpt.map { Integer.parseInt(it.last().toString()) },
+                    JishoEntry(this, senseIndex),
+                    StudyingWord.State.LEARNING
+            )
+        }
+    }
 
     data class JishoJapaneseDetail(
             val word: String?,

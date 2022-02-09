@@ -76,31 +76,35 @@
             tools:text="普通"
             />
 
-        <TextView
-            android:id="@+id/text_read_sentence__is_common"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginTop="5dp"
-            android:text="@string/read_sentence__common"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintEnd_toStartOf="@id/text_read_sentence__jlpt"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewState.isCommon}"
-            />
-
-        <TextView
-            android:id="@+id/text_read_sentence__jlpt"
+        <LinearLayout
+            android:id="@+id/layout_read_sentence__jlpt_and_tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="@{viewState.jlpt}"
-            android:textSize="@dimen/small_text"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewState.jlpt}"
-            tools:text="N4"
-            />
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/read_sentence__common"
+                android:textSize="@dimen/small_text"
+                app:visibleOrGone="@{viewState.isCommon}"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@{viewState.jlpt}"
+                android:textSize="@dimen/small_text"
+                app:visibleOrGone="@{viewState.jlpt}"
+                tools:text="N4"
+                />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/text_read_sentence__tags"
@@ -110,7 +114,7 @@
             android:text="@{viewState.tags}"
             android:textSize="@dimen/small_text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_read_sentence__jlpt"
+            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
             app:visibleOrGone="@{viewState.tags}"
             tools:text="wanikani31"
             />
@@ -139,7 +143,7 @@
                 android:paddingHorizontal="10dp"
                 >
 
-                <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
+                <com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normal; ordinary; regular; usual; common; average"
@@ -148,7 +152,7 @@
                     app:tags="Usually written using kana alone"
                     />
 
-                <com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
+                <com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normally; ordinarily; usually; generally; commonly"

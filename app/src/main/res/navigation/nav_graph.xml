@@ -10,7 +10,7 @@
         android:id="@+id/readSentenceFragment"
         android:name="com.eywa.projectlectito.readSentence.ReadSentenceFragment"
         android:label="@string/read_sentence__title"
-        tools:layout="@layout/read_sentence_fragment"
+        tools:layout="@layout/rs_fragment"
         >
         <argument
             android:name="textId"

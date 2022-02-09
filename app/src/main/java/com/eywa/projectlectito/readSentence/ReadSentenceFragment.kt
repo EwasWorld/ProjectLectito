@@ -1,7 +1,6 @@
 package com.eywa.projectlectito.readSentence
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -9,9 +8,9 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
-import com.eywa.projectlectito.databinding.RsFragBinding
+import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.editSnippet.EditSnippetFragment
-import kotlinx.android.synthetic.main.rs_frag.*
+import kotlinx.android.synthetic.main.rs_fragment.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
 import kotlinx.android.synthetic.main.rs_word_definition.*
@@ -35,17 +34,16 @@ class ReadSentenceFragment : Fragment() {
 
     private val args: ReadSentenceFragmentArgs by navArgs()
 
-    private lateinit var binding: RsFragBinding
+    private lateinit var binding: RsFragmentBinding
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
     private var sentence: ReadSentenceViewModel.SentenceWithInfo? = null
-    private var currentSelectionStart: Int? = null
     private var wordSelectMode: WordSelectMode? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = LayoutInflater.from(context).inflate(R.layout.rs_frag, container, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.rs_fragment, container, false)
         if (!view.isInEditMode) {
-            binding = RsFragBinding.bind(view)
+            binding = RsFragmentBinding.bind(view)
         }
         return view
     }
@@ -60,11 +58,7 @@ class ReadSentenceFragment : Fragment() {
         layout_read_sentence__selected_word_simple_info.setLifecycleInfo(this, this)
         layout_read_sentence__selected_word_parsed_info.setLifecycleInfo(this, this)
         layout_read_sentence__word_definition.setLifecycleInfo(this, this)
-
-        readSentenceViewModel.allSnippets.observe(viewLifecycleOwner, {
-            val test = it
-            Log.d("ReadSentenceFragment", "Text snippets found: ${test.size}")
-        })
+        button_read_sentence__select_mode.setLifecycleInfo(this, this)
 
         if (args.currentSnippetId != -1) {
             readSentenceViewModel.updateCurrentCharacter(
@@ -79,34 +73,15 @@ class ReadSentenceFragment : Fragment() {
                 readSentenceViewModel.updateCurrentCharacter(Sentence.IndexInfo(0, firstSnippetId))
             })
         }
-        readSentenceViewModel.sentence.observe(viewLifecycleOwner, {
-            sentence = it
-        })
+
+        readSentenceViewModel.sentence.observe(viewLifecycleOwner, { sentence = it })
         readSentenceViewModel.wordSelectMode.observe(viewLifecycleOwner, { selectMode ->
-            if (selectMode != wordSelectMode) {
-                wordSelectMode = selectMode
-                if (selectMode == WordSelectMode.SELECT) {
-                    text_read_sentence__sentence.clearFocus()
-                }
-                button_read_sentence__select_mode.setInitialState(selectMode)
-            }
+            wordSelectMode = selectMode
+            text_read_sentence__sentence.clearFocus()
         })
 
-        readSentenceViewModel.editSnippetId.observe(viewLifecycleOwner, {
-            it?.let { snippetToEdit ->
-                EditSnippetFragment.navigateTo(
-                        requireView().findNavController(),
-                        snippetToEdit.id,
-                        snippetToEdit.startChar,
-                        snippetToEdit.endChar,
-                )
-                readSentenceViewModel.clearEditSnippetInfo()
-            }
-        })
-
-        button_read_sentence__select_mode.overlays = listOf(overlay_read_sentence__select_mode)
-        button_read_sentence__select_mode.selectModeChangedListener = {
-            readSentenceViewModel.updateWordSelectMode(it)
+        overlay_read_sentence__select_mode.setOnClickListener {
+            readSentenceViewModel.setSelectWordSelectModeMenuOpen(false)
         }
         button_read_sentence__select_mode.selectMenuOpenedListener = {
             text_read_sentence__sentence.clearFocus()
@@ -141,18 +116,28 @@ class ReadSentenceFragment : Fragment() {
         }
 
         button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
+        readSentenceViewModel.editSnippetId.observe(viewLifecycleOwner, {
+            it?.let { snippetToEdit ->
+                EditSnippetFragment.navigateTo(
+                        requireView().findNavController(),
+                        snippetToEdit.id,
+                        snippetToEdit.startChar,
+                        snippetToEdit.endChar,
+                )
+                readSentenceViewModel.clearEditSnippetInfo()
+            }
+        })
 
         text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
             if (wordSelectMode != WordSelectMode.SELECT) return@addSelectionChangedListener
             if (!text_read_sentence__sentence.hasSelection()) return@addSelectionChangedListener
 
-            currentSelectionStart = selStart
             val selectedText = sentence?.sentence?.substring(selStart, selEnd)
             if (selectedText.isNullOrBlank()) {
                 return@addSelectionChangedListener
             }
 
-            readSentenceViewModel.selectedWord.postValue(selectedText)
+            readSentenceViewModel.setSelectedWord(selectedText)
         }
     }
 

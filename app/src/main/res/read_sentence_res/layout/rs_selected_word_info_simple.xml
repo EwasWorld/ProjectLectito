@@ -16,7 +16,7 @@
         android:id="@+id/layout_rs_selected_word_info_simple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/rs_selected_word_background"
+        android:background="@color/read_sentence__selected_word_background"
         android:paddingStart="20dp"
         android:paddingEnd="15dp"
         app:visibleOrGone="@{viewState.showView}"

@@ -97,8 +97,7 @@ class RsSelectedWordInfoSimpleView : ConstraintLayout {
             return
         }
 
-        // TODO Sanitise word
-        readSentenceViewModel.searchWord.postValue(this)
+        readSentenceViewModel.setSearchWord(this)
     }
 }
 

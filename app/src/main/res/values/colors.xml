@@ -10,10 +10,4 @@
     <color name="black">#FF000000</color>
     <color name="grey_1">#6A6A6A</color>
     <color name="white">#FFFFFFFF</color>
-
-    <color name="read_sentence__definition_background">#D6D6D6</color>
-    <color name="read_sentence__success_green">#4CAF50</color>
-    <color name="read_sentence__warning_orange">#FF9800</color>
-    <color name="read_sentence__warning_red">#FF5722</color>
-    <color name="read_sentence__white_overlay">#B3FFFFFF</color>
 </resources>

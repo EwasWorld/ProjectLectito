@@ -10,18 +10,10 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectedWordInfoParsedBinding
 import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
-import com.eywa.projectlectito.readSentence.WordSelectMode
 
 class RsSelectedWordInfoParsedView : ConstraintLayout {
-    companion object {
-        private const val LOG_TAG = "RsSelWordInfoParsedView"
-    }
-
     private lateinit var layout: RsSelectedWordInfoParsedBinding
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
-
-    private var wordSelectMode: WordSelectMode? = null
-    private var selectedWord: String? = null
 
     constructor(context: Context) : super(context) {
         initialise(context)
@@ -48,19 +40,6 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
         readSentenceViewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
         layout.viewState = readSentenceViewModel.selectedWordParsedViewState
-
-        setupListeners()
-    }
-
-    // TODO Remove
-    private fun setupListeners() {
-        readSentenceViewModel.selectedWord.observe(layout.lifecycleOwner!!, { newWord ->
-            selectedWord = newWord
-        })
-
-        readSentenceViewModel.wordSelectMode.observe(layout.lifecycleOwner!!, { newMode ->
-            wordSelectMode = newMode
-        })
     }
 }
 

@@ -180,13 +180,13 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_marginHorizontal="5dp"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="25dp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__full_text"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="SpeakableTextPresentCheck"
             tools:visibility="visible"
             />
 
@@ -212,7 +212,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:clickable="true"
-            android:contentDescription="@string/read_sentence__full_text"
+            android:contentDescription="@string/read_sentence__edit_sentence"
             android:enabled="@{viewState.hasValidSentence}"
             android:focusable="true"
             android:src="@drawable/ic_edit"
@@ -263,14 +263,15 @@
             android:layout_height="0dp"
             android:background="@color/read_sentence__white_overlay"
             android:elevation="10dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{viewState.isSelectWordSelectModeMenuOpen}"
+            tools:visibility="gone"
             />
 
-        <com.eywa.projectlectito.readSentence.ReadSentenceSelectModeView
+        <com.eywa.projectlectito.readSentence.ui.ReadSentenceSelectModeView
             android:id="@+id/button_read_sentence__select_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -281,7 +282,7 @@
             tools:visibility="gone"
             />
 
-        <com.eywa.projectlectito.readSentence.HighlightOverlay
+        <com.eywa.projectlectito.readSentence.ui.HighlightOverlay
             android:id="@+id/overlay_read_sentence__sentence"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

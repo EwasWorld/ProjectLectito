@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.wordDefinitions
+package com.eywa.projectlectito.readSentence.wordDefinitions
 
 import android.util.Log
 import com.google.gson.GsonBuilder

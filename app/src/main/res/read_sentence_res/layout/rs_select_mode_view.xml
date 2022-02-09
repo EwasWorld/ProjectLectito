@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewState"
+            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel.WordSelectModeViewState"
+            />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fab_container_read_sentence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        >
+
+        <ImageButton
+            android:id="@+id/fab_read_sentence__select_mode_auto"
+            style="@style/FloatingActionButton.Mini"
+            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:contentDescription="@string/read_sentence__select_mode_auto"
+            android:src="@drawable/ic_auto_fix"
+            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_auto_with_colour"
+            app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+            app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <TextView
+            android:id="@+id/text_read_sentence__select_mode_auto"
+            style="@style/FloatingActionButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read_sentence__select_mode_auto"
+            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_auto"
+            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_auto"
+            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_auto"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <ImageButton
+            android:id="@+id/fab_read_sentence__select_mode_auto_with_colour"
+            style="@style/FloatingActionButton.Mini"
+            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:contentDescription="@string/read_sentence__select_mode_auto"
+            android:src="@drawable/ic_auto_fix"
+            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_select"
+            app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+            app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <TextView
+            android:id="@+id/text_read_sentence__select_mode_auto_with_colour"
+            style="@style/FloatingActionButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read_sentence__select_mode_auto_with_colour"
+            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_auto_with_colour"
+            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_auto_with_colour"
+            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_auto_with_colour"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <ImageButton
+            android:id="@+id/fab_read_sentence__select_mode_select"
+            style="@style/FloatingActionButton.Mini"
+            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:contentDescription="@string/read_sentence__select_mode_select"
+            android:src="@drawable/ic_touch"
+            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_type"
+            app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+            app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <TextView
+            android:id="@+id/text_read_sentence__select_mode_select"
+            style="@style/FloatingActionButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read_sentence__select_mode_select"
+            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_select"
+            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_select"
+            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_select"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <ImageButton
+            android:id="@+id/fab_read_sentence__select_mode_type"
+            style="@style/FloatingActionButton.Mini"
+            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:contentDescription="@string/read_sentence__select_mode_type"
+            android:src="@drawable/ic_text_fields"
+            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_main"
+            app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
+            app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <TextView
+            android:id="@+id/text_read_sentence__select_mode_type"
+            style="@style/FloatingActionButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read_sentence__select_mode_type"
+            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_type"
+            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_type"
+            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_type"
+            app:visibleOrGone="@{viewState.showMenu}"
+            />
+
+        <!-- Content description set in code -->
+        <ImageButton
+            android:id="@+id/fab_read_sentence__select_mode_main"
+            style="@style/FloatingActionButton"
+            android:contentDescription="@{viewState.currentModeContentDescription}"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:src="@{viewState.currentModeIcon}"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/ic_touch"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

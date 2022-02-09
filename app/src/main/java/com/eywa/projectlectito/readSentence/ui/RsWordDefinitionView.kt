@@ -11,8 +11,8 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.ToastSpamPrevention
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
 import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
-import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.wordDefinitions.WordDefinitionDetailView
+import com.eywa.projectlectito.readSentence.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
 
 class RsWordDefinitionView : ConstraintLayout {
@@ -81,7 +81,7 @@ class RsWordDefinitionView : ConstraintLayout {
         }
 
         button_read_sentence__close_definition.setOnClickListener {
-            readSentenceViewModel.searchWord.postValue(null)
+            readSentenceViewModel.setSearchWord(null)
         }
     }
 

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ProjectLectito</string>
 
+    <!--suppress CheckTagEmptyBody -->
     <string name="a"></string>
 
     <string name="complete">Complete</string>
@@ -26,30 +27,6 @@
     <string name="add_snippet__submit">Add</string>
     <string name="add_snippet__submit_and_another">Add and add another</string>
     <string name="add_snippet__no_title">Unknown Text</string>
-
-    <!-- Read Sentence -->
-    <string name="read_sentence__title">Read Sentence</string>
-    <string name="read_sentence__common">common</string>
-    <string name="read_sentence__other_forms_label">Other forms:</string>
-    <string name="read_sentence__previous_definition">Previous definition</string>
-    <string name="read_sentence__next_definition">Next definition</string>
-    <string name="read_sentence__home">Home</string>
-    <string name="read_sentence__full_text">Full text</string>
-    <string name="read_sentence__previous_sentence">Previous sentence</string>
-    <string name="read_sentence__next_sentence">Next sentence</string>
-    <string name="read_sentence__no_definition">No word selected.\n%s</string>
-    <string name="read_sentence__no_definition_auto">Click on a word to show its definition.</string>
-    <string name="read_sentence__no_definition_select">Select a word and click the arrow to show its definition.</string>
-    <string name="read_sentence__no_definition_type">Type in a word and click the arrow to show its definition.</string>
-    <string name="read_sentence__parse_success">Sentence parsed succeeded</string>
-    <string name="read_sentence__parse_failed">Sentence parse failed</string>
-    <string name="read_sentence__select_mode_auto">Auto</string>
-    <string name="read_sentence__select_mode_auto_with_colour">Auto (coloured)</string>
-    <string name="read_sentence__select_mode_select">Select</string>
-    <string name="read_sentence__select_mode_type">Type</string>
-
-    <string name="err_read_sentence__no_more_sentences">No more sentences</string>
-    <string name="err_read_sentence__no_more_definitions">No more definitions</string>
 
     <!-- Edit Snippet -->
     <string name="edit_snippet__title">Edit sentence</string>

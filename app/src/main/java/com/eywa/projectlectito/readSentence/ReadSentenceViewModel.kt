@@ -15,10 +15,8 @@ import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
-import com.eywa.projectlectito.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.wordDefinitions.WordDefinitionRequester
-import kotlinx.android.synthetic.main.read_sentence_fragment.*
-import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
+import com.eywa.projectlectito.readSentence.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionRequester
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,6 +74,10 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Current sentence info
      */
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
+    private val selectWordSelectModeMenuOpenMutable = MutableLiveData<Boolean>(false)
+    val selectWordSelectModeMenuOpen = selectWordSelectModeMenuOpenMutable
+
+    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
     private val wordSelectModeMutable = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
     val wordSelectMode: LiveData<WordSelectMode> = wordSelectModeMutable.distinctUntilChanged()
     val selectedParsedInfo = MutableLiveData<ParsedInfo?>(null)
@@ -91,14 +93,16 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     /*
      * Word definitions
      */
-    val selectedWord = MutableLiveData<String?>(null)
-    val searchWord = MutableLiveData<String?>(null)
+    private val selectedWordMutable = MutableLiveData<String?>(null)
+    val selectedWord = selectedWordMutable.distinctUntilChanged()
+    private val searchWordMutable = MutableLiveData<String?>(null)
+    val searchWord = searchWordMutable.distinctUntilChanged()
     val currentDefinition = MutableLiveData<Int>(0)
     val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
         var currentRequester: WordDefinitionRequester? = null
 
         init {
-            addSource(searchWord.distinctUntilChanged()) { word ->
+            addSource(searchWordMutable.distinctUntilChanged()) { word ->
                 if (word.isNullOrBlank()) {
                     postValue(null)
                     return@addSource
@@ -126,8 +130,9 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     fun updateWordSelectMode(wordSelectMode: WordSelectMode) {
         wordSelectModeMutable.postValue(wordSelectMode)
-        selectedWord.postValue(null)
-        searchWord.postValue(null)
+        selectedWordMutable.postValue(null)
+        searchWordMutable.postValue(null)
+        selectedParsedInfo.postValue(null)
         currentDefinition.postValue(0)
     }
 
@@ -176,8 +181,21 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         selectSnippetMode.postValue(value)
     }
 
+    fun setSelectWordSelectModeMenuOpen(value: Boolean) {
+        selectWordSelectModeMenuOpenMutable.postValue(value)
+    }
+
     fun clearEditSnippetInfo() {
         editSnippetIdMutable.postValue(null)
+    }
+
+    fun setSelectedWord(value: String?) {
+        selectedWordMutable.postValue(value)
+    }
+
+    fun setSearchWord(value: String?) {
+        // TODO Sanitise word
+        searchWordMutable.postValue(value)
     }
 
     data class SnippetToEdit(
@@ -269,6 +287,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     val selectedWordSimpleViewState = SelectedWordInfoSimpleViewState()
     val selectedWordParsedViewState = SelectedWordInfoParsedViewState()
     val wordDefinitionViewState = WordDefinitionViewState()
+    val wordSelectModeViewState = WordSelectModeViewState()
 
     inner class MainViewState {
         val hasValidSentence = sentence.map { it?.sentence?.currentSentence != null }
@@ -293,6 +312,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             }
         }
         val editOverlayClickedListener = View.OnClickListener { setSelectSnippetMode(false) }
+        val isSelectWordSelectModeMenuOpen = selectWordSelectModeMenuOpen
 
         val content: LiveData<SpannableString?> = object : MediatorLiveData<SpannableString?>() {
             init {
@@ -329,7 +349,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
                 val useColor = wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                 sentence.parsedInfo.forEachIndexed { index, parsedInfo ->
-                    val color = if (useColor && index % 0 == 1) Color.RED else null
+                    val color = if (useColor && index % 2 == 1) Color.RED else null
                     spannableString.setSpan(parsedInfo, content, color)
                 }
 
@@ -381,13 +401,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 setSpan(
                         object : ClickableSpan() {
                             override fun onClick(p0: View) {
-                                selectedWord.postValue(currentSentence.substring(spanStartIndex, spanEndIndex))
+                                selectedWordMutable.postValue(currentSentence.substring(spanStartIndex, spanEndIndex))
                                 selectedParsedInfo.postValue(parsedInfo)
 
                                 // supplementary symbol (number, punctuation, etc.)
                                 val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
                                 if (isWord) {
-                                    searchWord.postValue(parsedInfo.dictionaryForm)
+                                    searchWordMutable.postValue(parsedInfo.dictionaryForm)
                                 }
                             }
 
@@ -422,7 +442,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     inner class SelectedWordInfoParsedViewState {
         val showView: LiveData<Boolean> = wordSelectMode.map { it.isAuto }
-        val originalWord: LiveData<String?> = selectedWord
+        val originalWord: LiveData<String?> = selectedWordMutable
         val dictionaryForm: LiveData<String?> = object : MediatorLiveData<String?>() {
             init {
                 addSource(selectedParsedInfo) { update() }
@@ -431,7 +451,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
             private fun update() {
                 val parsedInfo = selectedParsedInfo.value
-                if (parsedInfo == null || parsedInfo.dictionaryForm == originalWord.value) {
+                if (parsedInfo?.dictionaryForm.isNullOrBlank() || parsedInfo!!.dictionaryForm == originalWord.value) {
                     postValue(null)
                     return
                 }
@@ -530,5 +550,11 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                     .subList(1, definition.japanese.size)
                     .joinToString(JAPANESE_LIST_DELIMINATOR) { "${it.word}[${it.reading}]" }
         }
+    }
+
+    inner class WordSelectModeViewState {
+        val showMenu = selectWordSelectModeMenuOpen
+        val currentModeIcon = wordSelectMode.map { it.iconId }
+        val currentModeContentDescription = wordSelectMode.map { it.iconDescriptionId }
     }
 }
