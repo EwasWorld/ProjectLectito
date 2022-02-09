@@ -2,6 +2,10 @@
 
 package com.eywa.projectlectito
 
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.style.CharacterStyle
+import android.text.style.ClickableSpan
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -42,5 +46,30 @@ object BindingAdapters {
         else {
             setText(resId)
         }
+    }
+
+    @BindingAdapter("spannableText")
+    @JvmStatic
+    fun TextView.setSpannableText(spannableString: SpannableString?) {
+        when {
+            spannableString == null -> text = ""
+            spannableString.getSpans(0, spannableString.toString().length, CharacterStyle::class.java).isEmpty() -> {
+                text = spannableString.toString()
+            }
+            spannableString.getSpans(0, spannableString.toString().length, ClickableSpan::class.java).isEmpty() -> {
+                text = spannableString
+            }
+            else -> {
+                text = spannableString
+                movementMethod = LinkMovementMethod.getInstance()
+                return
+            }
+        }
+    }
+
+    @BindingAdapter("android:enabled")
+    @JvmStatic
+    fun View.setEnabled(enabled: Any?) {
+        isEnabled = enabled != null
     }
 }
