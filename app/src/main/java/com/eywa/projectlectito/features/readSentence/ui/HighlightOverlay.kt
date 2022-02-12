@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence.ui
+package com.eywa.projectlectito.features.readSentence.ui
 
 import android.content.Context
 import android.graphics.*

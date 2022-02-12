@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.viewTexts
+package com.eywa.projectlectito.features.viewTexts
 
 import android.os.Bundle
 import android.view.LayoutInflater

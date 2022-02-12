@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.viewTexts
+package com.eywa.projectlectito.features.viewTexts
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -8,7 +8,7 @@
 
         <variable
             name="viewState"
-            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel.WordSelectModeViewState"
+            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.WordSelectModeViewState"
             />
     </data>
 

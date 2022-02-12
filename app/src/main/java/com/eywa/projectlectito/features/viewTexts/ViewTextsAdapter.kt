@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.viewTexts
+package com.eywa.projectlectito.features.viewTexts
 
 import android.annotation.SuppressLint
 import android.view.*
@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.ToastSpamPrevention
-import com.eywa.projectlectito.addSnippet.AddSnippetFragment
-import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.texts.Text
+import com.eywa.projectlectito.features.addSnippet.AddSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
-import com.eywa.projectlectito.readSentence.ReadSentenceFragment
+import com.eywa.projectlectito.features.readSentence.ReadSentenceFragment
+import com.eywa.projectlectito.utils.ToastSpamPrevention
+import com.eywa.projectlectito.utils.asVisibility
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 

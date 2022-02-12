@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence.wordDefinitions
+package com.eywa.projectlectito.features.readSentence.wordDefinitions
 
 import com.eywa.projectlectito.database.word.StudyingWord
 

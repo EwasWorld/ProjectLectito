@@ -8,7 +8,7 @@
 
         <variable
             name="viewState"
-            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel.WordDefinitionViewState"
+            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.WordDefinitionViewState"
             />
     </data>
 
@@ -143,7 +143,7 @@
                 android:paddingHorizontal="10dp"
                 >
 
-                <com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
+                <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normal; ordinary; regular; usual; common; average"
@@ -152,7 +152,7 @@
                     app:tags="Usually written using kana alone"
                     />
 
-                <com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
+                <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:definition="normally; ordinarily; usually; generally; commonly"

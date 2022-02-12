@@ -1,4 +1,4 @@
-package com.eywa.projectlectito
+package com.eywa.projectlectito.utils
 
 import android.content.Context
 import android.util.Log

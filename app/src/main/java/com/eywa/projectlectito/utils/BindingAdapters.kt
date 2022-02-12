@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.eywa.projectlectito
+package com.eywa.projectlectito.utils
 
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod

@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence.ui
+package com.eywa.projectlectito.features.readSentence.ui
 
 import android.content.Context
 import android.util.AttributeSet
@@ -11,8 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectModeViewBinding
-import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
-import com.eywa.projectlectito.readSentence.WordSelectMode
+import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel
+import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import kotlinx.android.synthetic.main.rs_select_mode_view.view.*
 
 class ReadSentenceSelectModeView : ConstraintLayout {

@@ -1,7 +1,7 @@
 package com.eywa.projectlectito
 
 import com.eywa.projectlectito.database.snippets.TextSnippet
-import com.eywa.projectlectito.readSentence.Sentence
+import com.eywa.projectlectito.features.readSentence.Sentence
 import org.junit.Assert
 import org.junit.Test
 

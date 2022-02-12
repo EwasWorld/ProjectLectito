@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence
+package com.eywa.projectlectito.features.readSentence
 
 data class ParsedInfo(
         /*

@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence.ui
+package com.eywa.projectlectito.features.readSentence.ui
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,11 +8,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.ToastSpamPrevention
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
-import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
-import com.eywa.projectlectito.readSentence.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionDetailView
+import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel
+import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+import com.eywa.projectlectito.utils.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
 
 class RsWordDefinitionView : ConstraintLayout {

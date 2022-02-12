@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.addSnippet
+package com.eywa.projectlectito.features.addSnippet
 
 import android.app.Application
 import androidx.lifecycle.*

@@ -9,7 +9,7 @@ import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.snippets.TextSnippetsDao
 import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.database.texts.TextsDao
-import com.eywa.projectlectito.readSentence.TempTestData
+import com.eywa.projectlectito.features.readSentence.TempTestData
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope

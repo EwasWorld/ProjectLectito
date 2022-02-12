@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.addSnippet
+package com.eywa.projectlectito.features.addSnippet
 
 import android.os.Bundle
 import android.text.Editable
@@ -12,7 +12,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.asVisibility
+import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.add_snippet_fragment.*
 
 class AddSnippetFragment : Fragment() {

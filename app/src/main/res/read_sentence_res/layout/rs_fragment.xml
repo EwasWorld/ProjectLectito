@@ -8,7 +8,7 @@
 
         <variable
             name="viewState"
-            type="com.eywa.projectlectito.readSentence.ReadSentenceViewModel.MainViewState"
+            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.MainViewState"
             />
     </data>
 
@@ -18,7 +18,7 @@
         android:layout_height="match_parent"
         >
 
-        <com.eywa.projectlectito.readSentence.ui.RsWordDefinitionView
+        <com.eywa.projectlectito.features.readSentence.ui.RsWordDefinitionView
             android:id="@+id/layout_read_sentence__word_definition"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -87,7 +87,7 @@
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.eywa.projectlectito.readSentence.ui.RsSelectedWordInfoSimpleView
+            <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoSimpleView
                 android:id="@+id/layout_read_sentence__selected_word_simple_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
                 tools:visibility="gone"
                 />
 
-            <com.eywa.projectlectito.readSentence.ui.RsSelectedWordInfoParsedView
+            <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoParsedView
                 android:id="@+id/layout_read_sentence__selected_word_parsed_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
                 tools:text="しかも、八人全てが美男美女という、僕のようなフノメンには居い地の悪い空間です。"
                 />
 
-            <com.eywa.projectlectito.readSentence.ui.SelectableTextView
+            <com.eywa.projectlectito.features.readSentence.ui.SelectableTextView
                 android:id="@+id/text_read_sentence__sentence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -271,7 +271,7 @@
             tools:visibility="gone"
             />
 
-        <com.eywa.projectlectito.readSentence.ui.ReadSentenceSelectModeView
+        <com.eywa.projectlectito.features.readSentence.ui.ReadSentenceSelectModeView
             android:id="@+id/button_read_sentence__select_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -282,7 +282,7 @@
             tools:visibility="gone"
             />
 
-        <com.eywa.projectlectito.readSentence.ui.HighlightOverlay
+        <com.eywa.projectlectito.features.readSentence.ui.HighlightOverlay
             android:id="@+id/overlay_read_sentence__sentence"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

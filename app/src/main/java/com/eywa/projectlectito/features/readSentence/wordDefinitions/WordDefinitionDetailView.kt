@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence.wordDefinitions
+package com.eywa.projectlectito.features.readSentence.wordDefinitions
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.asVisibility
+import com.eywa.projectlectito.utils.asVisibility
 
 class WordDefinitionDetailView : ConstraintLayout {
     private lateinit var definitionTextView: TextView

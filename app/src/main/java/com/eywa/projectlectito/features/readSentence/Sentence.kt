@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence
+package com.eywa.projectlectito.features.readSentence
 
 import android.util.Log
 import com.atilika.kuromoji.unidic.kanaaccent.Tokenizer

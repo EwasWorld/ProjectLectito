@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.editSnippet
+package com.eywa.projectlectito.features.editSnippet
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.asVisibility
+import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.edit_snippet_fragment.*
 
 class EditSnippetFragment : Fragment() {

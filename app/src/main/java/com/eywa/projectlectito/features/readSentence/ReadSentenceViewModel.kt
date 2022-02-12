@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence
+package com.eywa.projectlectito.features.readSentence
 
 import android.app.Application
 import android.graphics.Color
@@ -9,14 +9,14 @@ import android.util.Log
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.lifecycle.*
-import com.eywa.projectlectito.JAPANESE_LIST_DELIMINATOR
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
-import com.eywa.projectlectito.readSentence.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.readSentence.wordDefinitions.WordDefinitionRequester
+import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
+import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
+import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

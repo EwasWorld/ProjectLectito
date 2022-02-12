@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.readSentence
+package com.eywa.projectlectito.features.readSentence
 
 import android.os.Bundle
 import android.view.*
@@ -10,8 +10,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
 import com.eywa.projectlectito.databinding.RsFragmentBinding
-import com.eywa.projectlectito.editSnippet.EditSnippetFragment
+import com.eywa.projectlectito.features.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
+import com.eywa.projectlectito.utils.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_fragment.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*

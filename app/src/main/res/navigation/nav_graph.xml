@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/readSentenceFragment"
-        android:name="com.eywa.projectlectito.readSentence.ReadSentenceFragment"
+        android:name="com.eywa.projectlectito.features.readSentence.ReadSentenceFragment"
         android:label="@string/read_sentence__title"
         tools:layout="@layout/rs_fragment"
         >
@@ -28,13 +28,13 @@
 
     <fragment
         android:id="@+id/viewTextsFragment"
-        android:name="com.eywa.projectlectito.viewTexts.ViewTextsFragment"
+        android:name="com.eywa.projectlectito.features.viewTexts.ViewTextsFragment"
         android:label="ViewTextsFragment"
         tools:layout="@layout/view_texts_fragment"
         />
     <fragment
         android:id="@+id/addSnippetFragment"
-        android:name="com.eywa.projectlectito.addSnippet.AddSnippetFragment"
+        android:name="com.eywa.projectlectito.features.addSnippet.AddSnippetFragment"
         android:label="AddSnippetFragment"
         tools:layout="@layout/add_snippet_fragment"
         >
@@ -45,7 +45,7 @@
     </fragment>
     <fragment
         android:id="@+id/editSnippetFragment"
-        android:name="com.eywa.projectlectito.editSnippet.EditSnippetFragment"
+        android:name="com.eywa.projectlectito.features.editSnippet.EditSnippetFragment"
         android:label="EditSnippetFragment"
         tools:layout="@layout/edit_snippet_fragment"
         >
