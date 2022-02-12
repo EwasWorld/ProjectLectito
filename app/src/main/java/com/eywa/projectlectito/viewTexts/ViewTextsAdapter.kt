@@ -1,9 +1,7 @@
 package com.eywa.projectlectito.viewTexts
 
 import android.annotation.SuppressLint
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
@@ -14,8 +12,10 @@ import com.eywa.projectlectito.ToastSpamPrevention
 import com.eywa.projectlectito.addSnippet.AddSnippetFragment
 import com.eywa.projectlectito.asVisibility
 import com.eywa.projectlectito.database.texts.Text
+import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import com.eywa.projectlectito.readSentence.ReadSentenceFragment
 import kotlin.math.roundToInt
+import kotlin.properties.Delegates
 
 class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapter.TextViewHolder>(
         object : DiffUtil.ItemCallback<Text.WithCurrentSnippetInfo>() {
@@ -44,8 +44,15 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
         holder.bind(getItem(position))
     }
 
-    class TextViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class TextViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
+        var textId by Delegates.notNull<Int>()
+
+        init {
+            view.setOnCreateContextMenuListener(this)
+        }
+
         fun bind(item: Text.WithCurrentSnippetInfo) {
+            textId = item.text.id
             itemView.findViewById<TextView>(R.id.text_view_texts_item__title).text = item.text.name
 
             itemView.setOnClickListener {
@@ -62,10 +69,6 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
                         item.text.currentSnippetId,
                         item.text.currentCharacterIndex
                 )
-            }
-            itemView.setOnLongClickListener {
-                AddSnippetFragment.navigateTo(itemView.findNavController(), item.text.id)
-                return@setOnLongClickListener true
             }
 
             val progressView = itemView.findViewById<TextView>(R.id.text_view_texts_item__progress)
@@ -90,6 +93,40 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
             }
             currentView.text = item.currentSnippet?.getChapterPageString()
                     ?: itemView.resources.getString(R.string.view_texts__not_started)
+        }
+
+        override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+            ContextMenuItem.values().forEach {
+                it.addItemToMenu(menu, itemView, textId)
+            }
+        }
+
+        enum class ContextMenuItem(private val titleId: Int) {
+            READ_FULL(R.string.read_full_text__title) {
+                override fun onClick(view: View, textId: Int) {
+                    ReadFullTextFragment.navigateTo(view.findNavController(), textId)
+                }
+            },
+            ADD_SNIPPET(R.string.add_snippet__title) {
+                override fun onClick(view: View, textId: Int) {
+                    AddSnippetFragment.navigateTo(view.findNavController(), textId)
+                }
+            };
+
+            open fun addItemToMenu(menu: ContextMenu, view: View, textId: Int) {
+                val newItem = menu.add(Menu.NONE, ordinal, ordinal, titleId)
+                newItem.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
+                    override fun onMenuItemClick(item: MenuItem?): Boolean {
+                        if (item == null || item.itemId >= values().size) {
+                            return false
+                        }
+                        values()[item.itemId].onClick(view, textId)
+                        return true
+                    }
+                })
+            }
+
+            abstract fun onClick(view: View, textId: Int)
         }
     }
 }
