@@ -15,6 +15,13 @@
     <string name="view_texts__no_content_error">Entry has no content, long press to add text</string>
     <string name="view_texts__submit_description">Search for word</string>
     <string name="view_texts__type_word_hint">Search for a word</string>
+    <string name="view_texts__read_sentence">Read</string>
+
+    <!-- Add Text -->
+    <string name="add_texts__title">Add text</string>
+    <string name="add_texts__ok_button">Add</string>
+    <string name="add_texts__name_hint">Name</string>
+    <string name="err_add_texts__name_blank">Please enter a text name</string>
 
     <!-- Add Snippet -->
     <string name="add_snippet__title">Add page</string>

@@ -17,15 +17,19 @@ class ViewTextsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.title = resources.getString(R.string.read_sentence__title)
+        activity?.title = resources.getString(R.string.view_texts__title)
 
         val adapter = ViewTextsAdapter()
-        recycler_view_texts.adapter = adapter
-        recycler_view_texts.layoutManager = LinearLayoutManager(context)
+        recycler_vt__texts.adapter = adapter
+        recycler_vt__texts.layoutManager = LinearLayoutManager(context)
 
         val viewModel = ViewModelProvider(this)[ViewTextsViewModel::class.java]
         viewModel.allTexts.observe(viewLifecycleOwner, { texts ->
             texts?.let { adapter.submitList(it) }
         })
+
+        button_vt__add_text.setOnClickListener {
+            AddTextDialog().show(childFragmentManager, "dialog_vt__add_text")
+        }
     }
 }

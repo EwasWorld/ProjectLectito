@@ -15,7 +15,6 @@ import com.eywa.projectlectito.features.readSentence.ReadSentenceFragment
 import com.eywa.projectlectito.utils.ToastSpamPrevention
 import com.eywa.projectlectito.utils.asVisibility
 import kotlin.math.roundToInt
-import kotlin.properties.Delegates
 
 class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapter.TextViewHolder>(
         object : DiffUtil.ItemCallback<Text.WithCurrentSnippetInfo>() {
@@ -45,31 +44,35 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
     }
 
     class TextViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
-        var textId by Delegates.notNull<Int>()
+        lateinit var item: Text.WithCurrentSnippetInfo
 
         init {
             view.setOnCreateContextMenuListener(this)
         }
 
-        fun bind(item: Text.WithCurrentSnippetInfo) {
-            textId = item.text.id
-            itemView.findViewById<TextView>(R.id.text_view_texts_item__title).text = item.text.name
-
-            itemView.setOnClickListener {
-                if (item.totalSnippets == 0) {
+        companion object {
+            private fun Text.WithCurrentSnippetInfo.readSnippet(view: View) {
+                if (totalSnippets == 0) {
                     ToastSpamPrevention.displayToast(
-                            itemView.context,
-                            itemView.resources.getString(R.string.view_texts__no_content_error)
+                            view.context,
+                            view.resources.getString(R.string.view_texts__no_content_error)
                     )
-                    return@setOnClickListener
+                    return
                 }
                 ReadSentenceFragment.navigateTo(
-                        itemView.findNavController(),
-                        item.text.id,
-                        item.text.currentSnippetId,
-                        item.text.currentCharacterIndex
+                        view.findNavController(),
+                        text.id,
+                        text.currentSnippetId,
+                        text.currentCharacterIndex
                 )
             }
+        }
+
+        fun bind(item: Text.WithCurrentSnippetInfo) {
+            this.item = item
+            itemView.findViewById<TextView>(R.id.text_view_texts_item__title).text = item.text.name
+
+            itemView.setOnClickListener { item.readSnippet(it) }
 
             val progressView = itemView.findViewById<TextView>(R.id.text_view_texts_item__progress)
             val currentView = itemView.findViewById<TextView>(R.id.text_view_texts_item__current)
@@ -97,36 +100,42 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
 
         override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
             ContextMenuItem.values().forEach {
-                it.addItemToMenu(menu, itemView, textId)
+                it.addItemToMenu(menu, itemView, item)
             }
         }
 
         enum class ContextMenuItem(private val titleId: Int) {
+            READ_SENTENCE(R.string.view_texts__read_sentence) {
+                override fun onClick(view: View, item: Text.WithCurrentSnippetInfo) {
+                    item.readSnippet(view)
+                }
+            },
             READ_FULL(R.string.read_full_text__title) {
-                override fun onClick(view: View, textId: Int) {
-                    ReadFullTextFragment.navigateTo(view.findNavController(), textId)
+                override fun onClick(view: View, item: Text.WithCurrentSnippetInfo) {
+                    // TODO Check for content first
+                    ReadFullTextFragment.navigateTo(view.findNavController(), item.text.id)
                 }
             },
             ADD_SNIPPET(R.string.add_snippet__title) {
-                override fun onClick(view: View, textId: Int) {
-                    AddSnippetFragment.navigateTo(view.findNavController(), textId)
+                override fun onClick(view: View, item: Text.WithCurrentSnippetInfo) {
+                    AddSnippetFragment.navigateTo(view.findNavController(), item.text.id)
                 }
             };
 
-            open fun addItemToMenu(menu: ContextMenu, view: View, textId: Int) {
+            open fun addItemToMenu(menu: ContextMenu, view: View, text: Text.WithCurrentSnippetInfo) {
                 val newItem = menu.add(Menu.NONE, ordinal, ordinal, titleId)
                 newItem.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
                     override fun onMenuItemClick(item: MenuItem?): Boolean {
                         if (item == null || item.itemId >= values().size) {
                             return false
                         }
-                        values()[item.itemId].onClick(view, textId)
+                        values()[item.itemId].onClick(view, text)
                         return true
                     }
                 })
             }
 
-            abstract fun onClick(view: View, textId: Int)
+            abstract fun onClick(view: View, item: Text.WithCurrentSnippetInfo)
         }
     }
 }
