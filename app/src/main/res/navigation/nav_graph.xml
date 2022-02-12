@@ -62,4 +62,23 @@
             app:argType="integer"
             />
     </fragment>
+    <fragment
+        android:id="@+id/readFullTextFragment"
+        android:name="com.eywa.projectlectito.features.readFullText.ReadFullTextFragment"
+        android:label="ReadFullTextFragment"
+        tools:layout="@layout/read_full_text"
+        >
+        <argument
+            android:name="textId"
+            app:argType="integer"
+            />
+        <argument
+            android:name="currentSnippetId"
+            app:argType="integer"
+            />
+        <argument
+            android:name="currentCharacter"
+            app:argType="integer"
+            />
+    </fragment>
 </navigation>

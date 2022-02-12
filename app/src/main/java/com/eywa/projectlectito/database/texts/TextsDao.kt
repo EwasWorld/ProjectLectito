@@ -12,7 +12,7 @@ interface TextsDao {
     suspend fun update(vararg items: Text)
 
     @Query("SELECT * FROM ${Text.TABLE_NAME} WHERE id = :id")
-    fun getTextById(id: Int): LiveData<Text>
+    fun getTextById(id: Int): LiveData<Text?>
 
     @Query("SELECT * FROM ${Text.TABLE_NAME}")
     fun getAllTexts(): LiveData<List<Text>>

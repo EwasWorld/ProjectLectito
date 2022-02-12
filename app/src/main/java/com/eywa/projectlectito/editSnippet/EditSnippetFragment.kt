@@ -50,7 +50,7 @@ class EditSnippetFragment : Fragment() {
 
     private fun retrieveValuesFromVm() {
         viewModel.textName.observe(viewLifecycleOwner, {
-            text_edit_snippet__title.text = it ?: resources.getString(R.string.add_snippet__no_title)
+            text_edit_snippet__title.text = it ?: resources.getString(R.string.text_unknown_title)
         })
         viewModel.pageInfo.observe(viewLifecycleOwner, {
             it?.let { pageInfo -> text_edit_snippet__page_ref.text = pageInfo }

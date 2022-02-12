@@ -42,6 +42,10 @@ class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
         return textSnippetsDao.getTextSnippetEntry(textId, pageReference)
     }
 
+    fun getSnippetsForText(textId: Int): LiveData<List<TextSnippet>> {
+        return textSnippetsDao.getSnippetsForText(textId)
+    }
+
     suspend fun insert(item: TextSnippet) {
         textSnippetsDao.insert(item)
     }

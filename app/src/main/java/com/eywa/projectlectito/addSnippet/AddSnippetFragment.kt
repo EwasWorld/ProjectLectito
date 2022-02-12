@@ -39,7 +39,7 @@ class AddSnippetFragment : Fragment() {
         viewModel.textId.postValue(args.textId)
 
         viewModel.textName.observe(viewLifecycleOwner, {
-            text_add_snippet__text_name.text = it ?: resources.getString(R.string.add_snippet__no_title)
+            text_add_snippet__text_name.text = it ?: resources.getString(R.string.text_unknown_title)
         })
         viewModel.pageExists.observe(viewLifecycleOwner, {
             text_add_snippet__duplicate_page_warning.visibility = it.asVisibility(true)

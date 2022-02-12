@@ -296,7 +296,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         val parseFailed = sentence.map { it?.parseError == true }
         val textName = currentSnippet.switchMap { snippet ->
             if (snippet == null) return@switchMap MutableLiveData(null)
-            textsRepo.getTextById(snippet.textId).map { it.name }
+            textsRepo.getTextById(snippet.textId).map { it?.name }
         }.distinctUntilChanged()
         val chapterPage = currentSnippet.map { it?.getChapterPageString() ?: "" }
         val previousSentence = sentence.map { it?.sentence?.previousSentence }

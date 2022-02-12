@@ -27,7 +27,7 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     val textId = MutableLiveData<Int?>(null)
     val textName = textId.switchMap { textId ->
         if (textId == null) return@switchMap MutableLiveData<String?>(null)
-        textsRepo.getTextById(textId).map { it.name }
+        textsRepo.getTextById(textId).map { it?.name }
     }
 
     val pageReference = MutableLiveData<Int?>(null)

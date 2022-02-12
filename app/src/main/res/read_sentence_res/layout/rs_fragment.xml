@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:background="#DECFFF"
+                android:background="@color/read_sentence__text_info_background"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="5dp"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -40,7 +40,7 @@ class EditSnippetViewModel(application: Application) : AndroidViewModel(applicat
      */
     val textName = snippet.switchMap { snippet ->
         if (snippet == null) return@switchMap MutableLiveData<String?>(null)
-        textsRepo.getTextById(snippet.textId).map { it.name }
+        textsRepo.getTextById(snippet.textId).map { it?.name }
     }
     val pageInfo = snippet.map { snippet ->
         if (snippet == null) return@map null

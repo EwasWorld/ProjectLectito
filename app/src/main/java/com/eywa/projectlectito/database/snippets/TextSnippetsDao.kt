@@ -94,4 +94,13 @@ interface TextSnippetsDao {
             textId: Int,
             pageReference: Int
     ): LiveData<List<TextSnippet>>
+
+    @Query(
+            """
+                SELECT *
+                FROM ${TextSnippet.TABLE_NAME} 
+                WHERE textId = :textId
+            """
+    )
+    fun getSnippetsForText(textId: Int): LiveData<List<TextSnippet>>
 }

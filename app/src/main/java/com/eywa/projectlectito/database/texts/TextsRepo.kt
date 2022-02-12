@@ -3,7 +3,7 @@ package com.eywa.projectlectito.database.texts
 import androidx.lifecycle.LiveData
 
 class TextsRepo(private val textsDao: TextsDao) {
-    fun getTextById(textId: Int): LiveData<Text> {
+    fun getTextById(textId: Int): LiveData<Text?> {
         return textsDao.getTextById(textId)
     }
 

@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.*
 import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.editSnippet.EditSnippetFragment
+import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import kotlinx.android.synthetic.main.rs_fragment.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
@@ -115,11 +117,21 @@ class ReadSentenceFragment : Fragment() {
             }
         }
 
+        button_read_sentence__full_text.setOnClickListener {
+            val firstSnippet = sentence?.sentence?.snippetsInCurrentSentence?.get(0)
+            ReadFullTextFragment.navigateTo(
+                    findNavController(),
+                    args.textId,
+                    firstSnippet?.snippetId,
+                    firstSnippet?.snippetStartIndex
+            )
+        }
+
         button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
         readSentenceViewModel.editSnippetId.observe(viewLifecycleOwner, {
             it?.let { snippetToEdit ->
                 EditSnippetFragment.navigateTo(
-                        requireView().findNavController(),
+                        findNavController(),
                         snippetToEdit.id,
                         snippetToEdit.startChar,
                         snippetToEdit.endChar,

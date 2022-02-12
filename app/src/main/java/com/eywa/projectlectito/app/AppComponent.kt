@@ -4,6 +4,7 @@ import android.app.Application
 import com.eywa.projectlectito.addSnippet.AddSnippetViewModel
 import com.eywa.projectlectito.database.DatabaseDaggerModule
 import com.eywa.projectlectito.editSnippet.EditSnippetViewModel
+import com.eywa.projectlectito.features.readFullText.ReadFullTextViewModel
 import com.eywa.projectlectito.readSentence.ReadSentenceViewModel
 import com.eywa.projectlectito.viewTexts.ViewTextsViewModel
 import dagger.BindsInstance
@@ -29,6 +30,7 @@ interface AppComponent {
     fun inject(viewModel: ViewTextsViewModel)
     fun inject(viewModel: AddSnippetViewModel)
     fun inject(viewModel: EditSnippetViewModel)
+    fun inject(viewModel: ReadFullTextViewModel)
 
     @Component.Builder
     interface Builder {

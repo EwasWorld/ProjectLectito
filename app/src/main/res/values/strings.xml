@@ -6,6 +6,7 @@
 
     <string name="complete">Complete</string>
     <string name="cancel">Cancel</string>
+    <string name="text_unknown_title">Unknown Text</string>
 
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
@@ -26,12 +27,13 @@
     <string name="add_snippet__missing_field_page">page number</string>
     <string name="add_snippet__submit">Add</string>
     <string name="add_snippet__submit_and_another">Add and add another</string>
-    <string name="add_snippet__no_title">Unknown Text</string>
 
     <!-- Edit Snippet -->
     <string name="edit_snippet__title">Edit sentence</string>
     <string name="edit_snippet__input_hint">New sentence</string>
 
+    <!-- Read Full Text -->
+    <string name="read_full_text__title">Full content</string>
 
     <!-- Misc -->
     <string-array name="card_state_array">

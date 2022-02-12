@@ -6,4 +6,5 @@
     <color name="read_sentence__warning_red">#FF5722</color>
     <color name="read_sentence__white_overlay">#B3FFFFFF</color>
     <color name="read_sentence__selected_word_background">#CFE5FF</color>
+    <color name="read_sentence__text_info_background">#DECFFF</color>
 </resources>
