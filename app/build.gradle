@@ -45,7 +45,8 @@ android {
         main {
             res {
                 srcDirs 'src/main/res',
-                        'src/main/res/read_sentence_res'
+                        'src/main/res/read_sentence_res',
+                        'src/main/res/launcher_icon_res'
             }
         }
     }
