@@ -28,7 +28,7 @@ class Sentence(
          * Don't count these as either stop or non-stop characters. They don't indicate text and don't indicate a
          * sentence stop
          */
-        private val ignoreCharacters = setOf(' ', '　', '「', '」', '"', '”', ',', '、')
+        private val ignoreCharacters = setOf(' ', '　', '「', '」', '[', ']', '"', '”', ',', '、')
 
         /**
          * Break a sentence unless it's the start or end of a file, in which case allow the sentence to flow between
@@ -39,7 +39,7 @@ class Sentence(
         /**
          * Always breaks a sentence
          */
-        private val hardSentenceStops = setOf('.', '。', '?', '？')
+        private val hardSentenceStops = setOf('.', '。', '?', '？', '!', '！')
         private val sentenceStops = hardSentenceStops.plus(softSentenceStops)
 
         private val tokenizer by lazy { Tokenizer() }
@@ -434,16 +434,26 @@ class Sentence(
     }
 
     private enum class FindType(val findFunction: (String, Set<Char>) -> Int) {
-        FIRST_STOP({ substring, stopChars -> substring.indexOfFirst { stopChars.contains(it) } }
-        ),
+        FIRST_STOP({ substring, stopChars ->
+            substring.indexOfFirst { stopChars.contains(it) }
+        }),
         FIRST_NON_STOP({ substring, stopChars ->
-            substring.indexOfFirst { !stopChars.contains(it) && !ignoreCharacters.contains(it) }
+            //   ...'a
+            var firstNonStop = substring.indexOfFirst { !stopChars.contains(it) && !ignoreCharacters.contains(it) }
+            while (firstNonStop - 1 >= 0 && ignoreCharacters.contains(substring[firstNonStop - 1])) {
+                firstNonStop--
+            }
+            firstNonStop
         }),
         LAST_STOP({ substring, stopChars ->
-            substring.lastIndexOfAny(stopChars.joinToString("").toCharArray())
+            substring.indexOfLast { stopChars.contains(it) }
         }),
         LAST_NON_STOP({ substring, stopChars ->
-            substring.indexOfLast { !stopChars.contains(it) && !ignoreCharacters.contains(it) }
+            var lastNonStop = substring.indexOfLast { !stopChars.contains(it) && !ignoreCharacters.contains(it) }
+            while (lastNonStop + 1 < substring.length && ignoreCharacters.contains(substring[lastNonStop + 1])) {
+                lastNonStop++
+            }
+            lastNonStop
         })
     }
 }

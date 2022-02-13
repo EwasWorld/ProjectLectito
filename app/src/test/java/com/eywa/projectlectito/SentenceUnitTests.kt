@@ -2,7 +2,9 @@ package com.eywa.projectlectito
 
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.features.readSentence.Sentence
+import com.eywa.projectlectito.features.readSentence.TempTestData
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 
 class SentenceUnitTests {
@@ -193,5 +195,40 @@ class SentenceUnitTests {
         Assert.assertEquals("かきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals("あいうえお。", sentence.previousSentence)
         Assert.assertEquals(null, sentence.getNextSentenceStart())
+    }
+
+    @Test
+    fun `test current sentence - starts with ignore character`() {
+        val sentence = Sentence(
+                TextSnippet(1, "あいうえお。\n「かきくけこ」", 1, 1),
+                6,
+                parserSuccessCallback = {},
+                parserFailCallback = {}
+        )
+        Assert.assertEquals("「かきくけこ」", sentence.currentSentence)
+        Assert.assertEquals("あいうえお。", sentence.previousSentence)
+        Assert.assertEquals(null, sentence.getNextSentenceStart())
+    }
+
+    @Suppress("unused")
+    @Ignore("Manual test")
+    fun `manually test sentence`() {
+        listOf(TempTestData.page5Text, TempTestData.page6Text, TempTestData.page7Text).forEach { content ->
+            val snippet = TextSnippet(1, content, 1, 1)
+            var currentChar: Int? = 0
+
+            while (currentChar != null && currentChar >= 0 && currentChar < content.length) {
+                val sentence = Sentence(
+                        snippet,
+                        currentChar,
+                        parserFailCallback = {},
+                        parserSuccessCallback = {}
+                )
+                println(sentence.currentSentence)
+                currentChar = sentence.getNextSentenceStart()?.startIndex
+            }
+
+            println("NEXT SNIPPET =======\n\n")
+        }
     }
 }
