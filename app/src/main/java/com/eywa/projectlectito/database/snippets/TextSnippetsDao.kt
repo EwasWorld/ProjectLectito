@@ -20,7 +20,7 @@ interface TextSnippetsDao {
     fun getAllSnippets(): LiveData<List<TextSnippet>>
 
     @Query("SELECT * FROM ${TextSnippet.TABLE_NAME} WHERE id = :textSnippetId")
-    fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet>
+    fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet?>
 
     /**
      * First item is the item just after the current snippet, going down the list gets further away from the current

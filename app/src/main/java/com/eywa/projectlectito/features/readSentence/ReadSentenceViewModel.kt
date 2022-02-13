@@ -13,10 +13,12 @@ import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.database.texts.TextsRepo
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,24 +46,33 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     /*
      * Snippets info
      */
-    private val textSnippetId = MutableLiveData<Int?>(null)
+    private val currentSnippetId = MutableLiveData<RawSnippetInfo?>(null)
     fun getFirstSnippetForText(textId: Int) = snippetsRepo.getFirstSnippetId(textId)
 
-    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    private val currentCharacter = MutableLiveData<Int>(0)
-
-    @Suppress("unchecked_cast") // Explicit cast required else compiler error
-    private val currentSnippet: LiveData<TextSnippet?> = textSnippetId.switchMap { id ->
-        if (id == null) return@switchMap MutableLiveData(null)
-        snippetsRepo.getTextSnippetById(id) as LiveData<TextSnippet?>
+    private val currentSnippet = currentSnippetId.distinctUntilChanged().switchMap {
+        val currentChar = it?.currentCharacter ?: 0
+        val id = it?.currentSnippetId ?: return@switchMap MutableLiveData(null)
+        snippetsRepo.getTextSnippetById(id).map { snippet ->
+            if (snippet == null) return@map null
+            val newSnippetInfo = FilledSnippetInfo(snippet, currentChar)
+            updateCurr(newSnippetInfo)
+            newSnippetInfo
+        }
     }.distinctUntilChanged()
-    private val previousSnippets = currentSnippet.switchMap { currentSnippet ->
-        if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
-        snippetsRepo.getPreviousSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
-    }
-    private val nextSnippets = currentSnippet.switchMap { currentSnippet ->
-        if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
-        snippetsRepo.getNextSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
+
+    private fun updateCurr(newSnippetInfo: FilledSnippetInfo) {
+        text.value?.let { oldText ->
+            val newText = Text(
+                    oldText.id,
+                    oldText.name,
+                    newSnippetInfo.currentSnippet.id,
+                    newSnippetInfo.currentCharacter,
+                    oldText.isComplete
+            )
+            viewModelScope.launch {
+                textsRepo.update(newText)
+            }
+        } ?: Log.w(LOG_TAG, "Text not found")
     }
 
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
@@ -69,6 +80,12 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     private val editSnippetIdMutable = MutableLiveData<SnippetToEdit?>(null)
     val editSnippetId: LiveData<SnippetToEdit?> = editSnippetIdMutable
 
+    val text: LiveData<Text?> = currentSnippet.switchMap {
+        it?.currentSnippet.let { snippet ->
+            if (snippet == null) return@switchMap MutableLiveData(null)
+            textsRepo.getTextById(snippet.textId)
+        }
+    }.distinctUntilChanged()
 
     /*
      * Current sentence info
@@ -82,27 +99,22 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     val wordSelectMode: LiveData<WordSelectMode> = wordSelectModeMutable.distinctUntilChanged()
     val selectedParsedInfo = MutableLiveData<ParsedInfo?>(null)
     val sentence: LiveData<SentenceWithInfo?> =
-            SentenceMediatorLiveData(
-                    currentSnippet,
-                    previousSnippets,
-                    nextSnippets,
-                    currentCharacter.distinctUntilChanged(),
-                    wordSelectMode
-            )
+            SentenceMediatorLiveData(currentSnippet, wordSelectMode, viewModelScope, snippetsRepo)
 
     /*
      * Word definitions
      */
     private val selectedWordMutable = MutableLiveData<String?>(null)
     val selectedWord = selectedWordMutable.distinctUntilChanged()
-    private val searchWordMutable = MutableLiveData<String?>(null)
-    val searchWord = searchWordMutable.distinctUntilChanged()
+    private val searchWord = MutableLiveData<String?>(null)
+
+    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
     val currentDefinition = MutableLiveData<Int>(0)
     val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
         var currentRequester: WordDefinitionRequester? = null
 
         init {
-            addSource(searchWordMutable.distinctUntilChanged()) { word ->
+            addSource(searchWord.distinctUntilChanged()) { word ->
                 if (word.isNullOrBlank()) {
                     postValue(null)
                     return@addSource
@@ -131,15 +143,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     fun updateWordSelectMode(wordSelectMode: WordSelectMode) {
         wordSelectModeMutable.postValue(wordSelectMode)
         selectedWordMutable.postValue(null)
-        searchWordMutable.postValue(null)
+        searchWord.postValue(null)
         selectedParsedInfo.postValue(null)
         currentDefinition.postValue(0)
     }
 
     fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
-        // TODO Mediator will update twice, only want it to update once
-        currentCharacter.postValue(indexInfo.startIndex)
-        textSnippetId.postValue(indexInfo.textSnippetId)
+        currentSnippetId.postValue(RawSnippetInfo(indexInfo.textSnippetId, indexInfo.startIndex))
         return true
     }
 
@@ -195,7 +205,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     fun setSearchWord(value: String?) {
         // TODO Sanitise word
-        searchWordMutable.postValue(value)
+        searchWord.postValue(value)
     }
 
     data class SnippetToEdit(
@@ -204,13 +214,25 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val endChar: Int?,
     )
 
-    private inner class SentenceMediatorLiveData(
-            private val currentSnippet: LiveData<TextSnippet?>,
-            private val previousSnippets: LiveData<List<TextSnippet>>,
-            private val nextSnippets: LiveData<List<TextSnippet>>,
-            private val currentCharacter: LiveData<Int>,
-            private val wordSelectMode: LiveData<WordSelectMode>
+    private class SentenceMediatorLiveData(
+            private val currentSnippet: LiveData<FilledSnippetInfo?>,
+            private val wordSelectMode: LiveData<WordSelectMode>,
+            private val parsingScope: CoroutineScope,
+            private val snippetsRepo: SnippetsRepo
     ) : MediatorLiveData<SentenceWithInfo?>() {
+        private val previousSnippets = currentSnippet.switchMap {
+            it?.currentSnippet.let { currentSnippet ->
+                if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
+                snippetsRepo.getPreviousSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
+            }
+        }
+        private val nextSnippets = currentSnippet.switchMap {
+            it?.currentSnippet.let { currentSnippet ->
+                if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
+                snippetsRepo.getNextSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
+            }
+        }
+
         init {
             addSource(currentSnippet) {
                 generateNewSentence()
@@ -221,16 +243,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             addSource(nextSnippets) {
                 generateNewSentence()
             }
-            addSource(currentCharacter) {
-                generateNewSentence()
-            }
             addSource(wordSelectMode) { newWordSelectMode ->
                 if (value == null) {
                     return@addSource
                 }
 
                 if (newWordSelectMode.isAuto && value?.parseError != true && value?.parsedInfo == null) {
-                    viewModelScope.launch {
+                    parsingScope.launch {
                         value?.sentence?.startParse()
                     }
                     return@addSource
@@ -243,8 +262,8 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             var sentence: Sentence? = null
             try {
                 sentence = Sentence(
-                        currentSnippet.value,
-                        currentCharacter.value,
+                        currentSnippet.value?.currentSnippet,
+                        currentSnippet.value?.currentCharacter,
                         previousSnippets.value,
                         nextSnippets.value,
                         parserSuccessCallback = {
@@ -262,7 +281,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().startIndex}")
             value = SentenceWithInfo(sentence)
             if (wordSelectMode.value!!.isAuto) {
-                viewModelScope.launch {
+                parsingScope.launch {
                     sentence.startParse()
                 }
             }
@@ -289,16 +308,16 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     val wordDefinitionViewState = WordDefinitionViewState()
     val wordSelectModeViewState = WordSelectModeViewState()
 
+    data class RawSnippetInfo(val currentSnippetId: Int, val currentCharacter: Int)
+    data class FilledSnippetInfo(val currentSnippet: TextSnippet, val currentCharacter: Int)
+
     inner class MainViewState {
         val hasValidSentence = sentence.map { it?.sentence?.currentSentence != null }
         val isInSelectSnippetMode: LiveData<Boolean> = selectSnippetMode
         val parseComplete = sentence.map { it?.parseError != true && it?.parsedInfo != null }
         val parseFailed = sentence.map { it?.parseError == true }
-        val textName = currentSnippet.switchMap { snippet ->
-            if (snippet == null) return@switchMap MutableLiveData(null)
-            textsRepo.getTextById(snippet.textId).map { it?.name }
-        }.distinctUntilChanged()
-        val chapterPage = currentSnippet.map { it?.getChapterPageString() ?: "" }
+        val textName = text.map { it?.name }
+        val chapterPage = currentSnippet.map { it?.currentSnippet?.getChapterPageString() ?: "" }
         val previousSentence = sentence.map { it?.sentence?.previousSentence }
         val hasNextSentence = sentence.map { it?.sentence?.getNextSentenceStart() != null }
         val isContentSelectable: LiveData<Boolean> = object : MediatorLiveData<Boolean>() {
@@ -407,7 +426,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                                 // supplementary symbol (number, punctuation, etc.)
                                 val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
                                 if (isWord) {
-                                    searchWordMutable.postValue(parsedInfo.dictionaryForm)
+                                    searchWord.postValue(parsedInfo.dictionaryForm)
                                 }
                             }
 

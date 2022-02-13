@@ -6,7 +6,7 @@ import androidx.lifecycle.map
 class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
     val allSnippets = textSnippetsDao.getAllSnippets()
 
-    fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet> {
+    fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet?> {
         return textSnippetsDao.getTextSnippetById(textSnippetId)
     }
 
