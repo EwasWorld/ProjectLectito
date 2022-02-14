@@ -35,63 +35,68 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         (application as App).appComponent.inject(this)
     }
 
-    /*
-     * Repos
-     */
     private val textsRepo = TextsRepo(db.textsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
-    val allSnippets = snippetsRepo.allSnippets
 
     /*
-     * Snippets info
+     * Current Snippet
      */
-    private val currentSnippetId = MutableLiveData<RawSnippetInfo?>(null)
     fun getFirstSnippetForText(textId: Int) = snippetsRepo.getFirstSnippetId(textId)
-
-    private val currentSnippet = currentSnippetId.distinctUntilChanged().switchMap {
+    private val currentSnippetId = MutableLiveData<SnippetIdAndChar?>(null)
+    private val currentSnippet = currentSnippetId.switchMap {
+        Log.i(LOG_TAG, "Current ID: ${it?.snippetId}")
         val currentChar = it?.currentCharacter ?: 0
-        val id = it?.currentSnippetId ?: return@switchMap MutableLiveData(null)
+        val id = it?.snippetId ?: return@switchMap MutableLiveData(null)
         snippetsRepo.getTextSnippetById(id).map { snippet ->
             if (snippet == null) return@map null
-            FilledSnippetInfo(snippet, currentChar)
+            FullSnippetAndChar(snippet, currentChar)
         }
-    }.distinctUntilChanged()
+    }
+    private val sentenceWithParsedInfo = SentenceMediatorLiveData()
+    val sentence = sentenceWithParsedInfo.map { it?.sentence }
 
-    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    private val selectSnippetMode = MutableLiveData<Boolean>(false)
-    private val editSnippetIdMutable = MutableLiveData<SnippetToEdit?>(null)
-    val editSnippetId: LiveData<SnippetToEdit?> = editSnippetIdMutable
-
-    val text: LiveData<Text?> = currentSnippet.switchMap {
-        it?.currentSnippet.let { snippet ->
+    /*
+     * Current Text
+     */
+    private val text: LiveData<Text?> = currentSnippet.switchMap {
+        it?.snippet.let { snippet ->
             if (snippet == null) return@switchMap MutableLiveData(null)
             textsRepo.getTextById(snippet.textId)
         }
     }.distinctUntilChanged()
 
     /*
-     * Current sentence info
+     * Edit Snippet
      */
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    private val selectWordSelectModeMenuOpenMutable = MutableLiveData<Boolean>(false)
-    val selectWordSelectModeMenuOpen = selectWordSelectModeMenuOpenMutable
+    private val isInSelectSnippetToEditMode = MutableLiveData<Boolean>(false)
+    private val _snippetToEdit = MutableLiveData<SnippetIdWithStartAndEnd?>(null)
+    val snippetToEdit: LiveData<SnippetIdWithStartAndEnd?> = _snippetToEdit
+
+    /*
+     * Word select mode - how to choose words to look up in the dictionary
+     */
+    @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
+    private val _isWordSelectModeMenuOpen = MutableLiveData<Boolean>(false)
+    val isWordSelectModeMenuOpen = _isWordSelectModeMenuOpen
 
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    private val wordSelectModeMutable = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
-    val wordSelectMode: LiveData<WordSelectMode> = wordSelectModeMutable.distinctUntilChanged()
-    val selectedParsedInfo = MutableLiveData<ParsedInfo?>(null)
-    val sentence: LiveData<SentenceWithInfo?> = SentenceMediatorLiveData()
+    private val _wordSelectMode = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
+    val wordSelectMode: LiveData<WordSelectMode> = _wordSelectMode.distinctUntilChanged()
 
     /*
      * Word definitions
      */
-    private val selectedWordMutable = MutableLiveData<String?>(null)
-    val selectedWord = selectedWordMutable.distinctUntilChanged()
+    private val tempSelectedWord = MutableLiveData<TempSelectedWord?>(null)
+    val simpleTempSelectedWord = tempSelectedWord.distinctUntilChanged().map {
+        if (it !is TempSelectedWord.SimpleWord) return@map null
+        if (it.word.isBlank()) null else it.word
+    }
     private val searchWord = MutableLiveData<String?>(null)
 
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
-    val currentDefinition = MutableLiveData<Int>(0)
-    val definitions: LiveData<WordDefinitionsWithInfo?> = object : MediatorLiveData<WordDefinitionsWithInfo?>() {
+    private val currentDefinitionIndex = MutableLiveData<Int>(0)
+    private val allDefinitions = object : MediatorLiveData<WordDefinitionsWithErrorStatus?>() {
         var currentRequester: WordDefinitionRequester? = null
 
         init {
@@ -108,12 +113,12 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                  * This is presumably because requester.getDefinition() is changing the Dispatcher to IO
                  */
                 val requester = WordDefinitionRequester(word, {
-                    postValue(WordDefinitionsWithInfo(it))
+                    postValue(WordDefinitionsWithErrorStatus(it))
                 }, {
-                    postValue(WordDefinitionsWithInfo(error = true))
+                    postValue(WordDefinitionsWithErrorStatus(error = true))
                 })
                 currentRequester = requester
-                currentDefinition.postValue(0)
+                currentDefinitionIndex.postValue(0)
                 viewModelScope.launch {
                     requester.getDefinition()
                 }
@@ -121,22 +126,27 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    /*
+     * Update functions
+     */
+
     fun updateWordSelectMode(wordSelectMode: WordSelectMode) {
-        wordSelectModeMutable.postValue(wordSelectMode)
-        selectedWordMutable.postValue(null)
+        _wordSelectMode.postValue(wordSelectMode)
+        tempSelectedWord.postValue(null)
         searchWord.postValue(null)
-        selectedParsedInfo.postValue(null)
-        currentDefinition.postValue(0)
+        currentDefinitionIndex.postValue(0)
     }
 
-    fun updateCurrentCharacter(indexInfo: Sentence.IndexInfo): Boolean {
-        currentSnippetId.postValue(RawSnippetInfo(indexInfo.textSnippetId, indexInfo.startIndex))
+    fun updateCurrentSnippetAndChar(indexInfo: Sentence.IndexInfo): Boolean {
+        Log.i(LOG_TAG, "Set snippet: ${indexInfo.textSnippetId}")
+        currentSnippetId.postValue(SnippetIdAndChar(indexInfo.textSnippetId, indexInfo.startIndex))
+        Log.i(LOG_TAG, "Set snippet complete: ${indexInfo.textSnippetId}")
         return true
     }
 
     fun incrementCurrentDefinitionIndex(): Boolean {
-        val definitions = definitions.value
-        val currentDefinition = currentDefinition.value ?: 0
+        val definitions = allDefinitions.value
+        val currentDefinition = currentDefinitionIndex.value ?: 0
 
         if (definitions?.error == true) {
             return false
@@ -147,13 +157,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             return false
         }
 
-        this.currentDefinition.postValue(currentDefinition + 1)
+        this.currentDefinitionIndex.postValue(currentDefinition + 1)
         return true
     }
 
     fun decrementCurrentDefinitionIndex(): Boolean {
-        val definitions = definitions.value
-        val currentDefinition = currentDefinition.value ?: 0
+        val definitions = allDefinitions.value
+        val currentDefinition = currentDefinitionIndex.value ?: 0
 
         if (definitions?.error == true) {
             return false
@@ -164,24 +174,26 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             return false
         }
 
-        this.currentDefinition.postValue(currentDefinition - 1)
+        this.currentDefinitionIndex.postValue(currentDefinition - 1)
         return true
     }
 
     fun setSelectSnippetMode(value: Boolean) {
-        selectSnippetMode.postValue(value)
+        isInSelectSnippetToEditMode.postValue(value)
     }
 
     fun setSelectWordSelectModeMenuOpen(value: Boolean) {
-        selectWordSelectModeMenuOpenMutable.postValue(value)
+        _isWordSelectModeMenuOpen.postValue(value)
     }
 
     fun clearEditSnippetInfo() {
-        editSnippetIdMutable.postValue(null)
+        _snippetToEdit.postValue(null)
     }
 
     fun setSelectedWord(value: String?) {
-        selectedWordMutable.postValue(value)
+        tempSelectedWord.postValue(
+                if (value.isNullOrBlank()) null else TempSelectedWord.SimpleWord(value)
+        )
     }
 
     fun setSearchWord(value: String?) {
@@ -189,36 +201,29 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         searchWord.postValue(value)
     }
 
-    data class SnippetToEdit(
-            val id: Int,
-            val startChar: Int,
-            val endChar: Int?,
-    )
+    /*
+     * Helper Classes
+     */
 
-    private inner class SentenceMediatorLiveData : MediatorLiveData<SentenceWithInfo?>() {
+    private inner class SentenceMediatorLiveData : MediatorLiveData<SentenceWithParsedInfo?>() {
         private val previousSnippets = currentSnippet.switchMap {
-            it?.currentSnippet.let { currentSnippet ->
+            it?.snippet.let { currentSnippet ->
                 if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
                 snippetsRepo.getPreviousSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
             }
         }
         private val nextSnippets = currentSnippet.switchMap {
-            it?.currentSnippet.let { currentSnippet ->
+            it?.snippet.let { currentSnippet ->
                 if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
                 snippetsRepo.getNextSnippets(currentSnippet, SURROUNDING_SNIPPETS_TO_RETRIEVE)
             }
         }
 
         init {
-            addSource(currentSnippet) {
-                generateNewSentence()
-            }
-            addSource(previousSnippets) {
-                generateNewSentence()
-            }
-            addSource(nextSnippets) {
-                generateNewSentence()
-            }
+            value = null
+            addSource(currentSnippet) { generateNewSentence() }
+            addSource(previousSnippets) { generateNewSentence() }
+            addSource(nextSnippets) { generateNewSentence() }
             addSource(wordSelectMode) { newWordSelectMode ->
                 if (value == null) {
                     return@addSource
@@ -253,28 +258,30 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
         private fun generateNewSentence() {
             value?.sentence?.cancelParse()
+            if (currentSnippet.value == null) return
+
             var sentence: Sentence? = null
             try {
                 sentence = Sentence(
-                        currentSnippet.value?.currentSnippet,
+                        currentSnippet.value?.snippet,
                         currentSnippet.value?.currentCharacter,
                         previousSnippets.value,
                         nextSnippets.value,
                         parserSuccessCallback = {
-                            value = SentenceWithInfo(sentence!!, it)
+                            postValue(SentenceWithParsedInfo(sentence!!, it))
                         },
                         parserFailCallback = {
-                            value = SentenceWithInfo(sentence!!, parseError = true)
+                            postValue(SentenceWithParsedInfo(sentence!!, parseError = true))
                         }
                 )
                 updateCurrentLocationInText(sentence.getCurrentSentenceStart(), sentence.getNextSentenceStart() != null)
             }
             catch (e: Exception) {
-                value = null
+                postValue(null)
                 return
             }
             Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().startIndex}")
-            value = SentenceWithInfo(sentence)
+            postValue(SentenceWithParsedInfo(sentence))
             if (wordSelectMode.value!!.isAuto) {
                 viewModelScope.launch {
                     sentence.startParse()
@@ -283,16 +290,28 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    data class SentenceWithInfo(
+    data class SentenceWithParsedInfo(
             val sentence: Sentence,
             val parsedInfo: List<ParsedInfo>? = null,
             val parseError: Boolean = false
     )
 
-    data class WordDefinitionsWithInfo(
+    data class WordDefinitionsWithErrorStatus(
             val jishoWordDefinitions: JishoWordDefinitions? = null,
             val error: Boolean = false
     )
+
+    data class SnippetIdAndChar(val snippetId: Int, val currentCharacter: Int)
+    data class FullSnippetAndChar(val snippet: TextSnippet, val currentCharacter: Int)
+    data class SnippetIdWithStartAndEnd(val snippetId: Int, val startChar: Int, val endChar: Int?)
+
+    /**
+     * Temporarily store the word currently typed/selected on the screen without searching for it
+     */
+    sealed class TempSelectedWord {
+        data class SimpleWord(val word: String) : TempSelectedWord()
+        data class ParsedWord(val originalWord: String, val parsedInfo: ParsedInfo) : TempSelectedWord()
+    }
 
     /*
      * Data binding states
@@ -303,18 +322,15 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     val wordDefinitionViewState = WordDefinitionViewState()
     val wordSelectModeViewState = WordSelectModeViewState()
 
-    data class RawSnippetInfo(val currentSnippetId: Int, val currentCharacter: Int)
-    data class FilledSnippetInfo(val currentSnippet: TextSnippet, val currentCharacter: Int)
-
     inner class MainViewState {
-        val hasValidSentence = sentence.map { it?.sentence?.currentSentence != null }
-        val isInSelectSnippetMode: LiveData<Boolean> = selectSnippetMode
-        val parseComplete = sentence.map { it?.parseError != true && it?.parsedInfo != null }
-        val parseFailed = sentence.map { it?.parseError == true }
+        val hasValidSentence = sentenceWithParsedInfo.map { it?.sentence?.currentSentence != null }
+        val isInSelectSnippetMode: LiveData<Boolean> = isInSelectSnippetToEditMode
+        val parseComplete = sentenceWithParsedInfo.map { it?.parseError != true && it?.parsedInfo != null }
+        val parseFailed = sentenceWithParsedInfo.map { it?.parseError == true }
         val textName = text.map { it?.name }
-        val chapterPage = currentSnippet.map { it?.currentSnippet?.getChapterPageString() ?: "" }
-        val previousSentence = sentence.map { it?.sentence?.previousSentence }
-        val hasNextSentence = sentence.map { it?.sentence?.getNextSentenceStart() != null }
+        val chapterPage = currentSnippet.map { it?.snippet?.getChapterPageString() ?: "" }
+        val previousSentence = sentenceWithParsedInfo.map { it?.sentence?.previousSentence }
+        val hasNextSentence = sentenceWithParsedInfo.map { it?.sentence?.getNextSentenceStart() != null }
         val isContentSelectable: LiveData<Boolean> = object : MediatorLiveData<Boolean>() {
             init {
                 addSource(wordSelectMode) { update() }
@@ -326,18 +342,18 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             }
         }
         val editOverlayClickedListener = View.OnClickListener { setSelectSnippetMode(false) }
-        val isSelectWordSelectModeMenuOpen = selectWordSelectModeMenuOpen
+        val isSelectWordSelectModeMenuOpen = isWordSelectModeMenuOpen
 
         val content: LiveData<SpannableString?> = object : MediatorLiveData<SpannableString?>() {
             init {
-                addSource(sentence) { update() }
+                addSource(sentenceWithParsedInfo) { update() }
                 addSource(wordSelectMode) { update() }
                 addSource(isInSelectSnippetMode) { update() }
                 addSource(parseComplete) { update() }
             }
 
             private fun update() {
-                val sentence = sentence.value
+                val sentence = sentenceWithParsedInfo.value
                 val wordSelectMode = wordSelectMode.value!!
                 val isInSelectSnippetMode = isInSelectSnippetMode.value!!
                 val content = sentence?.sentence?.currentSentence
@@ -384,14 +400,14 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 setSpan(
                         object : ClickableSpan() {
                             override fun onClick(p0: View) {
-                                editSnippetIdMutable.postValue(
-                                        SnippetToEdit(
+                                _snippetToEdit.postValue(
+                                        SnippetIdWithStartAndEnd(
                                                 snippetInfo.snippetId,
                                                 snippetInfo.snippetStartIndex ?: 0,
                                                 snippetInfo.snippetEndIndex
                                         )
                                 )
-                                selectSnippetMode.postValue(false)
+                                isInSelectSnippetToEditMode.postValue(false)
                             }
 
                             override fun updateDrawState(ds: TextPaint) {
@@ -415,8 +431,12 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 setSpan(
                         object : ClickableSpan() {
                             override fun onClick(p0: View) {
-                                selectedWordMutable.postValue(currentSentence.substring(spanStartIndex, spanEndIndex))
-                                selectedParsedInfo.postValue(parsedInfo)
+                                this@ReadSentenceViewModel.tempSelectedWord.postValue(
+                                        TempSelectedWord.ParsedWord(
+                                                currentSentence.substring(spanStartIndex, spanEndIndex),
+                                                parsedInfo
+                                        )
+                                )
 
                                 // supplementary symbol (number, punctuation, etc.)
                                 val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
@@ -456,29 +476,25 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
 
     inner class SelectedWordInfoParsedViewState {
         val showView: LiveData<Boolean> = wordSelectMode.map { it.isAuto }
-        val originalWord: LiveData<String?> = selectedWordMutable
-        val dictionaryForm: LiveData<String?> = object : MediatorLiveData<String?>() {
-            init {
-                addSource(selectedParsedInfo) { update() }
-                addSource(originalWord) { update() }
-            }
-
-            private fun update() {
-                val parsedInfo = selectedParsedInfo.value
-                if (parsedInfo?.dictionaryForm.isNullOrBlank() || parsedInfo!!.dictionaryForm == originalWord.value) {
-                    postValue(null)
-                    return
-                }
-                postValue(parsedInfo.dictionaryForm)
-            }
+        val originalWord: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
+            if (it !is TempSelectedWord.ParsedWord) null else it.originalWord
         }
-        val partsOfSpeech: LiveData<String?> = selectedParsedInfo.map { parsedInfo ->
-            parsedInfo?.partsOfSpeech
-                    ?.filterNot { it.isBlank() || it == "*" }
-                    ?.joinToString(JAPANESE_LIST_DELIMINATOR)
+        val dictionaryForm: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
+            if (it !is TempSelectedWord.ParsedWord) return@map null
+            if (it.parsedInfo.dictionaryForm.isBlank() || it.parsedInfo.dictionaryForm == it.originalWord) {
+                return@map null
+            }
+            it.parsedInfo.dictionaryForm
         }
-        val pitchAccent: LiveData<String?> = selectedParsedInfo.map { parsedInfo ->
-            parsedInfo?.pitchAccentPattern?.toString()
+        val partsOfSpeech: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
+            if (it !is TempSelectedWord.ParsedWord) return@map null
+            it.parsedInfo.partsOfSpeech
+                    .filterNot { pos -> pos.isBlank() || pos == "*" }
+                    .joinToString(JAPANESE_LIST_DELIMINATOR)
+        }
+        val pitchAccent: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
+            if (it !is TempSelectedWord.ParsedWord) return@map null
+            it.parsedInfo.pitchAccentPattern?.toString()
         }
     }
 
@@ -486,13 +502,13 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         val currDefinition: LiveData<JishoWordDefinitions.JishoEntry?> = object :
                 MediatorLiveData<JishoWordDefinitions.JishoEntry?>() {
             init {
-                addSource(definitions) { update() }
-                addSource(currentDefinition) { update() }
+                addSource(allDefinitions) { update() }
+                addSource(currentDefinitionIndex) { update() }
             }
 
             private fun update() {
-                val definitions = definitions.value
-                val currentIndex = currentDefinition.value ?: 0
+                val definitions = allDefinitions.value
+                val currentIndex = currentDefinitionIndex.value ?: 0
 
                 if (definitions == null || definitions.error || definitions.jishoWordDefinitions == null) {
                     postValue(null)
@@ -510,28 +526,28 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         }
         val notFoundString: LiveData<Int?> = object : MediatorLiveData<Int?>() {
             init {
-                addSource(definitions) { update() }
+                addSource(allDefinitions) { update() }
                 addSource(wordSelectMode) { update() }
             }
 
             private fun update() {
-                if (definitions.value != null) {
+                if (allDefinitions.value != null) {
                     postValue(null)
                     return
                 }
                 postValue(wordSelectMode.value!!.noDefinitionStringId)
             }
         }
-        val previousDefinitionButtonEnabled: LiveData<Boolean> = currentDefinition.map { it > 0 }
+        val previousDefinitionButtonEnabled: LiveData<Boolean> = currentDefinitionIndex.map { it > 0 }
         val nextDefinitionButtonEnabled: LiveData<Boolean> = object : MediatorLiveData<Boolean>() {
             init {
-                addSource(definitions) { update() }
-                addSource(currentDefinition) { update() }
+                addSource(allDefinitions) { update() }
+                addSource(currentDefinitionIndex) { update() }
             }
 
             private fun update() {
-                val definitions = definitions.value
-                val currentIndex = currentDefinition.value ?: 0
+                val definitions = allDefinitions.value
+                val currentIndex = currentDefinitionIndex.value ?: 0
 
                 if (definitions == null || definitions.error || definitions.jishoWordDefinitions == null) {
                     postValue(false)
@@ -567,7 +583,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     }
 
     inner class WordSelectModeViewState {
-        val showMenu = selectWordSelectModeMenuOpen
+        val showMenu = isWordSelectModeMenuOpen
         val currentModeIcon = wordSelectMode.map { it.iconId }
         val currentModeContentDescription = wordSelectMode.map { it.iconDescriptionId }
     }

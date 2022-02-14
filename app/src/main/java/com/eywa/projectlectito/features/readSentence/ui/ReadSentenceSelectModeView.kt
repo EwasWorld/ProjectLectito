@@ -82,7 +82,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
     }
 
     private fun setupListeners() {
-        readSentenceViewModel.selectWordSelectModeMenuOpen.observe(layout.lifecycleOwner!!, {
+        readSentenceViewModel.isWordSelectModeMenuOpen.observe(layout.lifecycleOwner!!, {
             if (it == isOpen) return@observe
 
             isOpen = it

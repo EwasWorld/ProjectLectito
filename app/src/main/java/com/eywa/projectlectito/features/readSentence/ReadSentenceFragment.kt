@@ -40,7 +40,7 @@ class ReadSentenceFragment : Fragment() {
     private lateinit var binding: RsFragmentBinding
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
 
-    private var sentence: ReadSentenceViewModel.SentenceWithInfo? = null
+    private var sentence: Sentence? = null
     private var wordSelectMode: WordSelectMode? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,7 +64,7 @@ class ReadSentenceFragment : Fragment() {
         button_read_sentence__select_mode.setLifecycleInfo(this, this)
 
         if (args.currentSnippetId != -1) {
-            readSentenceViewModel.updateCurrentCharacter(
+            readSentenceViewModel.updateCurrentSnippetAndChar(
                     Sentence.IndexInfo(
                             if (args.currentCharacter != -1) args.currentCharacter else 0,
                             args.currentSnippetId
@@ -73,7 +73,7 @@ class ReadSentenceFragment : Fragment() {
         }
         else {
             readSentenceViewModel.getFirstSnippetForText(args.textId).observe(viewLifecycleOwner, { firstSnippetId ->
-                readSentenceViewModel.updateCurrentCharacter(Sentence.IndexInfo(0, firstSnippetId))
+                readSentenceViewModel.updateCurrentSnippetAndChar(Sentence.IndexInfo(0, firstSnippetId))
             })
         }
 
@@ -92,7 +92,7 @@ class ReadSentenceFragment : Fragment() {
 
         button_read_sentence__next_sentence.setOnClickListener {
             sentence?.let {
-                val nextSentenceStart = it.sentence.getNextSentenceStart()
+                val nextSentenceStart = it.getNextSentenceStart()
                 if (nextSentenceStart == null) {
                     ToastSpamPrevention.displayToast(
                             requireContext(),
@@ -100,13 +100,13 @@ class ReadSentenceFragment : Fragment() {
                     )
                     return@setOnClickListener
                 }
-                readSentenceViewModel.updateCurrentCharacter(nextSentenceStart)
+                readSentenceViewModel.updateCurrentSnippetAndChar(nextSentenceStart)
             }
         }
 
         button_read_sentence__previous_sentence.setOnClickListener {
             sentence?.let {
-                val previousSentenceStart = it.sentence.getPreviousSentenceStart()
+                val previousSentenceStart = it.getPreviousSentenceStart()
                 if (previousSentenceStart == null) {
                     ToastSpamPrevention.displayToast(
                             requireContext(),
@@ -114,12 +114,12 @@ class ReadSentenceFragment : Fragment() {
                     )
                     return@setOnClickListener
                 }
-                readSentenceViewModel.updateCurrentCharacter(previousSentenceStart)
+                readSentenceViewModel.updateCurrentSnippetAndChar(previousSentenceStart)
             }
         }
 
         button_read_sentence__full_text.setOnClickListener {
-            val firstSnippet = sentence?.sentence?.snippetsInCurrentSentence?.get(0)
+            val firstSnippet = sentence?.snippetsInCurrentSentence?.get(0)
             ReadFullTextFragment.navigateTo(
                     findNavController(),
                     args.textId,
@@ -129,11 +129,11 @@ class ReadSentenceFragment : Fragment() {
         }
 
         button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
-        readSentenceViewModel.editSnippetId.observe(viewLifecycleOwner, {
+        readSentenceViewModel.snippetToEdit.observe(viewLifecycleOwner, {
             it?.let { snippetToEdit ->
                 EditSnippetFragment.navigateTo(
                         findNavController(),
-                        snippetToEdit.id,
+                        snippetToEdit.snippetId,
                         snippetToEdit.startChar,
                         snippetToEdit.endChar,
                 )
@@ -145,7 +145,7 @@ class ReadSentenceFragment : Fragment() {
             if (wordSelectMode != WordSelectMode.SELECT) return@addSelectionChangedListener
             if (!text_read_sentence__sentence.hasSelection()) return@addSelectionChangedListener
 
-            val selectedText = sentence?.sentence?.substring(selStart, selEnd)
+            val selectedText = sentence?.substring(selStart, selEnd)
             if (selectedText.isNullOrBlank()) {
                 return@addSelectionChangedListener
             }
@@ -155,7 +155,7 @@ class ReadSentenceFragment : Fragment() {
     }
 
     private fun editSentenceButtonAction() {
-        sentence?.sentence?.let { currentSentence ->
+        sentence?.let { currentSentence ->
             when (currentSentence.snippetsInCurrentSentence.size) {
                 0 -> {
                     ToastSpamPrevention.displayToast(
