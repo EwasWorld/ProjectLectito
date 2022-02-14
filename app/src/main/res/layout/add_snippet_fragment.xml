@@ -45,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:hint="1"
+                android:importantForAutofill="no"
                 android:inputType="number"
                 android:minWidth="@dimen/touch_target"
                 tools:ignore="HardcodedText"
@@ -111,14 +112,14 @@
         android:id="@+id/text_add_snippet__missing_field_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="@string/add_snippet__required_fields_warning"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/read_sentence__warning_red"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:paddingBottom="10dp"
-        android:paddingTop="5dp"
-        android:visibility="invisible"
+        tools:text="@string/add_snippet__required_fields_warning"
         />
 
     <Button
@@ -128,6 +129,7 @@
         android:text="@string/add_snippet__submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_add_snippet__submit_and_another"
         app:layout_constraintStart_toStartOf="parent"
         />
 
@@ -135,9 +137,9 @@
         android:id="@+id/button_add_snippet__submit_and_another"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_snippet__submit"
+        android:text="@string/add_snippet__submit_and_another"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_add_snippet__submit"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

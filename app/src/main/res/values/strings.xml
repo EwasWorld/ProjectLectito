@@ -10,6 +10,7 @@
 
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
+    <string name="view_texts__complete">Complete</string>
     <string name="view_texts__not_started">Not started</string>
     <string name="view_texts__no_content">No content</string>
     <string name="view_texts__no_content_error">Entry has no content, long press to add text</string>

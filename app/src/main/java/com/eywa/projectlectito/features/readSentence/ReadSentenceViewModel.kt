@@ -18,7 +18,6 @@ import com.eywa.projectlectito.database.texts.TextsRepo
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,26 +53,9 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         val id = it?.currentSnippetId ?: return@switchMap MutableLiveData(null)
         snippetsRepo.getTextSnippetById(id).map { snippet ->
             if (snippet == null) return@map null
-            val newSnippetInfo = FilledSnippetInfo(snippet, currentChar)
-            updateCurr(newSnippetInfo)
-            newSnippetInfo
+            FilledSnippetInfo(snippet, currentChar)
         }
     }.distinctUntilChanged()
-
-    private fun updateCurr(newSnippetInfo: FilledSnippetInfo) {
-        text.value?.let { oldText ->
-            val newText = Text(
-                    oldText.id,
-                    oldText.name,
-                    newSnippetInfo.currentSnippet.id,
-                    newSnippetInfo.currentCharacter,
-                    oldText.isComplete
-            )
-            viewModelScope.launch {
-                textsRepo.update(newText)
-            }
-        } ?: Log.w(LOG_TAG, "Text not found")
-    }
 
     @Suppress("RemoveExplicitTypeArguments") // Explicit type because it should be non-nullable
     private val selectSnippetMode = MutableLiveData<Boolean>(false)
@@ -98,8 +80,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
     private val wordSelectModeMutable = MutableLiveData<WordSelectMode>(WordSelectMode.SELECT)
     val wordSelectMode: LiveData<WordSelectMode> = wordSelectModeMutable.distinctUntilChanged()
     val selectedParsedInfo = MutableLiveData<ParsedInfo?>(null)
-    val sentence: LiveData<SentenceWithInfo?> =
-            SentenceMediatorLiveData(currentSnippet, wordSelectMode, viewModelScope, snippetsRepo)
+    val sentence: LiveData<SentenceWithInfo?> = SentenceMediatorLiveData()
 
     /*
      * Word definitions
@@ -214,12 +195,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             val endChar: Int?,
     )
 
-    private class SentenceMediatorLiveData(
-            private val currentSnippet: LiveData<FilledSnippetInfo?>,
-            private val wordSelectMode: LiveData<WordSelectMode>,
-            private val parsingScope: CoroutineScope,
-            private val snippetsRepo: SnippetsRepo
-    ) : MediatorLiveData<SentenceWithInfo?>() {
+    private inner class SentenceMediatorLiveData : MediatorLiveData<SentenceWithInfo?>() {
         private val previousSnippets = currentSnippet.switchMap {
             it?.currentSnippet.let { currentSnippet ->
                 if (currentSnippet == null) return@switchMap MutableLiveData(listOf())
@@ -249,12 +225,30 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 }
 
                 if (newWordSelectMode.isAuto && value?.parseError != true && value?.parsedInfo == null) {
-                    parsingScope.launch {
+                    viewModelScope.launch {
                         value?.sentence?.startParse()
                     }
                     return@addSource
                 }
             }
+        }
+
+        private fun updateCurrentLocationInText(currentSentenceStart: Sentence.IndexInfo, hasNextSentence: Boolean) {
+            val snippetId = if (!hasNextSentence) null else currentSentenceStart.textSnippetId
+            val currentChar = if (!hasNextSentence) null else currentSentenceStart.startIndex
+
+            text.value?.let { oldText ->
+                val newText = Text(
+                        oldText.id,
+                        oldText.name,
+                        snippetId,
+                        currentChar,
+                        oldText.isComplete || !hasNextSentence
+                )
+                viewModelScope.launch {
+                    textsRepo.update(newText)
+                }
+            } ?: Log.w(LOG_TAG, "Text not found")
         }
 
         private fun generateNewSentence() {
@@ -273,6 +267,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                             value = SentenceWithInfo(sentence!!, parseError = true)
                         }
                 )
+                updateCurrentLocationInText(sentence.getCurrentSentenceStart(), sentence.getNextSentenceStart() != null)
             }
             catch (e: Exception) {
                 value = null
@@ -281,7 +276,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
             Log.d(LOG_TAG, "Current sentence start index: ${sentence.getCurrentSentenceStart().startIndex}")
             value = SentenceWithInfo(sentence)
             if (wordSelectMode.value!!.isAuto) {
-                parsingScope.launch {
+                viewModelScope.launch {
                     sentence.startParse()
                 }
             }

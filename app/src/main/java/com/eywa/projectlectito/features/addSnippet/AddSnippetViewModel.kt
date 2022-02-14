@@ -6,6 +6,7 @@ import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.database.texts.TextsRepo
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,10 +26,11 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     val textId = MutableLiveData<Int?>(null)
-    val textName = textId.switchMap { textId ->
-        if (textId == null) return@switchMap MutableLiveData<String?>(null)
-        textsRepo.getTextById(textId).map { it?.name }
+    val text = textId.switchMap { textId ->
+        if (textId == null) return@switchMap MutableLiveData<Text?>(null)
+        textsRepo.getTextById(textId)
     }
+    val textName = text.map { it?.name }
 
     val pageReference = MutableLiveData<Int?>(null)
     private val existingPagesOrdinals = object : MediatorLiveData<List<Int>>() {
@@ -57,9 +59,26 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
         require(content.isNotBlank()) { "Content cannot be blank" }
         val textId = textId.value ?: throw IllegalArgumentException("No text id")
         val nextOrdinal = existingPagesOrdinals.value?.maxOrNull()?.plus(1) ?: 1
+        val newSnippet = TextSnippet(0, content, textId, pageReference, chapter, nextOrdinal)
 
+        var insertedId: Long? = null
         viewModelScope.launch {
-            snippetsRepo.insert(TextSnippet(0, content, textId, pageReference, chapter, nextOrdinal))
+            insertedId = snippetsRepo.insert(newSnippet)
+        }.invokeOnCompletion {
+            // Set the text to incomplete if inserting a snippet onto the end
+            val oldText = text.value
+            if (it != null || oldText?.isComplete != true) return@invokeOnCompletion
+            viewModelScope.launch {
+                textsRepo.update(
+                        Text(
+                                oldText.id,
+                                oldText.name,
+                                insertedId!!.toInt(),
+                                null,
+                                false
+                        )
+                )
+            }
         }
     }
 }

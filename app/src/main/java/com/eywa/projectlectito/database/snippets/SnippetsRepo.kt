@@ -46,8 +46,8 @@ class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
         return textSnippetsDao.getSnippetsForText(textId)
     }
 
-    suspend fun insert(item: TextSnippet) {
-        textSnippetsDao.insert(item)
+    suspend fun insert(item: TextSnippet): Long {
+        return textSnippetsDao.insert(item)
     }
 
     suspend fun update(vararg items: TextSnippet) {

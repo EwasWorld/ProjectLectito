@@ -86,16 +86,19 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
                 return
             }
 
-            val isTextStarted = item.percentageRead != 0.0
+            val isTextStarted = item.percentageRead != null
             progressView.visibility = isTextStarted.asVisibility()
             delimView.visibility = isTextStarted.asVisibility()
 
             if (isTextStarted) {
                 @SuppressLint("SetTextI18n") // Literal only used for a symbol
-                progressView.text = (item.percentageRead * 100).roundToInt().toString() + "%"
+                progressView.text = (item.percentageRead!! * 100).roundToInt().toString() + "%"
             }
-            currentView.text = item.currentSnippet?.getChapterPageString()
-                    ?: itemView.resources.getString(R.string.view_texts__not_started)
+            currentView.text = when {
+                isTextStarted -> item.currentSnippet?.getChapterPageString()
+                item.text.isComplete -> itemView.resources.getString(R.string.view_texts__complete)
+                else -> itemView.resources.getString(R.string.view_texts__not_started)
+            }
         }
 
         override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {

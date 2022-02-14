@@ -14,6 +14,7 @@ import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.add_snippet_fragment.*
+import kotlinx.android.synthetic.main.edit_snippet_fragment.*
 
 class AddSnippetFragment : Fragment() {
     companion object {
@@ -93,6 +94,10 @@ class AddSnippetFragment : Fragment() {
         // TODO POLISH Warn the user when the content length is < 40 chars? We're expecting a page of text
 
         viewModel.insert(content.toString(), pageReference!!, text_add_snippet__chapter.text.asInt())
+
+        text_add_snippet__snippet_content.setText("")
+        text_add_snippet__page.setText((pageReference + 1).toString())
+        viewModel.pageReference.postValue(pageReference + 1)
         return true
     }
 

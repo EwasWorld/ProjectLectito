@@ -11,7 +11,7 @@ interface TextSnippetsDao {
     }
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(item: TextSnippet)
+    suspend fun insert(item: TextSnippet): Long
 
     @Update
     suspend fun update(vararg items: TextSnippet)
