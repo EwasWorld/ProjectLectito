@@ -10,6 +10,8 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.utils.TextChangedListener
+import com.eywa.projectlectito.utils.ToastSpamPrevention
 import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.edit_snippet_fragment.*
 
@@ -27,6 +29,8 @@ class EditSnippetFragment : Fragment() {
     private val args: EditSnippetFragmentArgs by navArgs()
     private lateinit var viewModel: EditSnippetViewModel
 
+    private var hasErrors = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.edit_snippet_fragment, container, false)
     }
@@ -43,6 +47,7 @@ class EditSnippetFragment : Fragment() {
     }
 
     private fun postInitialValues() {
+        val args = args
         viewModel.snippetId.postValue(args.snippetId)
         val end = args.endCharacterExclusive.let { end -> if (end == -1) null else end }
         viewModel.startEnd.postValue(args.startCharacter to end)
@@ -57,8 +62,23 @@ class EditSnippetFragment : Fragment() {
             text_edit_snippet__page_ref.visibility = (it != null).asVisibility()
         })
         viewModel.editSection.observe(viewLifecycleOwner, {
-            // TODO POLISH Show an error if no text
             input_text_edit_snippet__content.setText(it ?: "")
+        })
+        viewModel.newContentErrors.observe(viewLifecycleOwner, { errors ->
+            val isEmpty = input_text_edit_snippet__content.text.isNullOrBlank()
+            val hasErrors = !errors.isNullOrEmpty() || isEmpty
+            this.hasErrors = hasErrors
+
+            text_edit_snippet__warning.visibility = (hasErrors).asVisibility()
+            if (!hasErrors) return@observe
+
+            text_edit_snippet__warning.text = resources.getString(
+                    if (isEmpty) R.string.err__required_field else errors[0]
+            )
+        })
+
+        input_text_edit_snippet__content.addTextChangedListener(TextChangedListener {
+            viewModel.updateNewSentence(it?.toString())
         })
     }
 
@@ -68,8 +88,14 @@ class EditSnippetFragment : Fragment() {
         }
 
         button_edit_snippet__complete.setOnClickListener {
+            if (hasErrors) {
+                ToastSpamPrevention.displayToast(
+                        requireContext(),
+                        resources.getString(R.string.err_add_snippet__has_error)
+                )
+                return@setOnClickListener
+            }
             val newContent = input_text_edit_snippet__content.text.toString()
-            // TODO Warn the user if content is blank
             viewModel.update(newContent)
             requireView().findNavController().popBackStack()
         }

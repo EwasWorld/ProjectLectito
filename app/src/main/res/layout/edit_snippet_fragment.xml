@@ -44,7 +44,7 @@
         android:id="@+id/input_text_edit_snippet__content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="20dp"
+        android:layout_marginTop="20dp"
         android:background="@null"
         android:ems="10"
         android:fadeScrollbars="false"
@@ -56,7 +56,7 @@
         android:maxLines="7"
         android:padding="5dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/button_edit_snippet__cancel"
+        app:layout_constraintBottom_toTopOf="@+id/text_edit_snippet__warning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,16 +65,34 @@
         tools:text="つまり、現代の日本ではヽ普通は体験てきなレ現場に出くわしてしるわけてす。"
         />
 
+    <TextView
+        android:id="@+id/text_edit_snippet__warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/read_sentence__warning_red"
+        android:textSize="@dimen/small_text"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/button_edit_snippet__cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_text_edit_snippet__content"
+        tools:text="Cannot be blank"
+        tools:visibility="visible"
+        />
+
     <Button
         android:id="@+id/button_edit_snippet__cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="@string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button_edit_snippet__complete"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_text_edit_snippet__content"
+        app:layout_constraintTop_toBottomOf="@+id/text_edit_snippet__warning"
         app:layout_constraintVertical_weight="1"
         />
 

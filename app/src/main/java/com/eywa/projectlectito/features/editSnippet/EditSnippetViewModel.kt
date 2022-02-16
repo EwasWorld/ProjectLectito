@@ -2,12 +2,14 @@ package com.eywa.projectlectito.features.editSnippet
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.TextsRepo
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class EditSnippetViewModel(application: Application) : AndroidViewModel(application) {
@@ -31,8 +33,7 @@ class EditSnippetViewModel(application: Application) : AndroidViewModel(applicat
     val startEnd = MutableLiveData<Pair<Int, Int?>?>(null)
     private val snippet = snippetId.distinctUntilChanged().switchMap {
         if (it == null) return@switchMap MutableLiveData<TextSnippet?>(null)
-        @Suppress("unchecked_cast") // Explicit cast required else compiler error
-        snippetsRepo.getTextSnippetById(it) as LiveData<TextSnippet?>
+        (snippetsRepo.getTextSnippetById(it))
     }
 
     /*
@@ -70,14 +71,31 @@ class EditSnippetViewModel(application: Application) : AndroidViewModel(applicat
             postValue(content.substring(start, end ?: content.length))
         }
     }
+    private val _newContentErrors = MutableLiveData<List<Int>>(listOf())
+    val newContentErrors: LiveData<List<Int>> = _newContentErrors
 
-    fun update(newContent: String) {
+    private fun getNewContent(newSentence: String): String {
         val current = snippet.value ?: throw IllegalStateException("No snippet")
         val startEnd = startEnd.value ?: throw IllegalStateException("No start or end boundaries")
 
+        return current.content.replaceRange(startEnd.first, startEnd.second ?: current.content.length, newSentence)
+    }
+
+    fun updateNewSentence(newSentence: String?) {
+        if (newSentence.isNullOrBlank()) {
+            _newContentErrors.postValue(listOf(R.string.err__required_field))
+            return
+        }
+        _newContentErrors.postValue(TextSnippet.isValidContent(getNewContent(newSentence)))
+    }
+
+    fun update(newSentence: String) {
+        val current = snippet.value ?: throw IllegalStateException("No snippet")
+        val newContent = getNewContent(newSentence)
+
         val updatedSnippet = TextSnippet(
                 current.id,
-                current.content.replaceRange(startEnd.first, startEnd.second ?: current.content.length, newContent),
+                newContent,
                 current.textId,
                 current.pageReference,
                 current.chapterId,

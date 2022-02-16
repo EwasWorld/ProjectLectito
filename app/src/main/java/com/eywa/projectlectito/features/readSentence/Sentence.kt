@@ -86,11 +86,18 @@ class Sentence(
                 }
 
                 allSnippets.add(SnippetInfo(actualId, start, end, null, null))
-            } while (nextSentenceStart?.relativeSnippet != null && currentRelativeId <= nextSentenceStart?.relativeSnippet!!)
+            } while (
+                    nextSentenceStart?.relativeSnippet != null
+                    && !(nextSentenceStart!!.startIndex == 0
+                            && nextSentenceStart!!.relativeSnippet == currentRelativeId)
+                    && currentRelativeId <= nextSentenceStart?.relativeSnippet!!
+            )
 
             if (allSnippets.isNotEmpty()) {
                 allSnippets.first().snippetStartIndex = currentSentenceStart.startIndex
-                allSnippets.last().snippetEndIndex = nextSentenceStart?.startIndex
+                allSnippets.last().snippetEndIndex = nextSentenceStart?.startIndex.let { nextSentenceStart ->
+                    if (nextSentenceStart == 0) null else nextSentenceStart
+                }
             }
 
             return allSnippets
