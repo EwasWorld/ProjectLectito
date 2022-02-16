@@ -13,88 +13,42 @@
         android:layout_height="wrap_content"
         android:paddingBottom="15dp"
         android:textSize="@dimen/medium_text"
-        app:layout_constraintBottom_toTopOf="@+id/table_add_snippet__info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="傭兵団の料理番"
         />
 
-    <TableLayout
-        android:id="@+id/table_add_snippet__info"
-        android:layout_width="wrap_content"
+    <com.eywa.projectlectito.features.addSnippet.AddSnippetDetail
+        android:id="@+id/layout_add_snippet__chapter"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_add_snippet__text_name"
-        >
+        app:label="@string/add_snippet__chapter"
+        app:hint="1"
+        />
 
-        <TableRow>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_snippet__chapter"
-                android:textAlignment="viewEnd"
-                android:textSize="@dimen/medium_text"
-                />
-
-            <EditText
-                android:id="@+id/text_add_snippet__chapter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:hint="1"
-                android:importantForAutofill="no"
-                android:inputType="number"
-                android:minWidth="@dimen/touch_target"
-                tools:ignore="HardcodedText"
-                />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_snippet__page"
-                android:textAlignment="viewEnd"
-                android:textSize="@dimen/medium_text"
-                />
-
-            <EditText
-                android:id="@+id/text_add_snippet__page"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:hint="1"
-                android:importantForAutofill="no"
-                android:inputType="number"
-                tools:ignore="HardcodedText"
-                />
-        </TableRow>
-    </TableLayout>
-
-    <TextView
-        android:id="@+id/text_add_snippet__duplicate_page_warning"
-        android:layout_width="wrap_content"
+    <com.eywa.projectlectito.features.addSnippet.AddSnippetDetail
+        android:id="@+id/layout_add_snippet__page"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_snippet__duplicate_page_warning"
-        android:textColor="@color/read_sentence__warning_red"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/table_add_snippet__info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_add_snippet__chapter"
+        app:label="@string/add_snippet__page"
+        app:hint="1"
         />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/text_add_snippet__missing_field_warning"
+        app:layout_constraintBottom_toTopOf="@+id/text_add_snippet__content_warning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_add_snippet__duplicate_page_warning"
+        app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__page"
         >
 
         <EditText
@@ -109,17 +63,17 @@
     </ScrollView>
 
     <TextView
-        android:id="@+id/text_add_snippet__missing_field_warning"
+        android:id="@+id/text_add_snippet__content_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
         android:textColor="@color/read_sentence__warning_red"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/add_snippet__required_fields_warning"
+        tools:text="@string/err__required_field"
         />
 
     <Button

@@ -1,8 +1,11 @@
 package com.eywa.projectlectito.database.snippets
 
+import androidx.annotation.StringRes
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.eywa.projectlectito.R
+import com.eywa.projectlectito.features.readSentence.Sentence
 
 @Entity(
         tableName = TextSnippet.TABLE_NAME,
@@ -47,5 +50,25 @@ data class TextSnippet(
 
     companion object {
         const val TABLE_NAME = "text_snippets"
+
+        /**
+         * @return list of [StringRes] reasons why the content is not valid
+         */
+        fun isValidContent(content: String?): List<Int> {
+            val errors = mutableListOf<Int>()
+            val empty = content.isNullOrBlank()
+
+            if (empty) {
+                errors.add(R.string.err__required_field)
+            }
+            if (empty || !Sentence.containsNonStopCharacter(content!!)) {
+                errors.add(R.string.err_bad_snippet_content__no_non_sentence_ends)
+            }
+            if (empty || !Sentence.containsHardStopCharacter(content!!)) {
+                errors.add(R.string.err_bad_snippet_content__no_sentence_end)
+            }
+
+            return errors
+        }
     }
 }

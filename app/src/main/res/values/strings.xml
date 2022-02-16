@@ -7,6 +7,9 @@
     <string name="complete">Complete</string>
     <string name="cancel">Cancel</string>
     <string name="text_unknown_title">Unknown Text</string>
+    <string name="err__required_field">Required field</string>
+    <string name="err_bad_snippet_content__no_sentence_end">Must contain a sentence end character (try a full stop)</string>
+    <string name="err_bad_snippet_content__no_non_sentence_ends">Must contain at least one letter</string>
 
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
@@ -29,12 +32,11 @@
     <string name="add_snippet__chapter">Chapter:</string>
     <string name="add_snippet__page">Page:</string>
     <string name="add_snippet__snippet_content_hint">Page text</string>
-    <string name="add_snippet__duplicate_page_warning">Warning: there is already an entry with this page number</string>
-    <string name="add_snippet__required_fields_warning">Error: required fields: %s</string>
-    <string name="add_snippet__missing_field_content">page text</string>
-    <string name="add_snippet__missing_field_page">page number</string>
     <string name="add_snippet__submit">Add</string>
     <string name="add_snippet__submit_and_another">Add and add another</string>
+    <string name="err_add_snippet__duplicate_page_warning">Warning: there is already an entry with this page number</string>
+    <string name="err_add_snippet__not_int">Must be an integer</string>
+    <string name="err_add_snippet__has_error">Please fix errors before continuing</string>
 
     <!-- Edit Snippet -->
     <string name="edit_snippet__title">Edit sentence</string>

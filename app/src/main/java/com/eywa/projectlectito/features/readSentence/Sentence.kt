@@ -43,6 +43,14 @@ class Sentence(
         private val sentenceStops = hardSentenceStops.plus(softSentenceStops)
 
         private val tokenizer by lazy { Tokenizer() }
+
+        fun containsHardStopCharacter(content: String): Boolean {
+            return content.any { hardSentenceStops.contains(it) }
+        }
+
+        fun containsNonStopCharacter(content: String): Boolean {
+            return content.any { !sentenceStops.contains(it) && !ignoreCharacters.contains(it) }
+        }
     }
 
     private lateinit var parseJob: Job

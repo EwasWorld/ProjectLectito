@@ -56,7 +56,7 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     val pageExists = existingPagesOrdinals.map { !it.isNullOrEmpty() }
 
     fun insert(content: String, pageReference: Int, chapter: Int?) {
-        require(content.isNotBlank()) { "Content cannot be blank" }
+        require(TextSnippet.isValidContent(content).isEmpty()) { "Content not valid" }
         val textId = textId.value ?: throw IllegalArgumentException("No text id")
         val nextOrdinal = existingPagesOrdinals.value?.maxOrNull()?.plus(1) ?: 1
         val newSnippet = TextSnippet(0, content, textId, pageReference, chapter, nextOrdinal)
