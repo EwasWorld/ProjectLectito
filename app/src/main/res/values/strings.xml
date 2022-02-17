@@ -27,6 +27,10 @@
     <string name="add_texts__name_hint">Name</string>
     <string name="err_add_texts__name_blank">Please enter a text name</string>
 
+    <!-- Snippet Browser -->
+    <string name="snippet_browser__title">Page browser</string>
+    <string name="snippet_browser__read_page">Read this page</string>
+
     <!-- Add Snippet -->
     <string name="add_snippet__title">Add page</string>
     <string name="add_snippet__chapter">Chapter:</string>

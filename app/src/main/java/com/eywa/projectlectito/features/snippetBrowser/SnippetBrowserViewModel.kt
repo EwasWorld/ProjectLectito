@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.features.readFullText
+package com.eywa.projectlectito.features.snippetBrowser
 
 import android.app.Application
 import androidx.lifecycle.*
@@ -8,7 +8,7 @@ import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.texts.TextsRepo
 import javax.inject.Inject
 
-class ReadFullTextViewModel(application: Application) : AndroidViewModel(application) {
+class SnippetBrowserViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
     lateinit var db: LectitoRoomDatabase
 

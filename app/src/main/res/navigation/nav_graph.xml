@@ -81,4 +81,15 @@
             app:argType="integer"
             />
     </fragment>
+    <fragment
+        android:id="@+id/snippetBrowserFragment"
+        android:name="com.eywa.projectlectito.features.snippetBrowser.SnippetBrowserFragment"
+        android:label="SnippetBrowserFragment"
+        tools:layout="@layout/snippet_browser_fragment"
+        >
+        <argument
+            android:name="textId"
+            app:argType="integer"
+            />
+    </fragment>
 </navigation>

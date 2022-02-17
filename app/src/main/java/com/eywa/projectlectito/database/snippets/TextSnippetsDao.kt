@@ -16,7 +16,7 @@ interface TextSnippetsDao {
     @Update
     suspend fun update(vararg items: TextSnippet)
 
-    @Query("SELECT * FROM ${TextSnippet.TABLE_NAME}")
+    @Query("SELECT * FROM ${TextSnippet.TABLE_NAME} $ORDERING")
     fun getAllSnippets(): LiveData<List<TextSnippet>>
 
     @Query("SELECT * FROM ${TextSnippet.TABLE_NAME} WHERE id = :textSnippetId")
@@ -100,6 +100,7 @@ interface TextSnippetsDao {
                 SELECT *
                 FROM ${TextSnippet.TABLE_NAME} 
                 WHERE textId = :textId
+                $ORDERING
             """
     )
     fun getSnippetsForText(textId: Int): LiveData<List<TextSnippet>>

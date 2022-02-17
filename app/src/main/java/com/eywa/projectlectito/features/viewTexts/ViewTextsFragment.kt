@@ -25,7 +25,10 @@ class ViewTextsFragment : Fragment() {
 
         val viewModel = ViewModelProvider(this)[ViewTextsViewModel::class.java]
         viewModel.allTexts.observe(viewLifecycleOwner, { texts ->
-            texts?.let { adapter.submitList(it) }
+            texts?.let {
+                adapter.submitList(it)
+                adapter.notifyDataSetChanged()
+            }
         })
 
         button_vt__add_text.setOnClickListener {

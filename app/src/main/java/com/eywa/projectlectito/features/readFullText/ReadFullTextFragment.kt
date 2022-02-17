@@ -89,6 +89,7 @@ class ReadFullTextFragment : Fragment() {
                             if (snippet.id == args.currentSnippetId) args.currentCharacter.coerceAtLeast(0) else null
                     )
                 })
+                adapter.notifyDataSetChanged()
             }
         })
     }

@@ -12,6 +12,7 @@ import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.features.addSnippet.AddSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import com.eywa.projectlectito.features.readSentence.ReadSentenceFragment
+import com.eywa.projectlectito.features.snippetBrowser.SnippetBrowserFragment
 import com.eywa.projectlectito.utils.ToastSpamPrevention
 import com.eywa.projectlectito.utils.asVisibility
 import kotlin.math.roundToInt
@@ -48,24 +49,6 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
 
         init {
             view.setOnCreateContextMenuListener(this)
-        }
-
-        companion object {
-            private fun Text.WithCurrentSnippetInfo.readSnippet(view: View) {
-                if (totalSnippets == 0) {
-                    ToastSpamPrevention.displayToast(
-                            view.context,
-                            view.resources.getString(R.string.view_texts__no_content_error)
-                    )
-                    return
-                }
-                ReadSentenceFragment.navigateTo(
-                        view.findNavController(),
-                        text.id,
-                        text.currentSnippetId,
-                        text.currentCharacterIndex
-                )
-            }
         }
 
         fun bind(item: Text.WithCurrentSnippetInfo) {
@@ -113,10 +96,18 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
                     item.readSnippet(view)
                 }
             },
+            SNIPPET_BROWSER(R.string.snippet_browser__title) {
+                override fun onClick(view: View, item: Text.WithCurrentSnippetInfo) {
+                    if (item.checkForContentAndAlert(view)) {
+                        SnippetBrowserFragment.navigateTo(view.findNavController(), item.text.id)
+                    }
+                }
+            },
             READ_FULL(R.string.read_full_text__title) {
                 override fun onClick(view: View, item: Text.WithCurrentSnippetInfo) {
-                    // TODO Check for content first
-                    ReadFullTextFragment.navigateTo(view.findNavController(), item.text.id)
+                    if (item.checkForContentAndAlert(view)) {
+                        ReadFullTextFragment.navigateTo(view.findNavController(), item.text.id)
+                    }
                 }
             },
             ADD_SNIPPET(R.string.add_snippet__title) {
@@ -139,6 +130,34 @@ class ViewTextsAdapter : ListAdapter<Text.WithCurrentSnippetInfo, ViewTextsAdapt
             }
 
             abstract fun onClick(view: View, item: Text.WithCurrentSnippetInfo)
+        }
+
+        companion object {
+            /**
+             * Checks the text has content. If it doesn't, displays a toast message
+             * @return true if there is content
+             */
+            private fun Text.WithCurrentSnippetInfo.checkForContentAndAlert(view: View): Boolean {
+                if (totalSnippets == 0) {
+                    ToastSpamPrevention.displayToast(
+                            view.context,
+                            view.resources.getString(R.string.view_texts__no_content_error)
+                    )
+                    return false
+                }
+                return true
+            }
+
+            private fun Text.WithCurrentSnippetInfo.readSnippet(view: View) {
+                if (checkForContentAndAlert(view)) {
+                    ReadSentenceFragment.navigateTo(
+                            view.findNavController(),
+                            text.id,
+                            text.currentSnippetId,
+                            text.currentCharacterIndex
+                    )
+                }
+            }
         }
     }
 }

@@ -45,7 +45,8 @@ data class TextSnippet(
     fun getChapterPageString(): String {
         val chapter = if (chapterId != null) "第%d章".format(chapterId) else ""
         val page = "%dページ".format(pageReference)
-        return "%s%s".format(chapter, page)
+        val part = if (ordinal != 1) " パート%d".format(ordinal) else ""
+        return "%s%s%s".format(chapter, page, part)
     }
 
     companion object {

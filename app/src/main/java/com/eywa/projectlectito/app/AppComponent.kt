@@ -6,6 +6,7 @@ import com.eywa.projectlectito.features.addSnippet.AddSnippetViewModel
 import com.eywa.projectlectito.features.editSnippet.EditSnippetViewModel
 import com.eywa.projectlectito.features.readFullText.ReadFullTextViewModel
 import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel
+import com.eywa.projectlectito.features.snippetBrowser.SnippetBrowserViewModel
 import com.eywa.projectlectito.features.viewTexts.ViewTextsViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -31,6 +32,7 @@ interface AppComponent {
     fun inject(viewModel: AddSnippetViewModel)
     fun inject(viewModel: EditSnippetViewModel)
     fun inject(viewModel: ReadFullTextViewModel)
+    fun inject(viewModel: SnippetBrowserViewModel)
 
     @Component.Builder
     interface Builder {
