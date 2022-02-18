@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
     android:layout_margin="3dp"
-    android:background="@color/teal_light"
+    android:background="@color/db_text_info_banner_background"
+    android:padding="10dp"
     >
 
     <TextView
         android:id="@+id/text_view_texts_item__title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/info_banner_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="傭兵団の料理番"
@@ -22,6 +23,7 @@
         android:id="@+id/text_view_texts_item__progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/info_banner_text"
         app:layout_constraintEnd_toStartOf="@+id/text_view_texts_item__jp_delim"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="78%"
@@ -31,9 +33,10 @@
         android:id="@+id/text_view_texts_item__jp_delim"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="・"
+        android:textColor="@color/info_banner_text"
         app:layout_constraintEnd_toStartOf="@+id/text_view_texts_item__current"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="・"
         tools:ignore="HardcodedText"
         />
 
@@ -41,8 +44,9 @@
         android:id="@+id/text_view_texts_item__current"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/info_banner_text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="第２章３０ページ"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

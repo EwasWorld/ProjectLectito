@@ -16,13 +16,13 @@
         android:id="@+id/layout_rs_selected_word_info_simple"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/read_sentence__selected_word_background"
+        android:background="@color/rs_selected_word_info_banner_background"
         android:paddingStart="20dp"
         android:paddingEnd="15dp"
-        app:visibleOrGone="@{viewState.showView}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:visibleOrGone="@{viewState.showView}"
         tools:visibility="visible"
         >
 
@@ -30,11 +30,12 @@
             android:id="@+id/text_read_sentence__selected_simple_word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.selectVisibility}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{viewState.selectVisibility}"
             tools:text="うまい"
             tools:visibility="gone"
             />
@@ -48,13 +49,14 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.typeVisibility}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__submit_word"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{viewState.typeVisibility}"
             tools:text="うまい"
             />
 
@@ -68,7 +70,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/grey_1"
+            app:tint="@color/info_banner_text"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

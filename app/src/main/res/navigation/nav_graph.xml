@@ -66,7 +66,7 @@
         android:id="@+id/readFullTextFragment"
         android:name="com.eywa.projectlectito.features.readFullText.ReadFullTextFragment"
         android:label="ReadFullTextFragment"
-        tools:layout="@layout/read_full_text"
+        tools:layout="@layout/read_full_text_fragment"
         >
         <argument
             android:name="textId"

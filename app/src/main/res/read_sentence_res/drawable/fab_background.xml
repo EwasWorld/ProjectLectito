@@ -4,7 +4,7 @@
     >
     <item>
         <shape android:shape="oval">
-            <solid android:color="?android:colorAccent" />
+            <solid android:color="@color/fab_background" />
         </shape>
     </item>
 </ripple>

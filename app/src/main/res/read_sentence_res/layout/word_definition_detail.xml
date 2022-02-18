@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:paddingVertical="5dp"
     >
 
@@ -11,47 +11,54 @@
         android:id="@+id/text_definition_detail__parts_of_speech"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Na-adjective"
+        android:textColor="@color/general_text"
         android:textSize="@dimen/small_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="Na-adjective"
         />
+
     <TextView
         android:id="@+id/text_definition_detail__index"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="1"
+        android:textColor="@color/general_text"
+        android:textSize="@dimen/medium_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_definition_detail__parts_of_speech"
-        android:textSize="@dimen/medium_text"
+        tools:text="1"
         />
 
     <TextView
         android:id="@+id/text_definition_detail__index_separator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="."
         android:paddingEnd="3dp"
+        android:text="."
+        android:textColor="@color/general_text"
+        android:textSize="@dimen/medium_text"
         app:layout_constraintStart_toEndOf="@+id/text_definition_detail__index"
         app:layout_constraintTop_toTopOf="@id/text_definition_detail__index"
         tools:ignore="HardcodedText,RtlSymmetry"
-        android:textSize="@dimen/medium_text"
         />
+
     <TextView
         android:id="@+id/text_definition_detail__definition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="definition of term"
+        android:textColor="@color/general_text"
+        android:textSize="@dimen/medium_text"
         app:layout_constraintStart_toEndOf="@+id/text_definition_detail__index_separator"
         app:layout_constraintTop_toTopOf="@id/text_definition_detail__index"
         tools:ignore="HardcodedText"
-        android:textSize="@dimen/medium_text"
+        tools:text="definition of term"
         />
 
     <TextView
         android:id="@+id/text_definition_detail__tags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/general_text"
         android:textSize="@dimen/small_text"
         app:layout_constraintStart_toEndOf="@+id/text_definition_detail__index_separator"
         app:layout_constraintTop_toBottomOf="@id/text_definition_detail__definition"

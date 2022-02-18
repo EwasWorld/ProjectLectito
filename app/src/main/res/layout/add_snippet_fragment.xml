@@ -4,18 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/general_background"
     android:padding="20dp"
     >
 
     <TextView
         android:id="@+id/text_add_snippet__text_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="15dp"
+        android:background="@color/db_text_info_banner_background"
+        android:gravity="center"
+        android:paddingVertical="10dp"
+        android:textColor="@color/info_banner_text"
         android:textSize="@dimen/medium_text"
+        app:layout_constraintBottom_toTopOf="@+id/layout_add_snippet__chapter"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside"
         tools:text="傭兵団の料理番"
         />
 
@@ -23,30 +30,40 @@
         android:id="@+id/layout_add_snippet__chapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_add_snippet__text_name"
-        app:label="@string/add_snippet__chapter"
         app:hint="1"
+        app:label="@string/add_snippet__chapter"
+        app:layout_constraintBottom_toTopOf="@+id/layout_add_snippet__page"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_add_snippet__text_name"
         />
 
     <com.eywa.projectlectito.features.addSnippet.AddSnippetDetail
         android:id="@+id/layout_add_snippet__page"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_add_snippet__chapter"
-        app:label="@string/add_snippet__page"
         app:hint="1"
+        app:label="@string/add_snippet__page"
+        app:layout_constraintBottom_toTopOf="@+id/scroll_add_snippet__content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__chapter"
         />
 
     <ScrollView
+        android:id="@+id/scroll_add_snippet__content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/text_add_snippet__content_warning"
+        android:layout_margin="10dp"
+        android:background="@drawable/edit_text_rounded_corners"
+        android:fillViewport="true"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__page"
         >
@@ -55,10 +72,13 @@
             android:id="@+id/text_add_snippet__snippet_content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@null"
+            android:gravity="start|top"
             android:hint="@string/add_snippet__snippet_content_hint"
             android:importantForAutofill="no"
-            android:inputType="text"
-            android:minWidth="@dimen/touch_target"
+            android:inputType="textMultiLine"
+            android:textColor="@color/edit_text_text_colour"
+            tools:text="@tools:sample/lorem/random"
             />
     </ScrollView>
 
@@ -68,7 +88,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
-        android:textColor="@color/read_sentence__warning_red"
+        android:textColor="@color/warning_red"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
         app:layout_constraintEnd_toEndOf="parent"
@@ -78,17 +98,21 @@
 
     <Button
         android:id="@+id/button_add_snippet__submit"
+        style="@style/GeneralButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_snippet__submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button_add_snippet__submit_and_another"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scroll_add_snippet__content"
         />
 
     <Button
         android:id="@+id/button_add_snippet__submit_and_another"
+        style="@style/GeneralButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_snippet__submit_and_another"

@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
-import kotlinx.android.synthetic.main.read_full_text.*
+import kotlinx.android.synthetic.main.read_full_text_fragment.*
 
 class ReadFullTextFragment : Fragment() {
     companion object {
@@ -35,7 +35,7 @@ class ReadFullTextFragment : Fragment() {
     private var displayedSnippetIds = listOf<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.read_full_text, container, false)
+        return inflater.inflate(R.layout.read_full_text_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

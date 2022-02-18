@@ -77,7 +77,7 @@ class AddSnippetDetail : ConstraintLayout {
             valueEditText.setTextColor(
                     resources.getColorByTheme(
                             errors?.level.let { level ->
-                                if (level == Validator.ErrorLevel.ERROR) level.color else R.color.text_colour
+                                if (level == Validator.ErrorLevel.ERROR) level.color else R.color.general_text
                             },
                             context.theme
                     )
@@ -113,8 +113,8 @@ class AddSnippetDetail : ConstraintLayout {
         }
 
         enum class ErrorLevel(@ColorRes val color: Int) {
-            ERROR(R.color.read_sentence__warning_red),
-            WARNING(R.color.read_sentence__warning_orange)
+            ERROR(R.color.warning_red),
+            WARNING(R.color.warning_orange)
         }
     }
 }

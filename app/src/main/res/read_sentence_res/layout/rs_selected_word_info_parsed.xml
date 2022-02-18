@@ -16,13 +16,13 @@
         android:id="@+id/layout_rs_selected_word_info_parsed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/read_sentence__selected_word_background"
+        android:background="@color/rs_selected_word_info_banner_background"
         android:paddingHorizontal="20dp"
         android:paddingVertical="5dp"
-        app:visibleOrGone="@{viewState.showView}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:visibleOrGone="@{viewState.showView}"
         >
 
         <TextView
@@ -30,14 +30,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/read_sentence__select_word_hint"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:invertVisibility="@{true}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
+            app:visibleOrGone="@{viewState.originalWord}"
             tools:visibility="gone"
-            app:invertVisibility="@{true}"
             />
 
         <TextView
@@ -45,12 +46,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewState.originalWord}"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.originalWord}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
+            app:visibleOrGone="@{viewState.originalWord}"
             tools:text="うまい"
             />
 
@@ -59,11 +61,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="・"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.dictionaryForm}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__dictionary_form"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_parsed_word"
+            app:visibleOrGone="@{viewState.dictionaryForm}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -73,11 +76,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewState.dictionaryForm}"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.originalWord}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_1"
+            app:visibleOrGone="@{viewState.originalWord}"
             tools:text="うまく"
             />
 
@@ -85,10 +89,10 @@
             android:id="@+id/space_read_sentence_1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:visibleOrGone="@{viewState.originalWord}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__parts_of_speech"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__dictionary_form"
+            app:visibleOrGone="@{viewState.originalWord}"
             />
 
         <TextView
@@ -96,11 +100,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewState.partsOfSpeech}"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.originalWord}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__selected_separator_2"
             app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
+            app:visibleOrGone="@{viewState.originalWord}"
             tools:text="動詞"
             />
 
@@ -109,11 +114,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="・"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.pitchAccent}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__pitch_accent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__parts_of_speech"
+            app:visibleOrGone="@{viewState.pitchAccent}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -123,11 +129,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewState.pitchAccent}"
+            android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
-            app:visibleOrGone="@{viewState.pitchAccent}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_2"
+            app:visibleOrGone="@{viewState.pitchAccent}"
             tools:text="1"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,7 @@
         android:id="@+id/layout_rs__word_definition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/read_sentence__definition_background"
+        android:background="@color/general_aux_background"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="15dp"
@@ -31,10 +31,11 @@
             android:id="@+id/text_read_sentence__no_definition"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/read_sentence__definition_background"
+            android:background="@color/general_aux_background"
             android:gravity="center"
             android:paddingVertical="20dp"
             android:text="@{viewState.notFoundString}"
+            android:textColor="@color/general_text"
             android:textSize="@dimen/small_text"
             app:invertVisibility="@{true}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -53,6 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="@{viewState.reading}"
+            android:textColor="@color/general_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__word"
             app:layout_constraintEnd_toEndOf="@id/text_read_sentence__word"
@@ -68,6 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewState.word}"
+            android:textColor="@color/general_text"
             android:textSize="@dimen/large_text"
             app:layout_constraintBottom_toTopOf="@+id/layout_read_sentence__english_definitions_scroll"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,6 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:text="@string/read_sentence__common"
+                android:textColor="@color/general_text"
                 android:textSize="@dimen/small_text"
                 app:visibleOrGone="@{viewState.isCommon}"
                 />
@@ -100,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:text="@{viewState.jlpt}"
+                android:textColor="@color/general_text"
                 android:textSize="@dimen/small_text"
                 app:visibleOrGone="@{viewState.jlpt}"
                 tools:text="N4"
@@ -112,6 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="@{viewState.tags}"
+            android:textColor="@color/general_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
@@ -126,7 +132,7 @@
             android:layout_marginVertical="10dp"
             android:fadeScrollbars="false"
             android:scrollbars="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms_label"
+            app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_default="wrap"
             app:layout_constraintHorizontal_bias="0.5"
@@ -136,80 +142,87 @@
             >
 
             <LinearLayout
-                android:id="@+id/layout_read_sentence__english_definitions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingHorizontal="10dp"
                 >
 
-                <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                <LinearLayout
+                    android:id="@+id/layout_read_sentence__english_definitions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:definition="normal; ordinary; regular; usual; common; average"
+                        app:index="1"
+                        app:parts_of_speech="Na-adjective"
+                        app:tags="Usually written using kana alone"
+                        />
+
+                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:definition="normally; ordinarily; usually; generally; commonly"
+                        app:index="2"
+                        app:parts_of_speech="Adverb (fukushi)"
+                        app:tags=""
+                        />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/text_read_sentence__other_forms_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:definition="normal; ordinary; regular; usual; common; average"
-                    app:index="1"
-                    app:parts_of_speech="Na-adjective"
-                    app:tags="Usually written using kana alone"
+                    android:text="@string/read_sentence__other_forms_label"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/small_text"
+                    app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
+                    app:visibleOrGone="@{viewState.otherForms}"
                     />
 
-                <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                <TextView
+                    android:id="@+id/text_read_sentence__other_forms"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:definition="normally; ordinarily; usually; generally; commonly"
-                    app:index="2"
-                    app:parts_of_speech="Adverb (fukushi)"
-                    app:tags=""
+                    android:text="@{viewState.otherForms}"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/small_text"
+                    app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
+                    app:visibleOrGone="@{viewState.otherForms}"
+                    tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
                     />
             </LinearLayout>
         </ScrollView>
 
-        <TextView
-            android:id="@+id/text_read_sentence__other_forms_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/read_sentence__other_forms_label"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
-            app:visibleOrGone="@{viewState.otherForms}"
-            />
-
-        <TextView
-            android:id="@+id/text_read_sentence__other_forms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:text="@{viewState.otherForms}"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
-            app:visibleOrGone="@{viewState.otherForms}"
-            tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
-            />
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_read_sentence__close_definition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/FloatingActionButton"
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__previous_definition"
             android:focusable="true"
             android:src="@drawable/ic_cross"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_definition"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
+            app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
             app:visibleOrGone="@{viewState.currDefinition}"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_read_sentence__previous_definition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/FloatingActionButton"
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__previous_definition"
@@ -220,7 +233,7 @@
             app:layout_constraintEnd_toStartOf="@id/spinner_read_sentence__state"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@id/button_read_sentence__close_definition"
-            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms"
+            app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
             app:visibleOrGone="@{viewState.currDefinition}"
             />
 
@@ -241,8 +254,7 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_read_sentence__next_definition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/FloatingActionButton"
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__next_definition"
