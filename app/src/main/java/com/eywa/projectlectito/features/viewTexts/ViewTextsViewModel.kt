@@ -19,7 +19,7 @@ class ViewTextsViewModel(application: Application) : AndroidViewModel(applicatio
         (application as App).appComponent.inject(this)
     }
 
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     val allTexts = textsRepo.getAllTextsWithSnippetInfo()
 
     fun insert(textName: String): Job {
@@ -29,4 +29,6 @@ class ViewTextsViewModel(application: Application) : AndroidViewModel(applicatio
             textsRepo.insert(Text(0, textName))
         }
     }
+
+    fun delete(textId: Int) = viewModelScope.launch { textsRepo.delete(textId) }
 }

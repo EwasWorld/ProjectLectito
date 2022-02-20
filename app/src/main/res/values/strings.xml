@@ -6,6 +6,7 @@
 
     <string name="complete">Complete</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
     <string name="text_unknown_title">Unknown Text</string>
     <string name="err__required_field">Required field</string>
     <string name="err_bad_snippet_content__no_sentence_end">Must contain a sentence end character (try a full stop)</string>
@@ -20,6 +21,9 @@
     <string name="view_texts__submit_description">Search for word</string>
     <string name="view_texts__type_word_hint">Search for a word</string>
     <string name="view_texts__read_sentence">Read</string>
+    <string name="view_texts__delete_text">Delete</string>
+    <string name="view_texts__confirm_delete_dialog_title">Confirm Deletion</string>
+    <string name="view_texts__confirm_delete_dialog_body">Are you sure you want to delete %s?</string>
 
     <!-- Add Text -->
     <string name="add_texts__title">Add text</string>

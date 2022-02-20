@@ -23,7 +23,7 @@ class EditSnippetViewModel(application: Application) : AndroidViewModel(applicat
     /*
      * Repos
      */
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     /*

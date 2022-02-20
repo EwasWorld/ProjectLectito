@@ -19,7 +19,7 @@ class ReadFullTextViewModel(application: Application) : AndroidViewModel(applica
     /*
      * Repos
      */
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     /*

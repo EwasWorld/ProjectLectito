@@ -22,7 +22,7 @@ class AddSnippetViewModel(application: Application) : AndroidViewModel(applicati
     /*
      * Repos
      */
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     val textId = MutableLiveData<Int?>(null)

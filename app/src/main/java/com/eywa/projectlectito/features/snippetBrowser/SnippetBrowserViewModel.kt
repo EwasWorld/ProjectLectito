@@ -6,6 +6,7 @@ import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.texts.TextsRepo
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SnippetBrowserViewModel(application: Application) : AndroidViewModel(application) {
@@ -19,7 +20,7 @@ class SnippetBrowserViewModel(application: Application) : AndroidViewModel(appli
     /*
      * Repos
      */
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     /*
@@ -35,4 +36,6 @@ class SnippetBrowserViewModel(application: Application) : AndroidViewModel(appli
         if (textId == null) return@switchMap MutableLiveData(listOf())
         return@switchMap snippetsRepo.getSnippetsForText(textId)
     }
+
+    fun delete(snippetId: Int) = viewModelScope.launch { snippetsRepo.delete(snippetId) }
 }

@@ -35,7 +35,7 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
         (application as App).appComponent.inject(this)
     }
 
-    private val textsRepo = TextsRepo(db.textsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
 
     /*

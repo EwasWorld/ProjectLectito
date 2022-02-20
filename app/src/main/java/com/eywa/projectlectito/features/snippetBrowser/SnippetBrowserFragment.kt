@@ -43,7 +43,7 @@ class SnippetBrowserFragment : Fragment() {
             }
         })
 
-        val adapter = SnippetBrowserAdapter()
+        val adapter = SnippetBrowserAdapter(viewModel)
         recycler_sb.adapter = adapter
         recycler_sb.layoutManager = LinearLayoutManager(context)
         viewModel.snippetsForText.observe(viewLifecycleOwner, { texts ->

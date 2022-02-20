@@ -41,4 +41,7 @@ interface TextsDao {
             """
     )
     fun getAllTextsWithSnippetInfo(): LiveData<List<Text.WithCurrentSnippetInfo>>
+
+    @Query("DELETE FROM ${Text.TABLE_NAME} WHERE id = :id")
+    suspend fun deleteText(id: Int)
 }

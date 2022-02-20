@@ -1,8 +1,9 @@
 package com.eywa.projectlectito.database.texts
 
 import androidx.lifecycle.LiveData
+import com.eywa.projectlectito.database.snippets.TextSnippetsDao
 
-class TextsRepo(private val textsDao: TextsDao) {
+class TextsRepo(private val textsDao: TextsDao, private val snippetsDao: TextSnippetsDao) {
     fun getTextById(textId: Int): LiveData<Text?> {
         return textsDao.getTextById(textId)
     }
@@ -21,5 +22,10 @@ class TextsRepo(private val textsDao: TextsDao) {
 
     suspend fun update(vararg items: Text) {
         textsDao.update(*items)
+    }
+
+    suspend fun delete(textId: Int) {
+        textsDao.deleteText(textId)
+        snippetsDao.deleteSnippetsForText(textId)
     }
 }

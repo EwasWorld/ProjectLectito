@@ -53,4 +53,8 @@ class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
     suspend fun update(vararg items: TextSnippet) {
         textSnippetsDao.update(*items)
     }
+
+    suspend fun delete(snippetId: Int) {
+        textSnippetsDao.deleteSnippet(snippetId)
+    }
 }

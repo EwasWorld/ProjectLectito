@@ -19,11 +19,10 @@ class ViewTextsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = resources.getString(R.string.view_texts__title)
 
-        val adapter = ViewTextsAdapter()
+        val viewModel = ViewModelProvider(this)[ViewTextsViewModel::class.java]
+        val adapter = ViewTextsAdapter(viewModel)
         recycler_vt__texts.adapter = adapter
         recycler_vt__texts.layoutManager = LinearLayoutManager(context)
-
-        val viewModel = ViewModelProvider(this)[ViewTextsViewModel::class.java]
         viewModel.allTexts.observe(viewLifecycleOwner, { texts ->
             texts?.let {
                 adapter.submitList(it)

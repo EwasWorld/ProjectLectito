@@ -104,4 +104,10 @@ interface TextSnippetsDao {
             """
     )
     fun getSnippetsForText(textId: Int): LiveData<List<TextSnippet>>
+
+    @Query("DELETE FROM ${TextSnippet.TABLE_NAME} WHERE textId = :textId")
+    suspend fun deleteSnippetsForText(textId: Int)
+
+    @Query("DELETE FROM ${TextSnippet.TABLE_NAME} WHERE id = :snippetId")
+    suspend fun deleteSnippet(snippetId: Int)
 }
