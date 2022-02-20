@@ -11,13 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectModeViewBinding
-import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import kotlinx.android.synthetic.main.rs_select_mode_view.view.*
 
 class ReadSentenceSelectModeView : ConstraintLayout {
     private lateinit var layout: RsSelectModeViewBinding
-    private lateinit var readSentenceViewModel: ReadSentenceViewModel
+    private lateinit var viewModel: ReadSentenceMviViewModel
 
     private var isOpen = false
     var selectMenuOpenedListener: (() -> Unit)? = null
@@ -43,7 +44,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
         }
 
         fab_read_sentence__select_mode_main.setOnClickListener {
-            readSentenceViewModel.setSelectWordSelectModeMenuOpen(!isOpen)
+            viewModel.handle(ReadSentenceIntent.OnWordSelectModeMenuStateChange(!isOpen))
         }
 
         listOf(
@@ -74,18 +75,19 @@ class ReadSentenceSelectModeView : ConstraintLayout {
     }
 
     fun setLifecycleInfo(viewModelStoreOwner: ViewModelStoreOwner, lifecycleOwner: LifecycleOwner) {
-        readSentenceViewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceViewModel::class.java]
+        viewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceMviViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
-        layout.viewState = readSentenceViewModel.wordSelectModeViewState
+        layout.viewModel = viewModel
 
         setupListeners()
     }
 
     private fun setupListeners() {
-        readSentenceViewModel.isWordSelectModeMenuOpen.observe(layout.lifecycleOwner!!, {
-            if (it == isOpen) return@observe
+        viewModel.viewState.observe(layout.lifecycleOwner!!, {
+            val menuOpen = it.isSelectModeMenuOpen
+            if (menuOpen == isOpen) return@observe
 
-            isOpen = it
+            isOpen = menuOpen
             if (isOpen) {
                 selectMenuOpenedListener?.invoke()
             }
@@ -93,8 +95,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
     }
 
     private fun onButtonPressed(selectMode: WordSelectMode) {
-        readSentenceViewModel.setSelectWordSelectModeMenuOpen(false)
-        readSentenceViewModel.updateWordSelectMode(selectMode)
+        viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnWordSelectModeChanged(selectMode))
     }
 
     data class ModeButton(

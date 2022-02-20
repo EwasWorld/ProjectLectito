@@ -7,13 +7,13 @@
     <data>
 
         <variable
-            name="viewState"
-            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.SelectedWordInfoSimpleViewState"
+            name="viewModel"
+            type="com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel"
             />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_rs_selected_word_info_simple"
+        android:id="@+id/layout_rs_selected_word_info_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/rs_selected_word_info_banner_background"
@@ -22,46 +22,44 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:visibleOrGone="@{viewState.showView}"
-        tools:visibility="visible"
+        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState}"
         >
 
         <TextView
-            android:id="@+id/text_read_sentence__selected_simple_word"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/info_banner_text"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewState.selectVisibility}"
-            tools:text="うまい"
-            tools:visibility="gone"
-            />
-
-        <EditText
-            android:id="@+id/input_text_read_sentence__selected_simple_word"
+            android:id="@+id/text_read_sentence__selected_info_select__word"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:hint="@string/view_texts__type_word_hint"
-            android:importantForAutofill="no"
-            android:inputType="text"
             android:maxLines="1"
+            android:text="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__submit_word"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_select__submit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewState.typeVisibility}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
             tools:text="うまい"
             />
 
+        <TextView
+            android:id="@+id/text_read_sentence__selected_info_select__default_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/read_sentence__select_word_hint"
+            android:textColor="@color/info_banner_text"
+            android:textSize="@dimen/small_text"
+            app:invertVisibility="@{true}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_select__submit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
+            tools:visibility="gone"
+            />
+
         <ImageButton
-            android:id="@+id/button_read_sentence__submit_word"
+            android:id="@+id/button_read_sentence__selected_info_select__submit"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@null"

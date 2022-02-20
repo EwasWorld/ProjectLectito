@@ -8,11 +8,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.databinding.RsSelectedWordInfoParsedBinding
+import com.eywa.projectlectito.databinding.RsSelectedWordInfoTypeBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
+import kotlinx.android.synthetic.main.rs_selected_word_info_type.view.*
 
-class RsSelectedWordInfoParsedView : ConstraintLayout {
-    private lateinit var layout: RsSelectedWordInfoParsedBinding
+class RsSelectedWordInfoTypeView : ConstraintLayout {
+    private lateinit var layout: RsSelectedWordInfoTypeBinding
     private lateinit var viewModel: ReadSentenceMviViewModel
 
     constructor(context: Context) : super(context) {
@@ -29,10 +30,10 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
 
     private fun initialise(context: Context) {
         if (isInEditMode) {
-            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_parsed, this, true)
+            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_type, this, true)
         }
         else {
-            layout = RsSelectedWordInfoParsedBinding.inflate(LayoutInflater.from(context), this, true)
+            layout = RsSelectedWordInfoTypeBinding.inflate(LayoutInflater.from(context), this, true)
         }
     }
 
@@ -40,6 +41,17 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
         viewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceMviViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
         layout.viewModel = viewModel
+
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        button_read_sentence__selected_info_type__submit.setOnClickListener {
+            TODO()
+//            if (it.isNullOrBlank()) {
+//            ToastSpamPrevention.displayToast(context, resources.getString(failMessageId))
+//            }
+        }
     }
 }
 

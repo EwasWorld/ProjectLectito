@@ -8,11 +8,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.databinding.RsSelectedWordInfoParsedBinding
+import com.eywa.projectlectito.databinding.RsSelectedWordInfoSelectBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
+import kotlinx.android.synthetic.main.rs_selected_word_info_select.view.*
 
-class RsSelectedWordInfoParsedView : ConstraintLayout {
-    private lateinit var layout: RsSelectedWordInfoParsedBinding
+class RsSelectedWordInfoSelectView : ConstraintLayout {
+    private lateinit var layout: RsSelectedWordInfoSelectBinding
     private lateinit var viewModel: ReadSentenceMviViewModel
 
     constructor(context: Context) : super(context) {
@@ -29,10 +30,10 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
 
     private fun initialise(context: Context) {
         if (isInEditMode) {
-            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_parsed, this, true)
+            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_select, this, true)
         }
         else {
-            layout = RsSelectedWordInfoParsedBinding.inflate(LayoutInflater.from(context), this, true)
+            layout = RsSelectedWordInfoSelectBinding.inflate(LayoutInflater.from(context), this, true)
         }
     }
 
@@ -40,6 +41,17 @@ class RsSelectedWordInfoParsedView : ConstraintLayout {
         viewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceMviViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
         layout.viewModel = viewModel
+
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        button_read_sentence__selected_info_select__submit.setOnClickListener {
+            TODO()
+//            if (it.isNullOrBlank()) {
+//            ToastSpamPrevention.displayToast(context, resources.getString(failMessageId))
+//            }
+        }
     }
 }
 

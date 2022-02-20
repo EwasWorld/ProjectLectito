@@ -15,7 +15,6 @@ import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import com.eywa.projectlectito.utils.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_fragment.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
-import kotlinx.android.synthetic.main.rs_selected_word_info_simple.*
 import kotlinx.android.synthetic.main.rs_word_definition.*
 
 
@@ -58,9 +57,11 @@ class ReadSentenceFragment : Fragment() {
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewState = readSentenceViewModel.mainViewState
-        layout_read_sentence__selected_word_simple_info.setLifecycleInfo(this, this)
-        layout_read_sentence__selected_word_parsed_info.setLifecycleInfo(this, this)
         layout_read_sentence__word_definition.setLifecycleInfo(this, this)
+
+        layout_read_sentence__selected_word_info_select.setLifecycleInfo(this, this)
+        layout_read_sentence__selected_word_info_type.setLifecycleInfo(this, this)
+        layout_read_sentence__selected_word_info_parsed.setLifecycleInfo(this, this)
         button_read_sentence__select_mode.setLifecycleInfo(this, this)
 
         if (args.currentSnippetId != -1) {

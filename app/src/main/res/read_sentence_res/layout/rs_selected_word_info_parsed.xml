@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="viewState"
-            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.SelectedWordInfoParsedViewState"
+            name="viewModel"
+            type="com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel"
             />
     </data>
 
@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:visibleOrGone="@{viewState.showView}"
+        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState}"
         >
 
         <TextView
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
             tools:visibility="gone"
             />
 
@@ -45,14 +45,14 @@
             android:id="@+id/text_read_sentence__selected_parsed_word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewState.originalWord}"
+            android:text="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
             tools:text="うまい"
             />
 
@@ -66,7 +66,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__dictionary_form"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_parsed_word"
-            app:visibleOrGone="@{viewState.dictionaryForm}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -75,13 +75,13 @@
             android:id="@+id/text_read_sentence__dictionary_form"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewState.dictionaryForm}"
+            android:text="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_1"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
             tools:text="うまく"
             />
 
@@ -92,20 +92,20 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__parts_of_speech"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__dictionary_form"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
             />
 
         <TextView
             android:id="@+id/text_read_sentence__parts_of_speech"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewState.partsOfSpeech}"
+            android:text="@{viewModel.viewState.selectedWordState.asParsedState.partsOfSpeech}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__selected_separator_2"
             app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
-            app:visibleOrGone="@{viewState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.partsOfSpeech}"
             tools:text="動詞"
             />
 
@@ -119,7 +119,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__pitch_accent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__parts_of_speech"
-            app:visibleOrGone="@{viewState.pitchAccent}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -128,13 +128,13 @@
             android:id="@+id/text_read_sentence__pitch_accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewState.pitchAccent}"
+            android:text="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_2"
-            app:visibleOrGone="@{viewState.pitchAccent}"
+            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
             tools:text="1"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

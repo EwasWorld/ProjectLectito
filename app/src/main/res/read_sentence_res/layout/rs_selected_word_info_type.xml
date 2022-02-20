@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel"
+            />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_rs_selected_word_info_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rs_selected_word_info_banner_background"
+        android:paddingStart="20dp"
+        android:paddingEnd="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asTypeState}"
+        >
+
+        <EditText
+            android:id="@+id/input_text_read_sentence__selected_info_type__word"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:hint="@string/view_texts__type_word_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/info_banner_text"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_type__submit"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="うまい"
+            />
+
+        <ImageButton
+            android:id="@+id/button_read_sentence__selected_info_type__submit"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@null"
+            android:contentDescription="@string/view_texts__submit_description"
+            android:src="@drawable/ic_narrow_arrow_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/info_banner_text"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
