@@ -27,6 +27,8 @@
     <string name="err_read_sentence__no_more_sentences">No more sentences</string>
     <string name="err_read_sentence__no_more_definitions">No more definitions</string>
 
+    <string name="err_read_sentence__definition_fetch_error">Unknown error occurred while retrieving definition</string>
+
     <string name="read_sentence__select_word_hint">Select a word</string>
     <string name="read_sentence__no_content_to_edit">No content to edit</string>
 

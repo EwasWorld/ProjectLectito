@@ -17,7 +17,6 @@ import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.database.texts.TextsRepo
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
-import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -316,10 +315,6 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
      * Data binding states
      */
     val mainViewState = MainViewState()
-    val selectedWordSimpleViewState = SelectedWordInfoSimpleViewState()
-    val selectedWordParsedViewState = SelectedWordInfoParsedViewState()
-    val wordDefinitionViewState = WordDefinitionViewState()
-    val wordSelectModeViewState = WordSelectModeViewState()
 
     inner class MainViewState {
         val hasValidSentence = sentenceWithParsedInfo.map { it?.sentence?.currentSentence != null }
@@ -463,127 +458,5 @@ class ReadSentenceViewModel(application: Application) : AndroidViewModel(applica
                 }
             }
         }
-    }
-
-    inner class SelectedWordInfoSimpleViewState {
-        val showView: LiveData<Boolean> = wordSelectMode.map {
-            it == WordSelectMode.SELECT || it == WordSelectMode.TYPE
-        }
-        val selectVisibility: LiveData<Boolean> = wordSelectMode.map { it == WordSelectMode.SELECT }
-        val typeVisibility: LiveData<Boolean> = wordSelectMode.map { it == WordSelectMode.TYPE }
-    }
-
-    inner class SelectedWordInfoParsedViewState {
-        val showView: LiveData<Boolean> = wordSelectMode.map { it.isAuto }
-        val originalWord: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
-            if (it !is TempSelectedWord.ParsedWord) null else it.originalWord
-        }
-        val dictionaryForm: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
-            if (it !is TempSelectedWord.ParsedWord) return@map null
-            if (it.parsedInfo.dictionaryForm.isBlank() || it.parsedInfo.dictionaryForm == it.originalWord) {
-                return@map null
-            }
-            it.parsedInfo.dictionaryForm
-        }
-        val partsOfSpeech: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
-            if (it !is TempSelectedWord.ParsedWord) return@map null
-            it.parsedInfo.partsOfSpeech
-                    .filterNot { pos -> pos.isBlank() || pos == "*" }
-                    .joinToString(JAPANESE_LIST_DELIMINATOR)
-        }
-        val pitchAccent: LiveData<String?> = this@ReadSentenceViewModel.tempSelectedWord.map {
-            if (it !is TempSelectedWord.ParsedWord) return@map null
-            it.parsedInfo.pitchAccentPattern?.toString()
-        }
-    }
-
-    inner class WordDefinitionViewState {
-        val currDefinition: LiveData<JishoWordDefinitions.JishoEntry?> = object :
-                MediatorLiveData<JishoWordDefinitions.JishoEntry?>() {
-            init {
-                addSource(allDefinitions) { update() }
-                addSource(currentDefinitionIndex.distinctUntilChanged()) { update() }
-            }
-
-            private fun update() {
-                val definitions = allDefinitions.value
-                val currentIndex = currentDefinitionIndex.value ?: 0
-
-                if (definitions == null || definitions.error || definitions.jishoWordDefinitions == null) {
-                    postValue(null)
-                    return
-                }
-
-                val currentDefinition = definitions.jishoWordDefinitions.data[currentIndex]
-                if (currentDefinition.japanese.isNullOrEmpty()) {
-                    postValue(null)
-                    return
-                }
-
-                postValue(currentDefinition)
-            }
-        }
-        val notFoundString: LiveData<Int?> = object : MediatorLiveData<Int?>() {
-            init {
-                addSource(allDefinitions) { update() }
-                addSource(wordSelectMode) { update() }
-            }
-
-            private fun update() {
-                if (allDefinitions.value != null) {
-                    postValue(null)
-                    return
-                }
-                postValue(wordSelectMode.value!!.noDefinitionStringId)
-            }
-        }
-        val previousDefinitionButtonEnabled: LiveData<Boolean> = currentDefinitionIndex.map { it > 0 }
-        val nextDefinitionButtonEnabled: LiveData<Boolean> = object : MediatorLiveData<Boolean>() {
-            init {
-                addSource(allDefinitions) { update() }
-                addSource(currentDefinitionIndex.distinctUntilChanged()) { update() }
-            }
-
-            private fun update() {
-                val definitions = allDefinitions.value
-                val currentIndex = currentDefinitionIndex.value ?: 0
-
-                if (definitions == null || definitions.error || definitions.jishoWordDefinitions == null) {
-                    postValue(false)
-                    return
-                }
-
-                postValue(currentIndex + 1 < definitions.jishoWordDefinitions.data.size)
-            }
-        }
-        val word: LiveData<String?> = currDefinition.map { definition ->
-            if (definition == null) {
-                return@map null
-            }
-            var newWord = definition.japanese[0].word
-            if (newWord.isNullOrBlank()) {
-                newWord = definition.slug
-            }
-            return@map newWord
-        }
-        val reading: LiveData<String?> = currDefinition.map { it?.japanese?.get(0)?.reading }
-        val isCommon: LiveData<Boolean> = currDefinition.map { it?.is_common ?: false }
-        val jlpt: LiveData<String?> = currDefinition.map { it?.jlpt?.joinToString(",") }
-        val tags: LiveData<String?> = currDefinition.map { it?.tags?.joinToString(",") }
-        val otherForms: LiveData<String?> = currDefinition.map { definition ->
-            if (definition?.japanese?.size ?: 0 <= 1) {
-                return@map null
-            }
-            // TODO Stop this from getting too long?
-            return@map definition!!.japanese
-                    .subList(1, definition.japanese.size)
-                    .joinToString(JAPANESE_LIST_DELIMINATOR) { "${it.word}[${it.reading}]" }
-        }
-    }
-
-    inner class WordSelectModeViewState {
-        val showMenu = isWordSelectModeMenuOpen
-        val currentModeIcon = wordSelectMode.map { it.iconId }
-        val currentModeContentDescription = wordSelectMode.map { it.iconDescriptionId }
     }
 }

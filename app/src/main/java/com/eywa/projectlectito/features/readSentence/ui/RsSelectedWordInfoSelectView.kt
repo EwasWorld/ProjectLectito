@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectedWordInfoSelectBinding
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import kotlinx.android.synthetic.main.rs_selected_word_info_select.view.*
 
@@ -47,10 +48,7 @@ class RsSelectedWordInfoSelectView : ConstraintLayout {
 
     private fun setupListeners() {
         button_read_sentence__selected_info_select__submit.setOnClickListener {
-            TODO()
-//            if (it.isNullOrBlank()) {
-//            ToastSpamPrevention.displayToast(context, resources.getString(failMessageId))
-//            }
+            viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSubmit)
         }
     }
 }

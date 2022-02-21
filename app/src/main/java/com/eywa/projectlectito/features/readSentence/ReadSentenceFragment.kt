@@ -12,6 +12,8 @@ import com.eywa.projectlectito.*
 import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.features.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.utils.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_fragment.*
 import kotlinx.android.synthetic.main.rs_selected_word_info_parsed.*
@@ -38,6 +40,7 @@ class ReadSentenceFragment : Fragment() {
 
     private lateinit var binding: RsFragmentBinding
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
+    private lateinit var readSentenceMviViewModel: ReadSentenceMviViewModel
 
     private var sentence: Sentence? = null
     private var wordSelectMode: WordSelectMode? = null
@@ -55,6 +58,7 @@ class ReadSentenceFragment : Fragment() {
         activity?.title = resources.getString(R.string.read_sentence__title)
 
         readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
+        readSentenceMviViewModel = ViewModelProvider(this)[ReadSentenceMviViewModel::class.java]
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewState = readSentenceViewModel.mainViewState
         layout_read_sentence__word_definition.setLifecycleInfo(this, this)
@@ -152,6 +156,7 @@ class ReadSentenceFragment : Fragment() {
             }
 
             readSentenceViewModel.setSelectedWord(selectedText)
+            readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSimpleWordSelected(selectedText))
         }
     }
 

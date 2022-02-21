@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="viewState"
-            type="com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.WordDefinitionViewState"
+            name="viewModel"
+            type="com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel"
             />
     </data>
 
@@ -34,239 +34,263 @@
             android:background="@color/general_aux_background"
             android:gravity="center"
             android:paddingVertical="20dp"
-            android:text="@{viewState.notFoundString}"
+            android:text="@{viewModel.viewState.selectedWordState.wordSelectMode.noDefinitionStringId}"
             android:textColor="@color/general_text"
             android:textSize="@dimen/small_text"
-            app:invertVisibility="@{true}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread_inside"
-            app:visibleOrGone="@{viewState.currDefinition}"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.noneOrLoading}"
             tools:text="No word selected.\nClick on a word to show its definition."
             tools:visibility="gone"
             />
 
         <TextView
-            android:id="@+id/text_read_sentence__reading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@{viewState.reading}"
-            android:textColor="@color/general_text"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__word"
-            app:layout_constraintEnd_toEndOf="@id/text_read_sentence__word"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@id/text_read_sentence__word"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewState.reading}"
-            tools:text="ふつう"
-            />
-
-        <TextView
-            android:id="@+id/text_read_sentence__word"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{viewState.word}"
-            android:textColor="@color/general_text"
-            android:textSize="@dimen/large_text"
-            app:layout_constraintBottom_toTopOf="@+id/layout_read_sentence__english_definitions_scroll"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__reading"
-            app:visibleOrGone="@{viewState.currDefinition}"
-            tools:text="普通"
-            />
-
-        <LinearLayout
-            android:id="@+id/layout_read_sentence__jlpt_and_tags"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/read_sentence__common"
-                android:textColor="@color/general_text"
-                android:textSize="@dimen/small_text"
-                app:visibleOrGone="@{viewState.isCommon}"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@{viewState.jlpt}"
-                android:textColor="@color/general_text"
-                android:textSize="@dimen/small_text"
-                app:visibleOrGone="@{viewState.jlpt}"
-                tools:text="N4"
-                />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/text_read_sentence__tags"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@{viewState.tags}"
-            android:textColor="@color/general_text"
-            android:textSize="@dimen/small_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
-            app:visibleOrGone="@{viewState.tags}"
-            tools:text="wanikani31"
-            />
-
-        <ScrollView
-            android:id="@+id/layout_read_sentence__english_definitions_scroll"
+            android:id="@+id/text_read_sentence__error"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginVertical="10dp"
-            android:fadeScrollbars="false"
-            android:scrollbars="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+            android:layout_height="wrap_content"
+            android:background="@color/general_aux_background"
+            android:gravity="center"
+            android:paddingVertical="20dp"
+            android:text="@string/err_read_sentence__definition_fetch_error"
+            android:textColor="@color/general_text"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asError}"
+            tools:text="No word selected.\nClick on a word to show its definition."
+            tools:visibility="gone"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_default="wrap"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__word"
-            app:visibleOrGone="@{viewState.currDefinition}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord}"
             >
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/text_read_sentence__reading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="10dp"
+                android:layout_marginTop="5dp"
+                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                android:textColor="@color/general_text"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__word"
+                app:layout_constraintEnd_toEndOf="@id/text_read_sentence__word"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/text_read_sentence__word"
+                app:layout_constraintTop_toTopOf="parent"
+                app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                tools:text="ふつう"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.word}"
+                android:textColor="@color/general_text"
+                android:textSize="@dimen/large_text"
+                app:layout_constraintBottom_toTopOf="@+id/layout_read_sentence__english_definitions_scroll"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__reading"
+                tools:text="普通"
+                />
+
+            <LinearLayout
+                android:id="@+id/layout_read_sentence__jlpt_and_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/read_sentence__common"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/small_text"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.isCommon()}"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.jlpt}"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/small_text"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.jlpt}"
+                    tools:text="N4"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/text_read_sentence__tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.tags}"
+                android:textColor="@color/general_text"
+                android:textSize="@dimen/small_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
+                app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.tags}"
+                tools:text="wanikani31"
+                />
+
+            <ScrollView
+                android:id="@+id/layout_read_sentence__english_definitions_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="10dp"
+                android:fadeScrollbars="false"
+                android:scrollbars="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_default="wrap"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__word"
                 >
 
                 <LinearLayout
-                    android:id="@+id/layout_read_sentence__english_definitions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
                     android:orientation="vertical"
+                    android:paddingHorizontal="10dp"
                     >
 
-                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                    <LinearLayout
+                        android:id="@+id/layout_read_sentence__english_definitions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="vertical"
+                        >
+
+                        <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:definition="normal; ordinary; regular; usual; common; average"
+                            app:index="1"
+                            app:parts_of_speech="Na-adjective"
+                            app:tags="Usually written using kana alone"
+                            />
+
+                        <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:definition="normally; ordinarily; usually; generally; commonly"
+                            app:index="2"
+                            app:parts_of_speech="Adverb (fukushi)"
+                            app:tags=""
+                            />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/text_read_sentence__other_forms_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:definition="normal; ordinary; regular; usual; common; average"
-                        app:index="1"
-                        app:parts_of_speech="Na-adjective"
-                        app:tags="Usually written using kana alone"
+                        android:text="@string/read_sentence__other_forms_label"
+                        android:textColor="@color/general_text"
+                        android:textSize="@dimen/small_text"
+                        app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
+                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
                         />
 
-                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                    <TextView
+                        android:id="@+id/text_read_sentence__other_forms"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:definition="normally; ordinarily; usually; generally; commonly"
-                        app:index="2"
-                        app:parts_of_speech="Adverb (fukushi)"
-                        app:tags=""
+                        android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
+                        android:textColor="@color/general_text"
+                        android:textSize="@dimen/small_text"
+                        app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
+                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
+                        tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
                         />
                 </LinearLayout>
+            </ScrollView>
 
-                <TextView
-                    android:id="@+id/text_read_sentence__other_forms_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/read_sentence__other_forms_label"
-                    android:textColor="@color/general_text"
-                    android:textSize="@dimen/small_text"
-                    app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
-                    app:visibleOrGone="@{viewState.otherForms}"
-                    />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_read_sentence__close_definition"
+                style="@style/FloatingActionButton"
+                android:layout_margin="5dp"
+                android:clickable="true"
+                android:contentDescription="@string/read_sentence__previous_definition"
+                android:focusable="true"
+                android:src="@drawable/ic_cross"
+                app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
+                app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_definition"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
+                />
 
-                <TextView
-                    android:id="@+id/text_read_sentence__other_forms"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{viewState.otherForms}"
-                    android:textColor="@color/general_text"
-                    android:textSize="@dimen/small_text"
-                    app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
-                    app:visibleOrGone="@{viewState.otherForms}"
-                    tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
-                    />
-            </LinearLayout>
-        </ScrollView>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_read_sentence__previous_definition"
+                style="@style/FloatingActionButton"
+                android:layout_margin="5dp"
+                android:clickable="true"
+                android:contentDescription="@string/read_sentence__previous_definition"
+                android:enabled="@{viewModel.viewState.wordDefinitionState.asHasWord.hasPreviousEntry()}"
+                android:focusable="true"
+                android:src="@drawable/ic_baseline_navigate_before"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/spinner_read_sentence__state"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@id/button_read_sentence__close_definition"
+                app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
+                />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__close_definition"
-            style="@style/FloatingActionButton"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__previous_definition"
-            android:focusable="true"
-            android:src="@drawable/ic_cross"
-            app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__previous_definition"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
-            app:visibleOrGone="@{viewState.currDefinition}"
-            />
+            <!-- TODO Implement learning state -->
+            <Spinner
+                android:id="@+id/spinner_read_sentence__state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__previous_definition"
+                app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_definition"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_definition"
+                app:layout_constraintTop_toTopOf="@id/button_read_sentence__previous_definition"
+                tools:entries="@array/card_state_array"
+                />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__previous_definition"
-            style="@style/FloatingActionButton"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__previous_definition"
-            android:enabled="@{viewState.previousDefinitionButtonEnabled}"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_navigate_before"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/spinner_read_sentence__state"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence__close_definition"
-            app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
-            app:visibleOrGone="@{viewState.currDefinition}"
-            />
-
-        <!-- TODO Implement learning state -->
-        <Spinner
-            android:id="@+id/spinner_read_sentence__state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__previous_definition"
-            app:layout_constraintEnd_toStartOf="@id/button_read_sentence__next_definition"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/button_read_sentence__previous_definition"
-            app:layout_constraintTop_toTopOf="@id/button_read_sentence__previous_definition"
-            app:visibleOrGone="@{viewState.currDefinition}"
-            tools:entries="@array/card_state_array"
-            />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_read_sentence__next_definition"
-            style="@style/FloatingActionButton"
-            android:layout_margin="5dp"
-            android:clickable="true"
-            android:contentDescription="@string/read_sentence__next_definition"
-            android:enabled="@{viewState.nextDefinitionButtonEnabled}"
-            android:focusable="true"
-            android:src="@drawable/ic_baseline_navigate_next"
-            app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@id/spinner_read_sentence__state"
-            app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
-            app:visibleOrGone="@{viewState.currDefinition}"
-            />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_read_sentence__next_definition"
+                style="@style/FloatingActionButton"
+                android:layout_margin="5dp"
+                android:clickable="true"
+                android:contentDescription="@string/read_sentence__next_definition"
+                android:enabled="@{viewModel.viewState.wordDefinitionState.asHasWord.hasNextEntry()}"
+                android:focusable="true"
+                android:src="@drawable/ic_baseline_navigate_next"
+                app:layout_constraintBottom_toBottomOf="@+id/button_read_sentence__previous_definition"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@id/spinner_read_sentence__state"
+                app:layout_constraintTop_toTopOf="@+id/button_read_sentence__previous_definition"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
-import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
-import com.eywa.projectlectito.utils.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
 
 class RsWordDefinitionView : ConstraintLayout {
@@ -21,7 +21,7 @@ class RsWordDefinitionView : ConstraintLayout {
     }
 
     private lateinit var layout: RsWordDefinitionBinding
-    private lateinit var readSentenceViewModel: ReadSentenceViewModel
+    private lateinit var viewModel: ReadSentenceMviViewModel
 
     private var currentDefinition: JishoWordDefinitions.JishoEntry? = null
 
@@ -47,41 +47,27 @@ class RsWordDefinitionView : ConstraintLayout {
     }
 
     fun setLifecycleInfo(viewModelStoreOwner: ViewModelStoreOwner, lifecycleOwner: LifecycleOwner) {
-        readSentenceViewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceViewModel::class.java]
+        viewModel = ViewModelProvider(viewModelStoreOwner)[ReadSentenceMviViewModel::class.java]
         layout.lifecycleOwner = lifecycleOwner
-        layout.viewState = readSentenceViewModel.wordDefinitionViewState
+        layout.viewModel = viewModel
 
         setupListeners()
     }
 
     private fun setupListeners() {
-        readSentenceViewModel.wordDefinitionViewState.currDefinition.observe(layout.lifecycleOwner!!, {
-            // TODO Handle loading and errors
-            currentDefinition = it
+        viewModel.viewState.observe(layout.lifecycleOwner!!, { viewState ->
+            currentDefinition = viewState.wordDefinitionState.getAsHasWord()?.getCurrentDefinition()
             displayDefinition()
         })
 
         button_read_sentence__next_definition.setOnClickListener {
-            val success = readSentenceViewModel.incrementCurrentDefinitionIndex()
-            if (!success) {
-                ToastSpamPrevention.displayToast(
-                        context,
-                        resources.getString(R.string.err_read_sentence__no_more_definitions)
-                )
-            }
+            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnNextPressed)
         }
         button_read_sentence__previous_definition.setOnClickListener {
-            val success = readSentenceViewModel.decrementCurrentDefinitionIndex()
-            if (!success) {
-                ToastSpamPrevention.displayToast(
-                        context,
-                        resources.getString(R.string.err_read_sentence__no_more_definitions)
-                )
-            }
+            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnPreviousPressed)
         }
-
         button_read_sentence__close_definition.setOnClickListener {
-            readSentenceViewModel.setSearchWord(null)
+            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnClosePressed)
         }
     }
 
