@@ -12,6 +12,7 @@ import com.eywa.projectlectito.*
 import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.features.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.utils.ToastSpamPrevention
@@ -67,6 +68,15 @@ class ReadSentenceFragment : Fragment() {
         layout_read_sentence__selected_word_info_type.setLifecycleInfo(this, this)
         layout_read_sentence__selected_word_info_parsed.setLifecycleInfo(this, this)
         button_read_sentence__select_mode.setLifecycleInfo(this, this)
+
+        readSentenceMviViewModel.viewEffect.getViewEffect().observe(viewLifecycleOwner, { effect ->
+            when (effect) {
+                is ReadSentenceEffect.Toast -> ToastSpamPrevention.displayToast(
+                        requireContext(),
+                        effect.getMessage(requireContext())
+                )
+            }
+        })
 
         if (args.currentSnippetId != -1) {
             readSentenceViewModel.updateCurrentSnippetAndChar(

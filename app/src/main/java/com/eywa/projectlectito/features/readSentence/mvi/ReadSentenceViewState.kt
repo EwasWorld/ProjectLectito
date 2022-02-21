@@ -1,5 +1,7 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
+import androidx.annotation.StringRes
+import com.eywa.projectlectito.R
 import com.eywa.projectlectito.features.readSentence.ParsedInfo
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
@@ -11,10 +13,22 @@ data class ReadSentenceViewState(
         val isSelectModeMenuOpen: Boolean = false,
         val wordDefinitionState: WordDefinitionState = WordDefinitionState.NoWord
 ) {
-    sealed class SelectedWordState(val wordSelectMode: WordSelectMode, val wordToSearch: String?) {
-        data class SelectState(val selectedWord: String?) : SelectedWordState(WordSelectMode.SELECT, selectedWord)
+    sealed class SelectedWordState(
+            val wordSelectMode: WordSelectMode,
+            val wordToSearch: String?,
+            @StringRes val nullWordSearchedMessage: Int? = null
+    ) {
+        data class SelectState(val selectedWord: String?) : SelectedWordState(
+                WordSelectMode.SELECT,
+                selectedWord,
+                R.string.read_sentence__simple_selected__submit_no_word_select
+        )
 
-        data class TypeState(val typedWord: String?) : SelectedWordState(WordSelectMode.TYPE, typedWord)
+        data class TypeState(val typedWord: String?) : SelectedWordState(
+                WordSelectMode.TYPE,
+                typedWord,
+                R.string.read_sentence__simple_selected__submit_no_word_type
+        )
 
         data class ParsedState(
                 val originalWord: String?,

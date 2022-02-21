@@ -5,7 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.eywa.projectlectito.R
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect.Toast
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.SelectedWordState
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.WordDefinitionState
@@ -15,6 +17,8 @@ import kotlinx.coroutines.launch
 class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(application) {
     private var _viewState: MutableLiveData<ReadSentenceViewState> = MutableLiveData(ReadSentenceViewState())
     var viewState: LiveData<ReadSentenceViewState> = _viewState
+
+    val viewEffect = ViewEffect()
 
     fun handle(action: ReadSentenceIntent) {
         val currentState = viewState.value ?: ReadSentenceViewState()
@@ -33,12 +37,16 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
             WordDefinitionIntent.OnNextPressed -> {
                 currentWordDefinitionState.getAsHasWord()!!.nextEntry()
                         ?.let { next -> updateWordDefinitionState(currentState, next) }
-                        ?: TODO("Notify user no next")
+                        ?: run {
+                            viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
+                        }
             }
             WordDefinitionIntent.OnPreviousPressed -> {
                 currentWordDefinitionState.getAsHasWord()!!.previousEntry()
                         ?.let { prev -> updateWordDefinitionState(currentState, prev) }
-                        ?: TODO("Notify user no previous")
+                        ?: run {
+                            viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
+                        }
             }
         }
     }
@@ -106,11 +114,17 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
 
     private fun searchForWord(currentState: ReadSentenceViewState) {
         val searchWord = currentState.selectedWordState.wordToSearch
-        if (searchWord == null) {
-            TODO("Notify user that there's no word selected")
+        if (searchWord.isNullOrBlank()) {
+            viewEffect.postValue(
+                    Toast.ResIdToast(
+                            currentState.selectedWordState.nullWordSearchedMessage
+                                    ?: throw IllegalStateException("No error message for null word")
+                    )
+            )
             return
         }
 
+        // TODO Sanitise word
         val requester = WordDefinitionRequester(
                 word = searchWord,
                 successCallback = { response ->
@@ -145,5 +159,18 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     ) {
         currentState.wordDefinitionState.cancel()
         _viewState.postValue(currentState.copy(wordDefinitionState = wordDefinitionState))
+    }
+
+    class ViewEffect {
+        private var viewEffect: MutableLiveData<ReadSentenceEffect?> = MutableLiveData(null)
+
+        fun postValue(effect: ReadSentenceEffect) {
+            viewEffect.value = effect
+            viewEffect.value = null
+        }
+
+        fun getViewEffect(): LiveData<ReadSentenceEffect?> {
+            return viewEffect
+        }
     }
 }
