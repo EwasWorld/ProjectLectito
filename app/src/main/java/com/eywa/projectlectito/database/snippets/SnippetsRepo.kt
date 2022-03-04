@@ -1,41 +1,14 @@
 package com.eywa.projectlectito.database.snippets
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.MediatorLiveData
+import com.eywa.projectlectito.database.texts.Text
 
 class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
     val allSnippets = textSnippetsDao.getAllSnippets()
 
     fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet?> {
         return textSnippetsDao.getTextSnippetById(textSnippetId)
-    }
-
-    /**
-     * First item is the item just after [currentSnippet], going down the list gets further away from [currentSnippet]
-     */
-    fun getNextSnippets(
-            currentSnippet: TextSnippet,
-            snippetsToRetrieve: Int
-    ): LiveData<List<TextSnippet>> {
-        return textSnippetsDao.getNextSnippets(
-                currentSnippet.textId, currentSnippet.pageReference, currentSnippet.ordinal, snippetsToRetrieve
-        )
-    }
-
-    /**
-     * Last item is the item just before [currentSnippet], going back up the list gets further away from [currentSnippet]
-     */
-    fun getPreviousSnippets(
-            currentSnippet: TextSnippet,
-            snippetsToRetrieve: Int
-    ): LiveData<List<TextSnippet>> {
-        return textSnippetsDao.getPreviousSnippets(
-                currentSnippet.textId, currentSnippet.pageReference, currentSnippet.ordinal, snippetsToRetrieve
-        ).map { it.reversed() }
-    }
-
-    fun getFirstSnippetId(textId: Int): LiveData<Int> {
-        return textSnippetsDao.getFirstSnippetId(textId)
     }
 
     fun getTextSnippetEntry(textId: Int, pageReference: Int): LiveData<List<TextSnippet>> {
@@ -57,4 +30,77 @@ class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
     suspend fun delete(snippetId: Int) {
         textSnippetsDao.deleteSnippet(snippetId)
     }
+
+    fun getSnippetInfo(
+            textId: Int,
+            snippetId: Int?,
+            surrounding: Int
+    ): LiveData<SnippetWithTextAndSurroundingSnippets?> {
+        val snippetWithText = if (snippetId == null) {
+            textSnippetsDao.getFirstSnippetWithText(textId)
+        }
+        else {
+            textSnippetsDao.getSnippetByIdWithText(snippetId)
+        }
+
+        return object : MediatorLiveData<SnippetWithTextAndSurroundingSnippets?>() {
+            var currentSource: LiveData<List<TextSnippet.WithInt>>? = null
+
+            init {
+                addSource(snippetWithText) {
+                    synchronized(this) {
+                        if (currentSource != null) {
+                            removeSource(currentSource!!)
+                        }
+                    }
+                    if (it == null) {
+                        postValue(null)
+                        return@addSource
+                    }
+                    update(it)
+                }
+            }
+
+            private fun update(snippetWithText: TextSnippet.WithText) {
+                val newSource: LiveData<List<TextSnippet.WithInt>>
+                synchronized(this) {
+                    newSource = textSnippetsDao.getWithSurroundingSnippets(
+                            textId,
+                            snippetWithText.snippet.pageReference,
+                            snippetWithText.snippet.ordinal,
+                            surrounding
+                    )
+                    if (currentSource != null) {
+                        removeSource(currentSource!!)
+                    }
+                    currentSource = newSource
+                }
+                addSource(newSource) { snippetsWithInts ->
+                    if (snippetsWithInts.isNullOrEmpty()) {
+                        postValue(null)
+                        return@addSource
+                    }
+
+                    check(snippetsWithInts.distinctBy { it.extraInfo }.size == 1) { "Multiple snippet counts" }
+                    synchronized(this) {
+                        if (currentSource == newSource) {
+                            postValue(
+                                    SnippetWithTextAndSurroundingSnippets(
+                                            snippetsWithInts.map { it.snippet },
+                                            snippetWithText.text,
+                                            snippetsWithInts.first().extraInfo
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    data class SnippetWithTextAndSurroundingSnippets(
+            val snippets: List<TextSnippet>,
+            val text: Text,
+            val prevSnippetsCount: Int
+    )
 }

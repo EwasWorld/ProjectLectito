@@ -8,10 +8,10 @@ import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.snippets.TextSnippetsDao
 import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.database.texts.TextsDao
-import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -71,7 +71,7 @@ class TextsTests {
 
         val retrievedInfo = textsDao.getAllTextsWithSnippetInfo().retrieveValue()!!
         retrievedInfo.forEach { actual ->
-            Log.i("test", "Testing testId: {$actual.text.id}")
+            Log.i("test", "Testing testId: ${actual.text.id}")
             val expected = expectedData.find { it.text.id == actual.text.id }
             assertNotNull(expected)
             assertEquals(expected?.currentSnippet?.id, actual.currentSnippet?.id)

@@ -1,18 +1,158 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
+import android.graphics.Color
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.features.readSentence.ParsedInfo
+import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.SentenceWithParsedInfo
+import com.eywa.projectlectito.features.readSentence.Sentence
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
+import kotlinx.coroutines.Job
 
 data class ReadSentenceViewState(
+        val sentenceState: SentenceState = SentenceState.NoSentence,
+        val wordDefinitionState: WordDefinitionState = WordDefinitionState.NoWord,
         val selectedWordState: SelectedWordState = SelectedWordState.SelectState(null),
         val isSelectModeMenuOpen: Boolean = false,
-        val wordDefinitionState: WordDefinitionState = WordDefinitionState.NoWord
+        val isChoosingSnippetToEdit: Boolean = false,
+        val snippetToEditClickableSpan: (Sentence.SnippetInfo) -> ClickableSpan? = { null },
+        val parsedWordClickableSpan: (String, ParsedInfo) -> ClickableSpan? = { _, _ -> null },
 ) {
+    fun isSentenceSelectable() = selectedWordState is SelectedWordState.SelectState || isChoosingSnippetToEdit
+
+    fun getSentence(): SpannableString? {
+        val sentenceWithParsedInfo = (sentenceState as? SentenceState.ValidSentence)?.sentenceWithParsedInfo
+                ?: return null
+        val wordSelectMode = selectedWordState
+        val content = sentenceWithParsedInfo.sentence.currentSentence ?: return null
+
+        val spannableString = SpannableString(content)
+        if (isChoosingSnippetToEdit) {
+            /*
+             * Select a snippet from a sentence which spans multiple snippets
+             */
+            val snippets = sentenceWithParsedInfo.sentence.snippetsInCurrentSentence
+            snippets.forEachIndexed { index, snippetInfo ->
+
+//                TODO Span click
+//                _snippetToEdit.postValue(
+//                        ReadSentenceViewModel.SnippetIdWithStartAndEnd(
+//                                snippetInfo.snippetId,
+//                                snippetInfo.snippetStartIndex ?: 0,
+//                                snippetInfo.snippetEndIndex
+//                        )
+//                )
+//                isInSelectSnippetToEditMode.postValue(false)
+
+                spannableString.setSpan(
+                        snippetToEditClickableSpan(snippetInfo)!!,
+                        snippetInfo.currentSentenceStartIndex,
+                        snippetInfo.currentSentenceEndIndex,
+                        SPAN_FLAGS
+                )
+                spannableString.setAlternatingColourSpan(
+                        snippetInfo.currentSentenceStartIndex..snippetInfo.currentSentenceEndIndex,
+                        index
+                )
+            }
+            return spannableString
+        }
+
+        if (wordSelectMode !is SelectedWordState.ParsedState || !sentenceState.isParseComplete) {
+            return spannableString
+        }
+
+        /*
+         * Select a word from a parsed sentence
+         */
+        sentenceWithParsedInfo.parsedInfo!!.forEachIndexed { index, parsedInfo ->
+            val spanStartIndex = parsedInfo.startCharacterIndex
+            val spanEndIndex = parsedInfo.endCharacterIndex
+
+//                TODO Span click
+//            this@ReadSentenceViewModel.tempSelectedWord.postValue(
+//                    ReadSentenceViewModel.TempSelectedWord.ParsedWord(
+//                            currentSentence.substring(spanStartIndex, spanEndIndex),
+//                            parsedInfo
+//                    )
+//            )
+
+            spannableString.setSpan(
+                    parsedWordClickableSpan(content.substring(spanStartIndex, spanEndIndex), parsedInfo),
+                    spanStartIndex,
+                    spanEndIndex,
+                    SPAN_FLAGS
+            )
+            if (wordSelectMode.coloured) {
+                spannableString.setAlternatingColourSpan(spanStartIndex..spanEndIndex, index)
+            }
+        }
+
+        return spannableString
+    }
+
+    private fun SpannableString.setAlternatingColourSpan(span: IntRange, index: Int, @ColorInt color: Int = Color.RED) =
+            index.takeIf { it % 2 == 1 }?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
+
+    sealed class SentenceState {
+        object NoSentence : SentenceState()
+        object Error : SentenceState()
+        data class LoadingSentence(val sentenceJob: Job) : SentenceState() {
+            override fun cleanUp() {
+                sentenceJob.cancel()
+            }
+
+            override fun isJobEqualTo(job: Job) = sentenceJob == job
+        }
+
+        data class ValidSentence(
+                val sentenceJob: Job,
+                val text: Text,
+                val currentCharacter: Int? = 0,
+                val snippets: List<TextSnippet>,
+                val previousSnippetCount: Int = 0
+        ) : SentenceState() {
+            private val currentSnippet = snippets[previousSnippetCount]
+            val sentenceWithParsedInfo: SentenceWithParsedInfo = SentenceWithParsedInfo(
+                    Sentence(
+                            currentSnippet,
+                            currentCharacter,
+                            snippets.take(previousSnippetCount),
+                            // -1 for current snippet
+                            snippets.takeLast(snippets.size - previousSnippetCount - 1),
+                            parserSuccessCallback = { /* TODO */ },
+                            parserFailCallback = { /* TODO */ }
+                    )
+            )
+            val isParseComplete = !sentenceWithParsedInfo.parseError && sentenceWithParsedInfo.parsedInfo != null
+            val isParseFailed = sentenceWithParsedInfo.parseError
+            val getTextName = text.name
+            val chapterPage = currentSnippet.getChapterPageString()
+            val hasNextSentence = sentenceWithParsedInfo.sentence.getNextSentenceStart() != null
+            val previousSentence = sentenceWithParsedInfo.sentence.previousSentence
+
+            override fun cleanUp() {
+                sentenceJob.cancel()
+            }
+
+            override fun isJobEqualTo(job: Job) = sentenceJob == job
+        }
+
+        open fun cleanUp() = run { }
+        open fun isJobEqualTo(job: Job) = false
+        fun asValidSentence() = getDataOrNull<ValidSentence>()
+    }
+
     sealed class SelectedWordState(
             val wordSelectMode: WordSelectMode,
             val wordToSearch: String?,
@@ -98,6 +238,7 @@ data class ReadSentenceViewState(
     }
 
     companion object {
+        private const val SPAN_FLAGS = Spanned.SPAN_INCLUSIVE_EXCLUSIVE
         private inline fun <reified S> Any?.getDataOrNull(): S? {
             return this?.takeIf { it is S } as? S
         }

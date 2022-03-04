@@ -4,6 +4,12 @@ import com.eywa.projectlectito.features.readSentence.ParsedInfo
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 
 sealed class ReadSentenceIntent {
+    sealed class SentenceIntent : ReadSentenceIntent() {
+        data class Initialise(val currentSnippetId: Int?, val currentCharacter: Int?, val textId: Int) :
+                SentenceIntent()
+//        object EditOverlayClicked : SentenceIntent()
+    }
+
     sealed class SelectedWordIntent : ReadSentenceIntent() {
         data class OnWordSelectModeChanged(val wordSelectMode: WordSelectMode) : SelectedWordIntent()
         data class OnSimpleWordSelected(val word: String?) : SelectedWordIntent()

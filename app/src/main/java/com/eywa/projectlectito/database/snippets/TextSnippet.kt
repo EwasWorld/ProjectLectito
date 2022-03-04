@@ -1,10 +1,12 @@
 package com.eywa.projectlectito.database.snippets
 
 import androidx.annotation.StringRes
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.features.readSentence.Sentence
 
 @Entity(
@@ -48,6 +50,16 @@ data class TextSnippet(
         val part = if (ordinal != 1) " パート%d".format(ordinal) else ""
         return "%s%s%s".format(chapter, page, part)
     }
+
+    data class WithInt(
+            @Embedded val snippet: TextSnippet,
+            val extraInfo: Int
+    )
+
+    data class WithText(
+            @Embedded(prefix = "txt_") val text: Text,
+            @Embedded val snippet: TextSnippet,
+    )
 
     companion object {
         const val TABLE_NAME = "text_snippets"

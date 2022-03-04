@@ -2,6 +2,7 @@ package com.eywa.projectlectito.database.snippets
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.eywa.projectlectito.database.texts.Text
 
 @Dao
 interface TextSnippetsDao {
@@ -22,66 +23,80 @@ interface TextSnippetsDao {
     @Query("SELECT * FROM ${TextSnippet.TABLE_NAME} WHERE id = :textSnippetId")
     fun getTextSnippetById(textSnippetId: Int): LiveData<TextSnippet?>
 
+    @Query(
+            """
+                SELECT 
+                    snip.*,
+                    text.id as txt_id,
+                    text.currentSnippetId as txt_currentSnippetId,
+                    text.currentCharacterIndex as txt_currentCharacterIndex,
+                    text.isComplete as txt_isComplete,
+                    text.name as txt_name
+                FROM ${TextSnippet.TABLE_NAME} as snip 
+                LEFT JOIN ${Text.TABLE_NAME} text ON snip.textId = text.id 
+                WHERE snip.id = :textSnippetId
+            """
+    )
+    fun getSnippetByIdWithText(textSnippetId: Int): LiveData<TextSnippet.WithText?>
+
     /**
-     * First item is the item just after the current snippet, going down the list gets further away from the current
-     * snippet
+     * @return previous snippets then the current snippet then next snippets in standard snippet order
      */
     @Query(
             """
-                SELECT *
-                FROM ${TextSnippet.TABLE_NAME} 
+                SELECT *, 
+                (
+                    SELECT COUNT(*)
+                    FROM ${TextSnippet.TABLE_NAME}
+                    WHERE
+                        textId = :textId
+                        AND (
+                            pageReference < :currentSnippetPageRef
+                            OR (pageReference = :currentSnippetPageRef AND ordinal < :currentSnippetOrdinal)
+                        )
+                ) as extraInfo
+                FROM ${TextSnippet.TABLE_NAME}
                 WHERE 
                     textId = :textId 
                     AND (
-                        pageReference > :currentSnippetPageRef
-                        OR (pageReference = :currentSnippetPageRef AND ordinal > :currentSnippetOrdinal) 
+                        (pageReference = :currentSnippetPageRef AND ordinal == :currentSnippetOrdinal)
+                        OR (
+                            pageReference > :currentSnippetPageRef
+                            OR (pageReference = :currentSnippetPageRef AND ordinal > :currentSnippetOrdinal)
+                        )
+                        OR (
+                            pageReference < :currentSnippetPageRef
+                            OR (pageReference = :currentSnippetPageRef AND ordinal < :currentSnippetOrdinal) 
+                        )
                     )
                 $ORDERING
                 LIMIT :snippetsToRetrieve
             """
     )
-    fun getNextSnippets(
+    fun getWithSurroundingSnippets(
             textId: Int,
             currentSnippetPageRef: Int,
             currentSnippetOrdinal: Int,
             snippetsToRetrieve: Int
-    ): LiveData<List<TextSnippet>>
-
-    /**
-     * First item is the item just before the current snippet, going down the list gets further away from the current
-     * snippet
-     */
-    @Query(
-            """
-                SELECT *
-                FROM ${TextSnippet.TABLE_NAME} 
-                WHERE 
-                    textId = :textId 
-                    AND (
-                        pageReference < :currentSnippetPageRef
-                        OR (pageReference = :currentSnippetPageRef AND ordinal < :currentSnippetOrdinal) 
-                    )
-                $INVERSE_ORDERING
-                LIMIT :snippetsToRetrieve
-            """
-    )
-    fun getPreviousSnippets(
-            textId: Int,
-            currentSnippetPageRef: Int,
-            currentSnippetOrdinal: Int,
-            snippetsToRetrieve: Int
-    ): LiveData<List<TextSnippet>>
+    ): LiveData<List<TextSnippet.WithInt>>
 
     @Query(
             """
-                SELECT id
-                FROM ${TextSnippet.TABLE_NAME} 
-                WHERE textId = :textId
+                SELECT 
+                    snip.*,
+                    text.id as txt_id,
+                    text.currentSnippetId as txt_currentSnippetId,
+                    text.currentCharacterIndex as txt_currentCharacterIndex,
+                    text.isComplete as txt_isComplete,
+                    text.name as txt_name
+                FROM ${TextSnippet.TABLE_NAME} as snip 
+                LEFT JOIN ${Text.TABLE_NAME} text ON snip.textId = text.id 
+                WHERE snip.textId = :textId
                 $ORDERING
                 LIMIT 1
             """
     )
-    fun getFirstSnippetId(textId: Int): LiveData<Int>
+    fun getFirstSnippetWithText(textId: Int): LiveData<TextSnippet.WithText?>
 
     @Query(
             """
