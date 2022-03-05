@@ -31,6 +31,10 @@ data class ReadSentenceViewState(
     fun isSentenceSelectable() = selectedWordState is SelectedWordState.SelectState || isChoosingSnippetToEdit
 
     fun getSentence(): SpannableString? {
+        fun SpannableString.setAlternatingColourSpan(span: IntRange, index: Int, @ColorInt color: Int = Color.RED) =
+                index.takeIf { it % 2 == 1 }
+                        ?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
+
         val sentenceWithParsedInfo = (sentenceState as? SentenceState.ValidSentence)?.sentenceWithParsedInfo
                 ?: return null
         val wordSelectMode = selectedWordState
@@ -100,9 +104,6 @@ data class ReadSentenceViewState(
 
         return spannableString
     }
-
-    private fun SpannableString.setAlternatingColourSpan(span: IntRange, index: Int, @ColorInt color: Int = Color.RED) =
-            index.takeIf { it % 2 == 1 }?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
 
     sealed class SentenceState {
         object NoSentence : SentenceState()

@@ -161,8 +161,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:text="@{viewModel.viewState.sentence}"
-                app:visibleOrGone="@{viewModel.viewState.sentence}"
+                android:text="@{viewModel.currentSentence}"
+                app:visibleOrGone="@{viewModel.currentSentence}"
                 tools:text="つまり、現代の日本ではヽ普通は体験てきなレ現場に出くわしてしるわけてす。"
                 />
 
@@ -230,7 +230,7 @@
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__edit_sentence"
-            android:enabled="@{viewModel.viewState.sentence}"
+            android:enabled="@{viewModel.currentSentence}"
             android:focusable="true"
             android:src="@drawable/ic_edit"
             app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"

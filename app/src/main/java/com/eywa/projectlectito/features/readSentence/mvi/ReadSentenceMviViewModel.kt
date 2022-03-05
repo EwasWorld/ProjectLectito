@@ -24,6 +24,13 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     var viewState: LiveData<ReadSentenceViewState> = _viewState
     val viewEffect = ViewEffect()
 
+    /**
+     * Separated from viewState because it derives from [viewState] but updating it every time [viewState] updates
+     * causes issues with selection. Namely, when [viewState] is updated, it generates a new sentence that has no
+     * selection, thus clearing the selection immediately.
+     */
+    val currentSentence = viewState.map { it.getSentence() }.distinctUntilChanged()
+
     @Inject
     lateinit var db: LectitoRoomDatabase
 
@@ -54,7 +61,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun handleSentenceChange(currentState: ReadSentenceViewState, action: SentenceIntent) {
-        val sentenceState = currentState.sentenceState
         when (action) {
             is SentenceIntent.Initialise -> setNewSentence(currentState, action.textId, action.currentSnippetId)
             SentenceIntent.OnNextSentenceClicked -> updateSentence(
@@ -166,14 +172,14 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun handleSelectedWordChange(currentState: ReadSentenceViewState, action: SelectedWordIntent) {
-        val currentSelectedWordState = currentState.selectedWordState
+        val selWordState = currentState.selectedWordState
         when (action) {
             is SelectedWordIntent.OnWordSelectModeChanged -> {
                 val newWordSelectMode = action.wordSelectMode
 
                 val newSelectedWordState =
-                        if (newWordSelectMode.isAuto && currentSelectedWordState is SelectedWordState.ParsedState) {
-                            currentSelectedWordState.copy(
+                        if (newWordSelectMode.isAuto && selWordState is SelectedWordState.ParsedState) {
+                            selWordState.copy(
                                     coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                             )
                         }
@@ -197,16 +203,16 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 )
             }
             is SelectedWordIntent.OnSimpleWordSelected -> {
-                check(currentSelectedWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
+                check(selWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
                 _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
             }
             is SelectedWordIntent.OnParsedWordSelected -> {
-                check(currentSelectedWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
+                check(selWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
                 val newState = currentState.copy(
                         selectedWordState = SelectedWordState.ParsedState(
                                 action.word,
                                 action.parsedInfo,
-                                currentSelectedWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                                selWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                         )
                 )
 
@@ -223,10 +229,11 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 searchForWord(currentState)
             }
             is SelectedWordIntent.OnSpanSelected -> {
-                if (currentSelectedWordState !is SelectedWordState.SelectState) return
-                if (action.start == currentSelectedWordState.selectionStart || action.end == currentSelectedWordState.selectionEnd) return
+                if (selWordState !is SelectedWordState.SelectState
+                        || (action.start == selWordState.selectionStart && action.end == selWordState.selectionEnd)
+                ) return
                 val newSelection = currentState.getSentence()?.toString()?.substring(action.start, action.end)
-                if (newSelection.isNullOrBlank()) return
+                        .takeIf { !it.isNullOrBlank() } ?: return
                 _viewState.postValue(
                         currentState.copy(
                                 selectedWordState = SelectedWordState.SelectState(
