@@ -6,6 +6,8 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
+import com.eywa.projectlectito.database.texts.TextsRepo
+import com.eywa.projectlectito.features.readSentence.Sentence
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect.Toast
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.*
@@ -30,6 +32,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private val snippetsRepo = SnippetsRepo(db.textSnippetsDao())
+    private val textsRepo = TextsRepo(db.textsDao(), db.textSnippetsDao())
 
     fun handle(action: ReadSentenceIntent) {
         val currentState = viewState.value ?: ReadSentenceViewState()
@@ -39,19 +42,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 _viewState.postValue(currentState.copy(isSelectModeMenuOpen = action.isOpen))
             is WordDefinitionIntent -> handleWordDefinitionChange(currentState, action)
             is SentenceIntent -> handleSentenceChange(currentState, action)
-        }
-    }
-
-    private fun getSentenceJobOrInitPartial(currentState: ReadSentenceViewState): Job? {
-        return when (val sentenceState = currentState.sentenceState) {
-            is SentenceState.Error -> null
-            is SentenceState.LoadingSentence -> sentenceState.sentenceJob
-            is SentenceState.ValidSentence -> sentenceState.sentenceJob
-            else -> {
-                val job = Job()
-                _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job)))
-                job
-            }
         }
     }
 
@@ -66,50 +56,91 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     private fun handleSentenceChange(currentState: ReadSentenceViewState, action: SentenceIntent) {
         val sentenceState = currentState.sentenceState
         when (action) {
-            is SentenceIntent.Initialise -> {
-                val job = getSentenceJobOrInitPartial(currentState) ?: return
-                job.launch {
-                    snippetsRepo.getSnippetInfo(
-                            action.textId,
-                            action.currentSnippetId,
-                            SURROUNDING_SNIPPETS_TO_RETRIEVE
-                    ).asFlow().collect {
-                        if (!job.isActive) return@collect
+            is SentenceIntent.Initialise -> setNewSentence(currentState, action.textId, action.currentSnippetId)
+            SentenceIntent.OnNextSentenceClicked -> updateSentence(
+                    currentState,
+                    currentState.sentenceState.asValidSentence()?.nextSentenceStart
+            )
+            SentenceIntent.OnPreviousSentenceClicked -> updateSentence(
+                    currentState,
+                    currentState.sentenceState.asValidSentence()?.previousSentenceStart
+            )
+        }
+    }
 
-                        if (it != null) {
-                            _viewState.postValue(
-                                    currentState.copy(
-                                            sentenceState = SentenceState.ValidSentence(
-                                                    sentenceJob = job,
-                                                    snippets = it.snippets,
-                                                    text = it.text,
-                                                    currentCharacter = it.text.currentCharacterIndex ?: 0,
-                                                    previousSnippetCount = it.prevSnippetsCount
-                                            )
+    private fun updateSentence(currentState: ReadSentenceViewState, newRef: Sentence.IndexInfo?) {
+        val sentenceState = currentState.sentenceState
+        if (sentenceState !is SentenceState.ValidSentence || newRef == null) {
+            viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_sentences))
+            return
+        }
+        val currentSnippet = sentenceState.snippets[sentenceState.previousSnippetCount]
+        val loadNewSentence = currentSnippet.id != newRef.textSnippetId
+
+        if (loadNewSentence) {
+            sentenceState.cleanUp()
+        }
+        viewModelScope.launch {
+            textsRepo.update(
+                    sentenceState.text.copy(
+                            currentSnippetId = newRef.textSnippetId,
+                            currentCharacterIndex = newRef.startIndex
+                    )
+            )
+        }
+        if (loadNewSentence) {
+            setNewSentence(currentState, currentSnippet.textId, newRef.textSnippetId)
+        }
+    }
+
+    private fun setNewSentence(
+            currentState: ReadSentenceViewState,
+            textId: Int,
+            currentSnippetId: Int?
+    ) {
+        val sentenceState = currentState.sentenceState
+        val job = Job()
+        _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job)))
+        job.launch {
+            snippetsRepo.getSnippetInfo(
+                    textId,
+                    currentSnippetId,
+                    SURROUNDING_SNIPPETS_TO_RETRIEVE
+            ).asFlow().collect {
+                if (!job.isActive) return@collect
+
+                if (it != null) {
+                    _viewState.postValue(
+                            currentState.copy(
+                                    sentenceState = SentenceState.ValidSentence(
+                                            sentenceJob = job,
+                                            snippets = it.snippets,
+                                            text = it.text,
+                                            currentCharacter = it.text.currentCharacterIndex ?: 0,
+                                            previousSnippetCount = it.prevSnippetsCount
                                     )
                             )
-                        }
-                        else if (sentenceState is SentenceState.LoadingSentence
-                                || sentenceState is SentenceState.ValidSentence
-                        ) {
-                            if (!sentenceState.isJobEqualTo(job)) {
-                                _viewState.postValue(
-                                        _viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job))
-                                )
-                            }
-                        }
-                        else {
-                            // TODO Log/toast error
-                            _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.Error))
-                        }
-
-                        // Clean up old state
-                        if (sentenceState.isJobEqualTo(job)) {
-                            sentenceState.cleanUp()
-                        }
+                    )
+                }
+                else if (sentenceState is SentenceState.LoadingSentence
+                        || sentenceState is SentenceState.ValidSentence
+                ) {
+                    if (!sentenceState.isJobEqualTo(job)) {
+                        _viewState.postValue(
+                                _viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job))
+                        )
                     }
                 }
+                else {
+                    // TODO Log/toast error
+                    _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.Error))
+                }
             }
+        }
+
+        // Clean up old state
+        if (sentenceState.isJobEqualTo(job)) {
+            sentenceState.cleanUp()
         }
     }
 
@@ -148,8 +179,8 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         }
                         else {
                             when (newWordSelectMode) {
-                                WordSelectMode.SELECT -> SelectedWordState.SelectState(null)
-                                WordSelectMode.TYPE -> SelectedWordState.TypeState(null)
+                                WordSelectMode.SELECT -> SelectedWordState.SelectState()
+                                WordSelectMode.TYPE -> SelectedWordState.TypeState()
                                 WordSelectMode.AUTO,
                                 WordSelectMode.AUTO_WITH_COLOUR -> SelectedWordState.ParsedState(
                                         null,
@@ -165,27 +196,18 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         )
                 )
             }
-            is SelectedWordIntent.OnSimpleWordSelected -> _viewState.postValue(
-                    currentState.copy(
-                            selectedWordState = when (currentSelectedWordState.wordSelectMode) {
-                                WordSelectMode.SELECT -> SelectedWordState.SelectState(action.word)
-                                WordSelectMode.TYPE -> SelectedWordState.TypeState(action.word)
-                                else -> throw IllegalStateException("Invalid simple word selection state")
-                            }
-                    )
-            )
+            is SelectedWordIntent.OnSimpleWordSelected -> {
+                check(currentSelectedWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
+                _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
+            }
             is SelectedWordIntent.OnParsedWordSelected -> {
+                check(currentSelectedWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
                 val newState = currentState.copy(
-                        selectedWordState = when (currentSelectedWordState.wordSelectMode) {
-                            WordSelectMode.AUTO,
-                            WordSelectMode.AUTO_WITH_COLOUR -> SelectedWordState.ParsedState(
-                                    action.word,
-                                    action.parsedInfo,
-                                    currentSelectedWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
-                            )
-                            else -> throw IllegalStateException("Invalid parsed word selection state")
-                        }
-
+                        selectedWordState = SelectedWordState.ParsedState(
+                                action.word,
+                                action.parsedInfo,
+                                currentSelectedWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                        )
                 )
 
                 // supplementary symbol (number, punctuation, etc.)
@@ -199,6 +221,21 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
             }
             is SelectedWordIntent.OnSubmit -> {
                 searchForWord(currentState)
+            }
+            is SelectedWordIntent.OnSpanSelected -> {
+                if (currentSelectedWordState !is SelectedWordState.SelectState) return
+                if (action.start == currentSelectedWordState.selectionStart || action.end == currentSelectedWordState.selectionEnd) return
+                val newSelection = currentState.getSentence()?.toString()?.substring(action.start, action.end)
+                if (newSelection.isNullOrBlank()) return
+                _viewState.postValue(
+                        currentState.copy(
+                                selectedWordState = SelectedWordState.SelectState(
+                                        newSelection,
+                                        action.start,
+                                        action.end
+                                )
+                        )
+                )
             }
         }
     }

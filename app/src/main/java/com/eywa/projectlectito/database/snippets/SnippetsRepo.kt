@@ -44,56 +44,97 @@ class SnippetsRepo(private val textSnippetsDao: TextSnippetsDao) {
         }
 
         return object : MediatorLiveData<SnippetWithTextAndSurroundingSnippets?>() {
-            var currentSource: LiveData<List<TextSnippet.WithInt>>? = null
+            var nextSource: LiveData<List<TextSnippet>>? = null
+            var previousSource: LiveData<List<TextSnippet>>? = null
 
             init {
                 addSource(snippetWithText) {
                     synchronized(this) {
-                        if (currentSource != null) {
-                            removeSource(currentSource!!)
+                        if (nextSource != null) {
+                            removeSource(nextSource!!)
+                        }
+                        if (previousSource != null) {
+                            removeSource(previousSource!!)
                         }
                     }
                     if (it == null) {
                         postValue(null)
                         return@addSource
                     }
-                    update(it)
+                    setupNextSnippetsSource(it)
+                    setupPreviousSnippetsSource(it)
                 }
             }
 
-            private fun update(snippetWithText: TextSnippet.WithText) {
-                val newSource: LiveData<List<TextSnippet.WithInt>>
+            private fun setupNextSnippetsSource(snippetWithText: TextSnippet.WithText) {
+                val newSource: LiveData<List<TextSnippet>>
                 synchronized(this) {
-                    newSource = textSnippetsDao.getWithSurroundingSnippets(
+                    newSource = textSnippetsDao.getNextSnippets(
                             textId,
                             snippetWithText.snippet.pageReference,
                             snippetWithText.snippet.ordinal,
                             surrounding
                     )
-                    if (currentSource != null) {
-                        removeSource(currentSource!!)
+                    if (nextSource != null) {
+                        removeSource(nextSource!!)
                     }
-                    currentSource = newSource
+                    nextSource = newSource
                 }
-                addSource(newSource) { snippetsWithInts ->
-                    if (snippetsWithInts.isNullOrEmpty()) {
-                        postValue(null)
-                        return@addSource
-                    }
-
-                    check(snippetsWithInts.distinctBy { it.extraInfo }.size == 1) { "Multiple snippet counts" }
+                addSource(newSource) { nextSnippets ->
                     synchronized(this) {
-                        if (currentSource == newSource) {
-                            postValue(
-                                    SnippetWithTextAndSurroundingSnippets(
-                                            snippetsWithInts.map { it.snippet },
-                                            snippetWithText.text,
-                                            snippetsWithInts.first().extraInfo
-                                    )
+                        if (nextSource == newSource) {
+                            updateValue(
+                                    snippetWithText.text,
+                                    snippetWithText.snippet,
+                                    previousSource?.value ?: listOf(),
+                                    nextSnippets ?: listOf()
                             )
                         }
                     }
                 }
+            }
+
+            private fun setupPreviousSnippetsSource(snippetWithText: TextSnippet.WithText) {
+                val newSource: LiveData<List<TextSnippet>>
+                synchronized(this) {
+                    newSource = textSnippetsDao.getPreviousSnippets(
+                            textId,
+                            snippetWithText.snippet.pageReference,
+                            snippetWithText.snippet.ordinal,
+                            surrounding
+                    )
+                    if (previousSource != null) {
+                        removeSource(previousSource!!)
+                    }
+                    previousSource = newSource
+                }
+                addSource(newSource) { previousSnippets ->
+                    synchronized(this) {
+                        if (previousSource == newSource) {
+                            updateValue(
+                                    snippetWithText.text,
+                                    snippetWithText.snippet,
+                                    previousSnippets ?: listOf(),
+                                    nextSource?.value ?: listOf()
+                            )
+                        }
+                    }
+                }
+            }
+
+            private fun updateValue(
+                    text: Text,
+                    currentSnippet: TextSnippet,
+                    previousSnippets: List<TextSnippet>,
+                    nextSnippets: List<TextSnippet>
+            ) {
+                postValue(
+                        SnippetWithTextAndSurroundingSnippets(
+                                previousSnippets.plus(currentSnippet).plus(nextSnippets),
+                                text,
+                                previousSnippets.size
+                        )
+                )
             }
         }
     }

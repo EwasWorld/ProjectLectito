@@ -7,11 +7,15 @@ sealed class ReadSentenceIntent {
     sealed class SentenceIntent : ReadSentenceIntent() {
         data class Initialise(val currentSnippetId: Int?, val currentCharacter: Int?, val textId: Int) :
                 SentenceIntent()
-//        object EditOverlayClicked : SentenceIntent()
+
+        object OnNextSentenceClicked : SentenceIntent()
+        object OnPreviousSentenceClicked : SentenceIntent()
+//        object OnEditOverlayClicked : SentenceIntent()
     }
 
     sealed class SelectedWordIntent : ReadSentenceIntent() {
         data class OnWordSelectModeChanged(val wordSelectMode: WordSelectMode) : SelectedWordIntent()
+        data class OnSpanSelected(val start: Int, val end: Int) : SelectedWordIntent()
         data class OnSimpleWordSelected(val word: String?) : SelectedWordIntent()
         data class OnParsedWordSelected(val word: String, val parsedInfo: ParsedInfo) : SelectedWordIntent()
         object OnSubmit : SelectedWordIntent()

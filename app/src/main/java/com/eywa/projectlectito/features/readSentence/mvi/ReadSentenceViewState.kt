@@ -22,7 +22,7 @@ import kotlinx.coroutines.Job
 data class ReadSentenceViewState(
         val sentenceState: SentenceState = SentenceState.NoSentence,
         val wordDefinitionState: WordDefinitionState = WordDefinitionState.NoWord,
-        val selectedWordState: SelectedWordState = SelectedWordState.SelectState(null),
+        val selectedWordState: SelectedWordState = SelectedWordState.SelectState(),
         val isSelectModeMenuOpen: Boolean = false,
         val isChoosingSnippetToEdit: Boolean = false,
         val snippetToEditClickableSpan: (Sentence.SnippetInfo) -> ClickableSpan? = { null },
@@ -138,8 +138,9 @@ data class ReadSentenceViewState(
             val isParseFailed = sentenceWithParsedInfo.parseError
             val getTextName = text.name
             val chapterPage = currentSnippet.getChapterPageString()
-            val hasNextSentence = sentenceWithParsedInfo.sentence.getNextSentenceStart() != null
             val previousSentence = sentenceWithParsedInfo.sentence.previousSentence
+            val nextSentenceStart = sentenceWithParsedInfo.sentence.getNextSentenceStart()
+            val previousSentenceStart = sentenceWithParsedInfo.sentence.getPreviousSentenceStart()
 
             override fun cleanUp() {
                 sentenceJob.cancel()
@@ -158,13 +159,19 @@ data class ReadSentenceViewState(
             val wordToSearch: String?,
             @StringRes val nullWordSearchedMessage: Int? = null
     ) {
-        data class SelectState(val selectedWord: String?) : SelectedWordState(
+        data class SelectState(
+                val selectedWord: String?,
+                val selectionStart: Int?,
+                val selectionEnd: Int?
+        ) : SelectedWordState(
                 WordSelectMode.SELECT,
                 selectedWord,
                 R.string.read_sentence__simple_selected__submit_no_word_select
-        )
+        ) {
+            constructor() : this(null, null, null)
+        }
 
-        data class TypeState(val typedWord: String?) : SelectedWordState(
+        data class TypeState(val typedWord: String? = null) : SelectedWordState(
                 WordSelectMode.TYPE,
                 typedWord,
                 R.string.read_sentence__simple_selected__submit_no_word_type

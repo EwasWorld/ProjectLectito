@@ -262,7 +262,7 @@
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__next_sentence"
-            android:enabled="@{viewModel.viewState.sentenceState.asValidSentence().hasNextSentence}"
+            android:enabled="@{viewModel.viewState.sentenceState.asValidSentence().nextSentenceStart}"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_next"
             app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"

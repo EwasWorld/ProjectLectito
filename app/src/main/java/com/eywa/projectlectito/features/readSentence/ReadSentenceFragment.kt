@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.utils.ToastSpamPrevention
@@ -81,6 +82,12 @@ class ReadSentenceFragment : Fragment() {
                         args.textId
                 )
         )
+        button_read_sentence__next_sentence.setOnClickListener {
+            readSentenceMviViewModel.handle(SentenceIntent.OnNextSentenceClicked)
+        }
+        button_read_sentence__previous_sentence.setOnClickListener {
+            readSentenceMviViewModel.handle(SentenceIntent.OnPreviousSentenceClicked)
+        }
 
 //        readSentenceViewModel.sentence.observe(viewLifecycleOwner, { sentence = it })
 //        readSentenceViewModel.wordSelectMode.observe(viewLifecycleOwner, { selectMode ->
@@ -93,34 +100,6 @@ class ReadSentenceFragment : Fragment() {
 //        }
 //        button_read_sentence__select_mode.selectMenuOpenedListener = {
 //            text_read_sentence__sentence.clearFocus()
-//        }
-//
-//        button_read_sentence__next_sentence.setOnClickListener {
-//            sentence?.let {
-//                val nextSentenceStart = it.getNextSentenceStart()
-//                if (nextSentenceStart == null) {
-//                    ToastSpamPrevention.displayToast(
-//                            requireContext(),
-//                            resources.getString(R.string.err_read_sentence__no_more_sentences)
-//                    )
-//                    return@setOnClickListener
-//                }
-//                readSentenceViewModel.updateCurrentSnippetAndChar(nextSentenceStart)
-//            }
-//        }
-//
-//        button_read_sentence__previous_sentence.setOnClickListener {
-//            sentence?.let {
-//                val previousSentenceStart = it.getPreviousSentenceStart()
-//                if (previousSentenceStart == null) {
-//                    ToastSpamPrevention.displayToast(
-//                            requireContext(),
-//                            resources.getString(R.string.err_read_sentence__no_more_sentences)
-//                    )
-//                    return@setOnClickListener
-//                }
-//                readSentenceViewModel.updateCurrentSnippetAndChar(previousSentenceStart)
-//            }
 //        }
 //
 //        button_read_sentence__full_text.setOnClickListener {
@@ -145,19 +124,10 @@ class ReadSentenceFragment : Fragment() {
 //                readSentenceViewModel.clearEditSnippetInfo()
 //            }
 //        })
-//
-//        text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
-//            if (wordSelectMode != WordSelectMode.SELECT) return@addSelectionChangedListener
-//            if (!text_read_sentence__sentence.hasSelection()) return@addSelectionChangedListener
-//
-//            val selectedText = sentence?.substring(selStart, selEnd)
-//            if (selectedText.isNullOrBlank()) {
-//                return@addSelectionChangedListener
-//            }
-//
-//            readSentenceViewModel.setSelectedWord(selectedText)
-//            readSentenceMviViewModel.handle(SelectedWordIntent.OnSimpleWordSelected(selectedText))
-//        }
+
+        text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
+            readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSpanSelected(selStart, selEnd))
+        }
     }
 
 //    private fun editSentenceButtonAction() {
