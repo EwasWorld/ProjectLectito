@@ -45,8 +45,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         val currentState = viewState.value ?: ReadSentenceViewState()
         when (action) {
             is SelectedWordIntent -> handleSelectedWordChange(currentState, action)
-            is OnWordSelectModeMenuStateChange ->
+            is OnWordSelectModeMenuStateChange -> {
+                if (action.isOpen) {
+                    viewEffect.postValue(ReadSentenceEffect.ClearTextSelection)
+                }
                 _viewState.postValue(currentState.copy(isSelectModeMenuOpen = action.isOpen))
+            }
             is WordDefinitionIntent -> handleWordDefinitionChange(currentState, action)
             is SentenceIntent -> handleSentenceChange(currentState, action)
         }

@@ -15,4 +15,6 @@ sealed class ReadSentenceEffect {
 
         abstract fun getMessage(context: Context): String
     }
+
+    object ClearTextSelection : ReadSentenceEffect()
 }

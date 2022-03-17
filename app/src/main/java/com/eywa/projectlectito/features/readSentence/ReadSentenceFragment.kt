@@ -72,6 +72,9 @@ class ReadSentenceFragment : Fragment() {
                         requireContext(),
                         effect.getMessage(requireContext())
                 )
+                ReadSentenceEffect.ClearTextSelection -> text_read_sentence__sentence.clearFocus()
+                null -> {
+                }
             }
         })
 
@@ -90,10 +93,6 @@ class ReadSentenceFragment : Fragment() {
         }
 
 //        readSentenceViewModel.sentence.observe(viewLifecycleOwner, { sentence = it })
-//        readSentenceViewModel.wordSelectMode.observe(viewLifecycleOwner, { selectMode ->
-//            wordSelectMode = selectMode
-//            text_read_sentence__sentence.clearFocus()
-//        })
 //
 //        overlay_read_sentence__select_mode.setOnClickListener {
 //            readSentenceViewModel.setSelectWordSelectModeMenuOpen(false)
@@ -127,6 +126,9 @@ class ReadSentenceFragment : Fragment() {
 
         text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
             readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSpanSelected(selStart, selEnd))
+        }
+        overlay_read_sentence__select_mode.setOnClickListener {
+            readSentenceMviViewModel.handle(ReadSentenceIntent.OnWordSelectModeMenuStateChange(false))
         }
     }
 
