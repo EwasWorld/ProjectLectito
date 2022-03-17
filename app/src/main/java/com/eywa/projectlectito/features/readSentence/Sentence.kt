@@ -13,9 +13,7 @@ class Sentence(
          */
         currentCharacter: Int? = 0,
         private val previousSnippets: List<TextSnippet>? = null,
-        private val nextSnippets: List<TextSnippet>? = null,
-        private val parserSuccessCallback: (List<ParsedInfo>) -> Unit,
-        private val parserFailCallback: (Throwable) -> Unit
+        private val nextSnippets: List<TextSnippet>? = null
 ) {
     companion object {
         private const val LOG_TAG = "Sentence"
@@ -54,6 +52,7 @@ class Sentence(
     }
 
     private lateinit var parseJob: Job
+    private var parserFailCallback: ((Throwable) -> Unit)? = null
 
     private var currentSentenceStart = RelativeIndexInfo(currentCharacter ?: 0, CURRENT_SNIPPET_RELATIVE_ID)
     private var nextSentenceStart: RelativeIndexInfo? = null
@@ -140,7 +139,7 @@ class Sentence(
                 }
                 Log.e(LOG_TAG, message)
 
-                parserFailCallback(e)
+                parserFailCallback?.invoke(e)
             }
         }
     }
@@ -384,7 +383,11 @@ class Sentence(
         return lastIndex + fromIndex
     }
 
-    suspend fun startParse() {
+    suspend fun startParse(
+            parserSuccessCallback: (List<ParsedInfo>) -> Unit,
+            parserFailCallback: (Throwable) -> Unit
+    ) {
+        this.parserFailCallback = parserFailCallback
         withContext(parseJob) {
             Log.d(LOG_TAG, "Parse invoked")
 

@@ -172,14 +172,16 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun handleSelectedWordChange(currentState: ReadSentenceViewState, action: SelectedWordIntent) {
-        val selWordState = currentState.selectedWordState
+        val currentWordState = currentState.selectedWordState
         when (action) {
             is SelectedWordIntent.OnWordSelectModeChanged -> {
                 val newWordSelectMode = action.wordSelectMode
+                        .takeIf { it != currentWordState.wordSelectMode } ?: return
 
+                var shouldStartParse = false
                 val newSelectedWordState =
-                        if (newWordSelectMode.isAuto && selWordState is SelectedWordState.ParsedState) {
-                            selWordState.copy(
+                        if (newWordSelectMode.isAuto && currentWordState is SelectedWordState.ParsedState) {
+                            currentWordState.copy(
                                     coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                             )
                         }
@@ -188,11 +190,14 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                 WordSelectMode.SELECT -> SelectedWordState.SelectState()
                                 WordSelectMode.TYPE -> SelectedWordState.TypeState()
                                 WordSelectMode.AUTO,
-                                WordSelectMode.AUTO_WITH_COLOUR -> SelectedWordState.ParsedState(
-                                        null,
-                                        null,
-                                        newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
-                                )
+                                WordSelectMode.AUTO_WITH_COLOUR -> {
+                                    shouldStartParse = true
+                                    SelectedWordState.ParsedState(
+                                            null,
+                                            null,
+                                            newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                                    )
+                                }
                             }
                         }
                 _viewState.postValue(
@@ -201,18 +206,32 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                 isSelectModeMenuOpen = false
                         )
                 )
+                if (shouldStartParse) {
+                    currentState.sentenceState.asValidSentence()?.let { validSentence ->
+                        viewModelScope.launch(validSentence.sentenceJob) {
+                            validSentence.sentence.startParse(
+                                    parserSuccessCallback = {
+                                        viewEffect.postValue(Toast.StringToast("Parse complete"))
+                                    },
+                                    parserFailCallback = {
+                                        viewEffect.postValue(Toast.StringToast("Parse failed"))
+                                    }
+                            )
+                        }
+                    }
+                }
             }
             is SelectedWordIntent.OnSimpleWordSelected -> {
-                check(selWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
+                check(currentWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
                 _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
             }
             is SelectedWordIntent.OnParsedWordSelected -> {
-                check(selWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
+                check(currentWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
                 val newState = currentState.copy(
                         selectedWordState = SelectedWordState.ParsedState(
                                 action.word,
                                 action.parsedInfo,
-                                selWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                                currentWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                         )
                 )
 
@@ -229,9 +248,10 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 searchForWord(currentState)
             }
             is SelectedWordIntent.OnSpanSelected -> {
-                if (selWordState !is SelectedWordState.SelectState
-                        || (action.start == selWordState.selectionStart && action.end == selWordState.selectionEnd)
-                ) return
+                currentWordState.getAsSelectState()?.takeIf {
+                    action.start != it.selectionStart || action.end != it.selectionEnd
+                } ?: return
+
                 val newSelection = currentState.getSentence()?.toString()?.substring(action.start, action.end)
                         .takeIf { !it.isNullOrBlank() } ?: return
                 _viewState.postValue(

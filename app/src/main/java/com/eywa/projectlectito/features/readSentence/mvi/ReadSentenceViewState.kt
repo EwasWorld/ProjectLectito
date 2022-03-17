@@ -11,7 +11,6 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.features.readSentence.ParsedInfo
-import com.eywa.projectlectito.features.readSentence.ReadSentenceViewModel.SentenceWithParsedInfo
 import com.eywa.projectlectito.features.readSentence.Sentence
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
@@ -35,17 +34,16 @@ data class ReadSentenceViewState(
                 index.takeIf { it % 2 == 1 }
                         ?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
 
-        val sentenceWithParsedInfo = (sentenceState as? SentenceState.ValidSentence)?.sentenceWithParsedInfo
-                ?: return null
+        val validSentence = (sentenceState as? SentenceState.ValidSentence) ?: return null
         val wordSelectMode = selectedWordState
-        val content = sentenceWithParsedInfo.sentence.currentSentence ?: return null
+        val content = validSentence.sentence.currentSentence ?: return null
 
         val spannableString = SpannableString(content)
         if (isChoosingSnippetToEdit) {
             /*
              * Select a snippet from a sentence which spans multiple snippets
              */
-            val snippets = sentenceWithParsedInfo.sentence.snippetsInCurrentSentence
+            val snippets = validSentence.sentence.snippetsInCurrentSentence
             snippets.forEachIndexed { index, snippetInfo ->
 
 //                TODO Span click
@@ -79,7 +77,7 @@ data class ReadSentenceViewState(
         /*
          * Select a word from a parsed sentence
          */
-        sentenceWithParsedInfo.parsedInfo!!.forEachIndexed { index, parsedInfo ->
+        validSentence.parsedInfo!!.forEachIndexed { index, parsedInfo ->
             val spanStartIndex = parsedInfo.startCharacterIndex
             val spanEndIndex = parsedInfo.endCharacterIndex
 
@@ -121,27 +119,25 @@ data class ReadSentenceViewState(
                 val text: Text,
                 val currentCharacter: Int? = 0,
                 val snippets: List<TextSnippet>,
-                val previousSnippetCount: Int = 0
+                val previousSnippetCount: Int = 0,
+                val parsedInfo: List<ParsedInfo>? = null,
+                val parseError: Boolean = false
         ) : SentenceState() {
             private val currentSnippet = snippets[previousSnippetCount]
-            val sentenceWithParsedInfo: SentenceWithParsedInfo = SentenceWithParsedInfo(
-                    Sentence(
-                            currentSnippet,
-                            currentCharacter,
-                            snippets.take(previousSnippetCount),
-                            // -1 for current snippet
-                            snippets.takeLast(snippets.size - previousSnippetCount - 1),
-                            parserSuccessCallback = { /* TODO */ },
-                            parserFailCallback = { /* TODO */ }
-                    )
+            val sentence = Sentence(
+                    currentSnippet,
+                    currentCharacter,
+                    snippets.take(previousSnippetCount),
+                    // -1 for current snippet
+                    snippets.takeLast(snippets.size - previousSnippetCount - 1)
             )
-            val isParseComplete = !sentenceWithParsedInfo.parseError && sentenceWithParsedInfo.parsedInfo != null
-            val isParseFailed = sentenceWithParsedInfo.parseError
+            val isParseComplete = !parseError && parsedInfo != null
+            val isParseFailed = parseError
             val getTextName = text.name
             val chapterPage = currentSnippet.getChapterPageString()
-            val previousSentence = sentenceWithParsedInfo.sentence.previousSentence
-            val nextSentenceStart = sentenceWithParsedInfo.sentence.getNextSentenceStart()
-            val previousSentenceStart = sentenceWithParsedInfo.sentence.getPreviousSentenceStart()
+            val previousSentence = sentence.previousSentence
+            val nextSentenceStart = sentence.getNextSentenceStart()
+            val previousSentenceStart = sentence.getPreviousSentenceStart()
 
             override fun cleanUp() {
                 sentenceJob.cancel()
