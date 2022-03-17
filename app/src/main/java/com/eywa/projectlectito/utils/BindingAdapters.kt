@@ -53,19 +53,15 @@ object BindingAdapters {
     @BindingAdapter("spannableText")
     @JvmStatic
     fun TextView.setSpannableText(spannableString: SpannableString?) {
-        when {
-            spannableString == null -> text = ""
-            spannableString.getSpans(0, spannableString.toString().length, CharacterStyle::class.java).isEmpty() -> {
-                text = spannableString.toString()
-            }
-            spannableString.getSpans(0, spannableString.toString().length, ClickableSpan::class.java).isEmpty() -> {
-                text = spannableString
-            }
-            else -> {
-                text = spannableString
-                movementMethod = LinkMovementMethod.getInstance()
-                return
-            }
+        if (spannableString == null
+                || spannableString.getSpans(0, spannableString.toString().length, CharacterStyle::class.java).isEmpty()
+                || spannableString.getSpans(0, spannableString.toString().length, ClickableSpan::class.java).isEmpty()
+        ) {
+            text = spannableString ?: ""
+        }
+        else {
+            text = spannableString
+            movementMethod = LinkMovementMethod.getInstance()
         }
     }
 

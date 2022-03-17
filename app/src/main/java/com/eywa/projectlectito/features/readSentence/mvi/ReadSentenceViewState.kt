@@ -16,6 +16,7 @@ import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
+import com.eywa.projectlectito.utils.UnformattedClickableSpan
 import kotlinx.coroutines.Job
 
 data class ReadSentenceViewState(
@@ -25,7 +26,7 @@ data class ReadSentenceViewState(
         val isSelectModeMenuOpen: Boolean = false,
         val isChoosingSnippetToEdit: Boolean = false,
         val snippetToEditClickableSpan: (Sentence.SnippetInfo) -> ClickableSpan? = { null },
-        val parsedWordClickableSpan: (String, ParsedInfo) -> ClickableSpan? = { _, _ -> null },
+        val parsedWordClickedListener: ((String, ParsedInfo) -> Unit)? = null,
 ) {
     fun isSentenceSelectable() = selectedWordState is SelectedWordState.SelectState || isChoosingSnippetToEdit
 
@@ -81,16 +82,13 @@ data class ReadSentenceViewState(
             val spanStartIndex = parsedInfo.startCharacterIndex
             val spanEndIndex = parsedInfo.endCharacterIndex
 
-//                TODO Span click
-//            this@ReadSentenceViewModel.tempSelectedWord.postValue(
-//                    ReadSentenceViewModel.TempSelectedWord.ParsedWord(
-//                            currentSentence.substring(spanStartIndex, spanEndIndex),
-//                            parsedInfo
-//                    )
-//            )
-
             spannableString.setSpan(
-                    parsedWordClickableSpan(content.substring(spanStartIndex, spanEndIndex), parsedInfo),
+                    UnformattedClickableSpan {
+                        parsedWordClickedListener?.invoke(
+                                content.substring(spanStartIndex, spanEndIndex),
+                                parsedInfo
+                        )
+                    },
                     spanStartIndex,
                     spanEndIndex,
                     SPAN_FLAGS

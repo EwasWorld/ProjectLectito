@@ -1,22 +1,22 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
 import com.eywa.projectlectito.database.LectitoRoomDatabase
 import com.eywa.projectlectito.database.snippets.SnippetsRepo
 import com.eywa.projectlectito.database.texts.TextsRepo
+import com.eywa.projectlectito.features.readSentence.ParsedInfo
 import com.eywa.projectlectito.features.readSentence.Sentence
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect.Toast
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.*
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(application) {
@@ -124,7 +124,25 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                             text = it.text,
                                             currentCharacter = it.text.currentCharacterIndex ?: 0,
                                             previousSnippetCount = it.prevSnippetsCount
-                                    )
+                                    ),
+                                    parsedWordClickedListener = { word, parsedInfo ->
+                                        onUpToDateState { upToDateState ->
+                                            val newState = upToDateState.copy(
+                                                    selectedWordState = SelectedWordState.ParsedState(
+                                                            word,
+                                                            parsedInfo,
+                                                            upToDateState.selectedWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                                                    )
+                                            )
+                                            _viewState.postValue(newState)
+
+                                            // supplementary symbol (number, punctuation, etc.)
+                                            val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
+                                            if (isWord) {
+                                                searchForWord(newState)
+                                            }
+                                        }
+                                    }
                             )
                     )
                 }
@@ -176,11 +194,13 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         when (action) {
             is SelectedWordIntent.OnWordSelectModeChanged -> {
                 val newWordSelectMode = action.wordSelectMode
-                        .takeIf { it != currentWordState.wordSelectMode } ?: return
 
                 var shouldStartParse = false
                 val newSelectedWordState =
-                        if (newWordSelectMode.isAuto && currentWordState is SelectedWordState.ParsedState) {
+                        if (newWordSelectMode == currentWordState.wordSelectMode) {
+                            currentWordState
+                        }
+                        else if (newWordSelectMode.isAuto && currentWordState is SelectedWordState.ParsedState) {
                             currentWordState.copy(
                                     coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
                             )
@@ -207,42 +227,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         )
                 )
                 if (shouldStartParse) {
-                    currentState.sentenceState.asValidSentence()?.let { validSentence ->
-                        viewModelScope.launch(validSentence.sentenceJob) {
-                            validSentence.sentence.startParse(
-                                    parserSuccessCallback = {
-                                        viewEffect.postValue(Toast.StringToast("Parse complete"))
-                                    },
-                                    parserFailCallback = {
-                                        viewEffect.postValue(Toast.StringToast("Parse failed"))
-                                    }
-                            )
-                        }
-                    }
+                    currentState.sentenceState.asValidSentence()?.let { startSentenceParse(currentState, it) }
                 }
             }
             is SelectedWordIntent.OnSimpleWordSelected -> {
                 check(currentWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
                 _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
-            }
-            is SelectedWordIntent.OnParsedWordSelected -> {
-                check(currentWordState.wordSelectMode.isAuto) { "Invalid parsed word selection state" }
-                val newState = currentState.copy(
-                        selectedWordState = SelectedWordState.ParsedState(
-                                action.word,
-                                action.parsedInfo,
-                                currentWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
-                        )
-                )
-
-                // supplementary symbol (number, punctuation, etc.)
-                val isWord = action.parsedInfo.partsOfSpeech[0] != "補助記号"
-                if (isWord) {
-                    searchForWord(newState)
-                }
-                else {
-                    _viewState.postValue(newState)
-                }
             }
             is SelectedWordIntent.OnSubmit -> {
                 searchForWord(currentState)
@@ -264,6 +254,48 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         )
                 )
             }
+        }
+    }
+
+    private fun startSentenceParse(currentState: ReadSentenceViewState, validSentence: SentenceState.ValidSentence) {
+        fun updateState(parsedInfo: List<ParsedInfo>?) {
+            onUpToDateState { newState ->
+                val newValidSentence = newState.sentenceState.asValidSentence() ?: return@onUpToDateState
+                val actualSentence = newValidSentence.sentence.currentSentence
+                val expectedSentence = currentState.sentenceState.asValidSentence()?.sentence?.currentSentence
+                if (actualSentence == expectedSentence) {
+                    _viewState.postValue(
+                            newState.copy(
+                                    sentenceState = newValidSentence.copy(
+                                            parseError = parsedInfo == null,
+                                            parsedInfo = parsedInfo
+                                    )
+                            )
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch(validSentence.sentenceJob) {
+            validSentence.sentence.startParse(
+                    parserSuccessCallback = { updateState(it) },
+                    parserFailCallback = {
+                        Log.e(LOG_TAG, it.message ?: "")
+                        updateState(null)
+                    }
+            )
+        }
+
+    }
+
+    private fun onUpToDateState(block: (ReadSentenceViewState) -> Unit) {
+        var observer: Observer<ReadSentenceViewState>? = null
+        observer = Observer<ReadSentenceViewState> {
+            block(it)
+            _viewState.removeObserver(observer!!)
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            _viewState.observeForever(observer)
         }
     }
 
@@ -302,7 +334,9 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun updateWordDefinitionState(wordDefinitionState: WordDefinitionState) {
-        updateWordDefinitionState(_viewState.value!!, wordDefinitionState)
+        onUpToDateState {
+            updateWordDefinitionState(it, wordDefinitionState)
+        }
     }
 
     /**
@@ -330,6 +364,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     companion object {
+        private const val LOG_TAG = "ReadSentenceMviViewMode"
         private const val SURROUNDING_SNIPPETS_TO_RETRIEVE = 1
     }
 }

@@ -161,7 +161,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:text="@{viewModel.currentSentence}"
+                app:spannableText="@{viewModel.currentSentence}"
                 app:visibleOrGone="@{viewModel.currentSentence}"
                 tools:text="つまり、現代の日本ではヽ普通は体験てきなレ現場に出くわしてしるわけてす。"
                 />
