@@ -8,7 +8,7 @@ import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.utils.ToastSpamPrevention
+import com.eywa.projectlectito.utils.androidWrappers.ToastSpamPrevention
 
 class AddTextDialog : DialogFragment() {
     private val viewModel: ViewTextsViewModel by activityViewModels()

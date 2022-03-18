@@ -12,7 +12,7 @@
         <attr name="hint" format="string" />
     </declare-styleable>
 
-    <declare-styleable name="HighlightOverlay">
+    <declare-styleable name="HighlightOverlayView">
         <attr name="view_to_frame_id" format="reference" />
         <attr name="overlay_color" format="color" />
     </declare-styleable>

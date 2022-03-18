@@ -11,8 +11,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
-import com.eywa.projectlectito.utils.TextChangedListener
-import com.eywa.projectlectito.utils.ToastSpamPrevention
+import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
+import com.eywa.projectlectito.utils.androidWrappers.ToastSpamPrevention
 import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.add_snippet_fragment.*
 import kotlinx.android.synthetic.main.edit_snippet_fragment.*

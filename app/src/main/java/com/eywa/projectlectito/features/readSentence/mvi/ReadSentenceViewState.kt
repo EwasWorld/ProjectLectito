@@ -15,7 +15,7 @@ import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
-import com.eywa.projectlectito.utils.UnformattedClickableSpan
+import com.eywa.projectlectito.utils.androidWrappers.UnformattedClickableSpan
 import kotlinx.coroutines.Job
 
 data class ReadSentenceViewState(

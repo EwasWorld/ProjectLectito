@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.utils
+package com.eywa.projectlectito.utils.androidWrappers
 
 import android.text.TextPaint
 import android.text.style.ClickableSpan

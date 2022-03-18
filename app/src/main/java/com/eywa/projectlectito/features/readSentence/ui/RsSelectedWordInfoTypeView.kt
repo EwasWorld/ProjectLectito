@@ -11,7 +11,7 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsSelectedWordInfoTypeBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import com.eywa.projectlectito.utils.TextChangedListener
+import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
 import kotlinx.android.synthetic.main.rs_selected_word_info_type.view.*
 
 class RsSelectedWordInfoTypeView : ConstraintLayout {

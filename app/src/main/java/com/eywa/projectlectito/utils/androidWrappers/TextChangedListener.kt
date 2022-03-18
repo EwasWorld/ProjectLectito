@@ -1,4 +1,4 @@
-package com.eywa.projectlectito.utils
+package com.eywa.projectlectito.utils.androidWrappers
 
 import android.text.Editable
 import android.text.TextWatcher

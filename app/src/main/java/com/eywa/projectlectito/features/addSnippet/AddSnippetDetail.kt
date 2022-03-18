@@ -10,7 +10,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.utils.TextChangedListener
+import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
 import com.eywa.projectlectito.utils.asVisibility
 import com.eywa.projectlectito.utils.getColorByTheme
 

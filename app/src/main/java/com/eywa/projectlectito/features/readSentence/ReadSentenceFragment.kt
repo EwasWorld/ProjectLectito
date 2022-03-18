@@ -17,7 +17,7 @@ import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import com.eywa.projectlectito.utils.ToastSpamPrevention
+import com.eywa.projectlectito.utils.androidWrappers.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_fragment.*
 
 
@@ -40,7 +40,6 @@ class ReadSentenceFragment : Fragment() {
     private val args: ReadSentenceFragmentArgs by navArgs()
 
     private lateinit var binding: RsFragmentBinding
-    private lateinit var readSentenceViewModel: ReadSentenceViewModel
     private lateinit var readSentenceMviViewModel: ReadSentenceMviViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +54,6 @@ class ReadSentenceFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = resources.getString(R.string.read_sentence__title)
 
-        readSentenceViewModel = ViewModelProvider(this)[ReadSentenceViewModel::class.java]
         readSentenceMviViewModel = ViewModelProvider(this)[ReadSentenceMviViewModel::class.java]
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = readSentenceMviViewModel
@@ -111,7 +109,6 @@ class ReadSentenceFragment : Fragment() {
         button_read_sentence__full_text.setOnClickListener {
             readSentenceMviViewModel.handle(SentenceIntent.OnViewFullTextClicked)
         }
-
         button_read_sentence__edit_sentence.setOnClickListener {
             readSentenceMviViewModel.handle(SentenceIntent.OnEditSentenceClicked)
         }

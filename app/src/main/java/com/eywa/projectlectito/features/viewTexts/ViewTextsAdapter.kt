@@ -14,7 +14,7 @@ import com.eywa.projectlectito.features.addSnippet.AddSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import com.eywa.projectlectito.features.readSentence.ReadSentenceFragment
 import com.eywa.projectlectito.features.snippetBrowser.SnippetBrowserFragment
-import com.eywa.projectlectito.utils.ToastSpamPrevention
+import com.eywa.projectlectito.utils.androidWrappers.ToastSpamPrevention
 import com.eywa.projectlectito.utils.asVisibility
 import kotlin.math.roundToInt
 

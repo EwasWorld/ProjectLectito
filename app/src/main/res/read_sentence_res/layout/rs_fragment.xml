@@ -297,7 +297,7 @@
             tools:visibility="gone"
             />
 
-        <com.eywa.projectlectito.features.readSentence.ui.HighlightOverlay
+        <com.eywa.projectlectito.features.readSentence.ui.HighlightOverlayView
             android:id="@+id/overlay_read_sentence__sentence"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

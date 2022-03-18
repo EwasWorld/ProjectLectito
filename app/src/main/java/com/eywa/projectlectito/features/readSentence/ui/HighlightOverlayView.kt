@@ -11,7 +11,7 @@ import com.eywa.projectlectito.R
 import kotlin.properties.Delegates
 
 
-class HighlightOverlay : View {
+class HighlightOverlayView : View {
     private var viewToFrameId by Delegates.notNull<Int>()
     private var overlayColour by Delegates.notNull<Int>()
     private var framedContentRectangle: RectF? = null
@@ -29,9 +29,9 @@ class HighlightOverlay : View {
     }
 
     private fun initialise(attrs: AttributeSet?) {
-        val styledAttributes = context.obtainStyledAttributes(attrs, R.styleable.HighlightOverlay)
-        viewToFrameId = styledAttributes.getResourceIdOrThrow(R.styleable.HighlightOverlay_view_to_frame_id)
-        overlayColour = styledAttributes.getColorOrThrow(R.styleable.HighlightOverlay_overlay_color)
+        val styledAttributes = context.obtainStyledAttributes(attrs, R.styleable.HighlightOverlayView)
+        viewToFrameId = styledAttributes.getResourceIdOrThrow(R.styleable.HighlightOverlayView_view_to_frame_id)
+        overlayColour = styledAttributes.getColorOrThrow(R.styleable.HighlightOverlayView_overlay_color)
         styledAttributes.recycle()
     }
 
