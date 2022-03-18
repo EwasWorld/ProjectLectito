@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsFragmentBinding
+import com.eywa.projectlectito.features.editSnippet.EditSnippetFragment
+import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent
@@ -39,9 +42,6 @@ class ReadSentenceFragment : Fragment() {
     private lateinit var binding: RsFragmentBinding
     private lateinit var readSentenceViewModel: ReadSentenceViewModel
     private lateinit var readSentenceMviViewModel: ReadSentenceMviViewModel
-
-    private var sentence: Sentence? = null
-    private var wordSelectMode: WordSelectMode? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = LayoutInflater.from(context).inflate(R.layout.rs_fragment, container, false)
@@ -75,6 +75,22 @@ class ReadSentenceFragment : Fragment() {
                 ReadSentenceEffect.ClearTextSelection -> text_read_sentence__sentence.clearFocus()
                 null -> {
                 }
+                is ReadSentenceEffect.NavigateTo.EditSnippet -> {
+                    EditSnippetFragment.navigateTo(
+                            findNavController(),
+                            effect.snippetInfo.snippetId,
+                            effect.snippetInfo.snippetStartIndex ?: 0,
+                            effect.snippetInfo.snippetEndIndex
+                    )
+                }
+                is ReadSentenceEffect.NavigateTo.ReadFullText -> {
+                    ReadFullTextFragment.navigateTo(
+                            findNavController(),
+                            args.textId,
+                            effect.snippetInfo.snippetId,
+                            effect.snippetInfo.snippetStartIndex
+                    )
+                }
             }
         })
 
@@ -85,75 +101,28 @@ class ReadSentenceFragment : Fragment() {
                         args.textId
                 )
         )
+
         button_read_sentence__next_sentence.setOnClickListener {
             readSentenceMviViewModel.handle(SentenceIntent.OnNextSentenceClicked)
         }
         button_read_sentence__previous_sentence.setOnClickListener {
             readSentenceMviViewModel.handle(SentenceIntent.OnPreviousSentenceClicked)
         }
+        button_read_sentence__full_text.setOnClickListener {
+            readSentenceMviViewModel.handle(SentenceIntent.OnViewFullTextClicked)
+        }
 
-//        readSentenceViewModel.sentence.observe(viewLifecycleOwner, { sentence = it })
-//
-//        overlay_read_sentence__select_mode.setOnClickListener {
-//            readSentenceViewModel.setSelectWordSelectModeMenuOpen(false)
-//        }
-//        button_read_sentence__select_mode.selectMenuOpenedListener = {
-//            text_read_sentence__sentence.clearFocus()
-//        }
-//
-//        button_read_sentence__full_text.setOnClickListener {
-//            val firstSnippet = sentence?.snippetsInCurrentSentence?.get(0)
-//            ReadFullTextFragment.navigateTo(
-//                    findNavController(),
-//                    args.textId,
-//                    firstSnippet?.snippetId,
-//                    firstSnippet?.snippetStartIndex
-//            )
-//        }
-//
-//        button_read_sentence__edit_sentence.setOnClickListener { editSentenceButtonAction() }
-//        readSentenceViewModel.snippetToEdit.observe(viewLifecycleOwner, {
-//            it?.let { snippetToEdit ->
-//                EditSnippetFragment.navigateTo(
-//                        findNavController(),
-//                        snippetToEdit.snippetId,
-//                        snippetToEdit.startChar,
-//                        snippetToEdit.endChar,
-//                )
-//                readSentenceViewModel.clearEditSnippetInfo()
-//            }
-//        })
-
+        button_read_sentence__edit_sentence.setOnClickListener {
+            readSentenceMviViewModel.handle(SentenceIntent.OnEditSentenceClicked)
+        }
         text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
             readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSpanSelected(selStart, selEnd))
         }
         overlay_read_sentence__select_mode.setOnClickListener {
             readSentenceMviViewModel.handle(ReadSentenceIntent.OnWordSelectModeMenuStateChange(false))
         }
+        overlay_read_sentence__sentence.setOnClickListener {
+            readSentenceMviViewModel.handle(SentenceIntent.OnEditOverlayClicked)
+        }
     }
-
-//    private fun editSentenceButtonAction() {
-//        sentence?.let { currentSentence ->
-//            when (currentSentence.snippetsInCurrentSentence.size) {
-//                0 -> {
-//                    ToastSpamPrevention.displayToast(
-//                            requireContext(),
-//                            resources.getString(R.string.read_sentence__no_content_to_edit)
-//                    )
-//                    return
-//                }
-//                1 -> {
-//                    val firstSnippet = currentSentence.snippetsInCurrentSentence.first()
-//                    EditSnippetFragment.navigateTo(
-//                            requireView().findNavController(),
-//                            firstSnippet.snippetId,
-//                            firstSnippet.snippetStartIndex ?: 0,
-//                            firstSnippet.snippetEndIndex,
-//                    )
-//                    return
-//                }
-//                else -> readSentenceViewModel.setSelectSnippetMode(true)
-//            }
-//        }
-//    }
 }

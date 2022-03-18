@@ -13,6 +13,7 @@ import com.eywa.projectlectito.features.readSentence.Sentence
 import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect.Toast
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.*
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.*
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import kotlinx.coroutines.*
@@ -66,15 +67,33 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
 
     private fun handleSentenceChange(currentState: ReadSentenceViewState, action: SentenceIntent) {
         when (action) {
-            is SentenceIntent.Initialise -> setNewSentence(currentState, action.textId, action.currentSnippetId)
-            SentenceIntent.OnNextSentenceClicked -> updateSentence(
+            is Initialise -> setNewSentence(currentState, action.textId, action.currentSnippetId)
+            OnNextSentenceClicked -> updateSentence(
                     currentState,
                     currentState.sentenceState.asValidSentence()?.nextSentenceStart
             )
-            SentenceIntent.OnPreviousSentenceClicked -> updateSentence(
+            OnPreviousSentenceClicked -> updateSentence(
                     currentState,
                     currentState.sentenceState.asValidSentence()?.previousSentenceStart
             )
+            OnEditSentenceClicked -> {
+                val snippets =
+                        currentState.sentenceState.asValidSentence()?.sentence?.snippetsInCurrentSentence ?: return
+                when (snippets.size) {
+                    0 -> throw IllegalStateException("No snippets found")
+                    1 -> viewEffect.postValue(ReadSentenceEffect.NavigateTo.EditSnippet(snippets[0]))
+                    else -> _viewState.postValue(currentState.copy(isChoosingSnippetToEdit = true))
+                }
+            }
+            OnEditOverlayClicked -> _viewState.postValue(currentState.copy(isChoosingSnippetToEdit = false))
+            OnViewFullTextClicked -> {
+                val firstSnippet = currentState.sentenceState.asValidSentence()
+                        ?.sentence?.snippetsInCurrentSentence
+                        ?.takeIf { it.isNotEmpty() }
+                        ?.get(0)
+                        ?: return
+                viewEffect.postValue(ReadSentenceEffect.NavigateTo.ReadFullText(firstSnippet))
+            }
         }
     }
 
@@ -146,6 +165,9 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                                 searchForWord(newState)
                                             }
                                         }
+                                    },
+                                    onSnippetToEditClicked = { snippetInfo ->
+                                        viewEffect.postValue(ReadSentenceEffect.NavigateTo.EditSnippet(snippetInfo))
                                     }
                             )
                     )
@@ -235,7 +257,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 }
             }
             is SelectedWordIntent.OnSimpleWordSelected -> {
-                check(currentWordState.wordSelectMode == WordSelectMode.TYPE) { "Invalid simple word selection state" }
                 _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
             }
             is SelectedWordIntent.OnSubmit -> {
@@ -292,6 +313,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
 
     }
 
+    // TODO This is probably wrong - maybe look into flows?
     private fun onUpToDateState(block: (ReadSentenceViewState) -> Unit) {
         var observer: Observer<ReadSentenceViewState>? = null
         observer = Observer<ReadSentenceViewState> {

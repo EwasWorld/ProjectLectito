@@ -4,12 +4,17 @@ import com.eywa.projectlectito.features.readSentence.WordSelectMode
 
 sealed class ReadSentenceIntent {
     sealed class SentenceIntent : ReadSentenceIntent() {
-        data class Initialise(val currentSnippetId: Int?, val currentCharacter: Int?, val textId: Int) :
-                SentenceIntent()
+        data class Initialise(
+                val currentSnippetId: Int?,
+                val currentCharacter: Int?,
+                val textId: Int
+        ) : SentenceIntent()
 
         object OnNextSentenceClicked : SentenceIntent()
         object OnPreviousSentenceClicked : SentenceIntent()
-//        object OnEditOverlayClicked : SentenceIntent()
+        object OnEditSentenceClicked : SentenceIntent()
+        object OnEditOverlayClicked : SentenceIntent()
+        object OnViewFullTextClicked : SentenceIntent()
     }
 
     sealed class SelectedWordIntent : ReadSentenceIntent() {

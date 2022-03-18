@@ -3,7 +3,6 @@ package com.eywa.projectlectito.features.readSentence.mvi
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
@@ -25,7 +24,7 @@ data class ReadSentenceViewState(
         val selectedWordState: SelectedWordState = SelectedWordState.SelectState(),
         val isSelectModeMenuOpen: Boolean = false,
         val isChoosingSnippetToEdit: Boolean = false,
-        val snippetToEditClickableSpan: (Sentence.SnippetInfo) -> ClickableSpan? = { null },
+        val onSnippetToEditClicked: ((Sentence.SnippetInfo) -> Unit)? = null,
         val parsedWordClickedListener: ((String, ParsedInfo) -> Unit)? = null,
 ) {
     fun isSentenceSelectable() = selectedWordState is SelectedWordState.SelectState || isChoosingSnippetToEdit
@@ -46,19 +45,10 @@ data class ReadSentenceViewState(
              */
             val snippets = validSentence.sentence.snippetsInCurrentSentence
             snippets.forEachIndexed { index, snippetInfo ->
-
-//                TODO Span click
-//                _snippetToEdit.postValue(
-//                        ReadSentenceViewModel.SnippetIdWithStartAndEnd(
-//                                snippetInfo.snippetId,
-//                                snippetInfo.snippetStartIndex ?: 0,
-//                                snippetInfo.snippetEndIndex
-//                        )
-//                )
-//                isInSelectSnippetToEditMode.postValue(false)
-
                 spannableString.setSpan(
-                        snippetToEditClickableSpan(snippetInfo)!!,
+                        UnformattedClickableSpan {
+                            onSnippetToEditClicked?.invoke(snippetInfo)
+                        },
                         snippetInfo.currentSentenceStartIndex,
                         snippetInfo.currentSentenceEndIndex,
                         SPAN_FLAGS

@@ -2,6 +2,7 @@ package com.eywa.projectlectito.features.readSentence.mvi
 
 import android.content.Context
 import androidx.annotation.StringRes
+import com.eywa.projectlectito.features.readSentence.Sentence
 
 sealed class ReadSentenceEffect {
     sealed class Toast : ReadSentenceEffect() {
@@ -14,6 +15,11 @@ sealed class ReadSentenceEffect {
         }
 
         abstract fun getMessage(context: Context): String
+    }
+
+    sealed class NavigateTo : ReadSentenceEffect() {
+        data class EditSnippet(val snippetInfo: Sentence.SnippetInfo) : NavigateTo()
+        data class ReadFullText(val snippetInfo: Sentence.SnippetInfo) : NavigateTo()
     }
 
     object ClearTextSelection : ReadSentenceEffect()
