@@ -1,10 +1,5 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
-import android.graphics.Color
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
@@ -15,86 +10,20 @@ import com.eywa.projectlectito.features.readSentence.WordSelectMode
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
 import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
-import com.eywa.projectlectito.utils.androidWrappers.UnformattedClickableSpan
 import kotlinx.coroutines.Job
 
 data class ReadSentenceViewState(
-        val sentenceState: SentenceState = SentenceState.NoSentence,
-        val wordDefinitionState: WordDefinitionState = WordDefinitionState.NoWord,
-        val selectedWordState: SelectedWordState = SelectedWordState.SelectState(),
-        val isSelectModeMenuOpen: Boolean = false,
-        val isChoosingSnippetToEdit: Boolean = false,
-        val onSnippetToEditClicked: ((Sentence.SnippetInfo) -> Unit)? = null,
-        val parsedWordClickedListener: ((String, ParsedInfo) -> Unit)? = null,
+        val sentenceState: SentenceState = SentenceState.None,
+        val wordDefinitionState: WordDefinitionState = WordDefinitionState.None,
+        val wordSelectionState: WordSelectionState = WordSelectionState.SelectMode()
 ) {
-    fun isSentenceSelectable() = selectedWordState is SelectedWordState.SelectState || isChoosingSnippetToEdit
-
-    fun getSentence(): SpannableString? {
-        fun SpannableString.setAlternatingColourSpan(span: IntRange, index: Int, @ColorInt color: Int = Color.RED) =
-                index.takeIf { it % 2 == 1 }
-                        ?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
-
-        val validSentence = (sentenceState as? SentenceState.ValidSentence) ?: return null
-        val wordSelectMode = selectedWordState
-        val content = validSentence.sentence.currentSentence ?: return null
-
-        val spannableString = SpannableString(content)
-        if (isChoosingSnippetToEdit) {
-            /*
-             * Select a snippet from a sentence which spans multiple snippets
-             */
-            val snippets = validSentence.sentence.snippetsInCurrentSentence
-            snippets.forEachIndexed { index, snippetInfo ->
-                spannableString.setSpan(
-                        UnformattedClickableSpan {
-                            onSnippetToEditClicked?.invoke(snippetInfo)
-                        },
-                        snippetInfo.currentSentenceStartIndex,
-                        snippetInfo.currentSentenceEndIndex,
-                        SPAN_FLAGS
-                )
-                spannableString.setAlternatingColourSpan(
-                        snippetInfo.currentSentenceStartIndex..snippetInfo.currentSentenceEndIndex,
-                        index
-                )
-            }
-            return spannableString
-        }
-
-        if (wordSelectMode !is SelectedWordState.ParsedState || !sentenceState.isParseComplete) {
-            return spannableString
-        }
-
-        /*
-         * Select a word from a parsed sentence
-         */
-        validSentence.parsedInfo!!.forEachIndexed { index, parsedInfo ->
-            val spanStartIndex = parsedInfo.startCharacterIndex
-            val spanEndIndex = parsedInfo.endCharacterIndex
-
-            spannableString.setSpan(
-                    UnformattedClickableSpan {
-                        parsedWordClickedListener?.invoke(
-                                content.substring(spanStartIndex, spanEndIndex),
-                                parsedInfo
-                        )
-                    },
-                    spanStartIndex,
-                    spanEndIndex,
-                    SPAN_FLAGS
-            )
-            if (wordSelectMode.coloured) {
-                spannableString.setAlternatingColourSpan(spanStartIndex..spanEndIndex, index)
-            }
-        }
-
-        return spannableString
-    }
+    fun isSentenceSelectable() =
+            wordSelectionState is WordSelectionState.SelectMode && !wordSelectionState.isChangeWordSelectionModeMenuOpen
 
     sealed class SentenceState {
-        object NoSentence : SentenceState()
+        object None : SentenceState()
         object Error : SentenceState()
-        data class LoadingSentence(val sentenceJob: Job) : SentenceState() {
+        data class Loading(val sentenceJob: Job) : SentenceState() {
             override fun cleanUp() {
                 sentenceJob.cancel()
             }
@@ -102,14 +31,15 @@ data class ReadSentenceViewState(
             override fun isJobEqualTo(job: Job) = sentenceJob == job
         }
 
-        data class ValidSentence(
+        data class Valid(
                 val sentenceJob: Job,
                 val text: Text,
                 val currentCharacter: Int? = 0,
                 val snippets: List<TextSnippet>,
                 val previousSnippetCount: Int = 0,
                 val parsedInfo: List<ParsedInfo>? = null,
-                val parseError: Boolean = false
+                val parseError: Boolean = false,
+                val isChooseSnippetToEditMenuOpen: Boolean = false
         ) : SentenceState() {
             private val currentSnippet = snippets[previousSnippetCount]
             val sentence = Sentence(
@@ -136,58 +66,91 @@ data class ReadSentenceViewState(
 
         open fun cleanUp() = run { }
         open fun isJobEqualTo(job: Job) = false
-        fun asValidSentence() = getDataOrNull<ValidSentence>()
+        fun asValid() = getDataOrNull<Valid>()
     }
 
-    sealed class SelectedWordState(
+    sealed class WordSelectionState(
             val wordSelectMode: WordSelectMode,
             val wordToSearch: String?,
             @StringRes val nullWordSearchedMessage: Int? = null
     ) {
-        data class SelectState(
+        /**
+         * Defaults to false as changing word selection state should only happen while the menu is open.
+         * On changing to a new state, the menu should be closed.
+         */
+        abstract val isChangeWordSelectionModeMenuOpen: Boolean
+
+        data class SelectMode(
                 val selectedWord: String?,
                 val selectionStart: Int?,
-                val selectionEnd: Int?
-        ) : SelectedWordState(
+                val selectionEnd: Int?,
+                override val isChangeWordSelectionModeMenuOpen: Boolean = false
+        ) : WordSelectionState(
                 WordSelectMode.SELECT,
                 selectedWord,
                 R.string.read_sentence__simple_selected__submit_no_word_select
         ) {
             constructor() : this(null, null, null)
+
+            override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
+                return copy(
+                        isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
+                                ?: this.isChangeWordSelectionModeMenuOpen
+                )
+            }
         }
 
-        data class TypeState(val typedWord: String? = null) : SelectedWordState(
+        data class TypeMode(
+                val typedWord: String? = null,
+                override val isChangeWordSelectionModeMenuOpen: Boolean = false
+        ) : WordSelectionState(
                 WordSelectMode.TYPE,
                 typedWord,
                 R.string.read_sentence__simple_selected__submit_no_word_type
-        )
+        ) {
+            override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
+                return copy(
+                        isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
+                                ?: this.isChangeWordSelectionModeMenuOpen
+                )
+            }
+        }
 
-        data class ParsedState(
+        data class ParsedMode(
                 val originalWord: String?,
                 val parsedInfo: ParsedInfo?,
-                val coloured: Boolean
-        ) : SelectedWordState(if (!coloured) WordSelectMode.AUTO else WordSelectMode.AUTO_WITH_COLOUR, originalWord) {
+                val coloured: Boolean,
+                override val isChangeWordSelectionModeMenuOpen: Boolean = false
+        ) : WordSelectionState(if (!coloured) WordSelectMode.AUTO else WordSelectMode.AUTO_WITH_COLOUR, originalWord) {
             val dictionaryForm = parsedInfo?.dictionaryForm?.takeIf { it.isNotBlank() && it != originalWord }
             val partsOfSpeech = parsedInfo?.partsOfSpeech
                     ?.filterNot { pos -> pos.isBlank() || pos == "*" }
                     ?.takeIf { it.isNotEmpty() }
                     ?.joinToString(JAPANESE_LIST_DELIMINATOR)
             val pitchAccent = parsedInfo?.pitchAccentPattern?.toString()
+
+            override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
+                return copy(
+                        isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
+                                ?: this.isChangeWordSelectionModeMenuOpen
+                )
+            }
         }
 
-        fun getAsSelectState() = getDataOrNull<SelectState>()
-        fun getAsTypeState() = getDataOrNull<TypeState>()
-        fun getAsParsedState() = getDataOrNull<ParsedState>()
+        fun asSelectMode() = getDataOrNull<SelectMode>()
+        fun asTypeMode() = getDataOrNull<TypeMode>()
+        fun asParsedMode() = getDataOrNull<ParsedMode>()
+
+        abstract fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean? = null): WordSelectionState
     }
 
     sealed class WordDefinitionState {
-        // TODO loading and errors
+        object None : WordDefinitionState()
 
+        // TODO loading and errors
         object Error : WordDefinitionState()
 
-        object NoWord : WordDefinitionState()
-
-        data class LoadingWord(val requester: WordDefinitionRequester) : WordDefinitionState() {
+        data class Loading(val requester: WordDefinitionRequester) : WordDefinitionState() {
             override fun cancel() {
                 requester.cancelParse()
             }
@@ -209,7 +172,15 @@ data class ReadSentenceViewState(
                 definition.japanese
                         .takeIf { it.size > 1 }
                         ?.subList(1, definition.japanese.size)
-                        ?.joinToString(JAPANESE_LIST_DELIMINATOR) { "${it.word}[${it.reading}]" }
+                        ?.mapNotNull {
+                            when {
+                                !it.word.isNullOrBlank() && it.reading.isNotBlank() -> "${it.word}[${it.reading}]"
+                                it.word.isNullOrBlank() -> it.reading
+                                it.reading.isBlank() -> it.word
+                                else -> null
+                            }
+                        }
+                        ?.joinToString(JAPANESE_LIST_DELIMINATOR) { it }
             }
 
             fun getCurrentDefinition() = allDefinitions[currentIndex]
@@ -224,13 +195,12 @@ data class ReadSentenceViewState(
 
         open fun cancel() = run { }
 
-        fun getAsHasWord() = getDataOrNull<HasWord>()
-        fun getAsError() = getDataOrNull<Error>()
-        fun isNoneOrLoading() = (getDataOrNull<NoWord>() ?: getDataOrNull<LoadingWord>()) != null
+        fun asHasWord() = getDataOrNull<HasWord>()
+        fun asError() = getDataOrNull<Error>()
+        fun hasNoDefinition() = asHasWord() == null && asError() == null
     }
 
     companion object {
-        private const val SPAN_FLAGS = Spanned.SPAN_INCLUSIVE_EXCLUSIVE
         private inline fun <reified S> Any?.getDataOrNull(): S? {
             return this?.takeIf { it is S } as? S
         }

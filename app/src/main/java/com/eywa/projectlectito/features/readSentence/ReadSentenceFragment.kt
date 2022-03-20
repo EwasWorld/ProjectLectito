@@ -113,10 +113,15 @@ class ReadSentenceFragment : Fragment() {
             readSentenceMviViewModel.handle(SentenceIntent.OnEditSentenceClicked)
         }
         text_read_sentence__sentence.addSelectionChangedListener { selStart, selEnd ->
-            readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSpanSelected(selStart, selEnd))
+            readSentenceMviViewModel.handle(
+                    ReadSentenceIntent.SelectedWordIntent.OnSentenceTextSelected(
+                            selStart,
+                            selEnd
+                    )
+            )
         }
         overlay_read_sentence__select_mode.setOnClickListener {
-            readSentenceMviViewModel.handle(ReadSentenceIntent.OnWordSelectModeMenuStateChange(false))
+            readSentenceMviViewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnWordSelectModeMenuStateChange(false))
         }
         overlay_read_sentence__sentence.setOnClickListener {
             readSentenceMviViewModel.handle(SentenceIntent.OnEditOverlayClicked)

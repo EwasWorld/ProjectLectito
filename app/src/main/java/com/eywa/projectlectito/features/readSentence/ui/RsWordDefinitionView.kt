@@ -56,7 +56,7 @@ class RsWordDefinitionView : ConstraintLayout {
 
     private fun setupListeners() {
         viewModel.viewState.observe(layout.lifecycleOwner!!, { viewState ->
-            currentDefinition = viewState.wordDefinitionState.getAsHasWord()?.getCurrentDefinition()
+            currentDefinition = viewState.wordDefinitionState.asHasWord()?.getCurrentDefinition()
             displayDefinition()
         })
 

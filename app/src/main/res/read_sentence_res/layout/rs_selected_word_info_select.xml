@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState}"
+        app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asSelectMode}"
         >
 
         <TextView
@@ -31,14 +31,14 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
+            android:text="@{viewModel.viewState.wordSelectionState.asSelectMode.selectedWord}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_select__submit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asSelectMode.selectedWord}"
             tools:text="うまい"
             />
 
@@ -54,7 +54,7 @@
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_select__submit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asSelectState.selectedWord}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asSelectMode.selectedWord}"
             tools:visibility="gone"
             />
 

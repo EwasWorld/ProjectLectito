@@ -65,7 +65,7 @@
                     android:layout_marginEnd="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{viewModel.viewState.sentenceState.asValidSentence().getTextName}"
+                    android:text="@{viewModel.viewState.sentenceState.asValid().getTextName}"
                     android:textColor="@color/info_banner_text"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -80,7 +80,7 @@
                     android:id="@+id/text_read_sentence__chapter_page"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.viewState.sentenceState.asValidSentence().chapterPage}"
+                    android:text="@{viewModel.viewState.sentenceState.asValid().chapterPage}"
                     android:textColor="@color/info_banner_text"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -137,13 +137,13 @@
                 android:ellipsize="start"
                 android:maxLines="7"
                 android:singleLine="false"
-                android:text="@{viewModel.viewState.sentenceState.asValidSentence().previousSentence}"
+                android:text="@{viewModel.viewState.sentenceState.asValid().previousSentence}"
                 android:textColor="@color/general_text"
                 android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toTopOf="@id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValidSentence().previousSentence}"
+                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().previousSentence}"
                 tools:text="しかも、八人全てが美男美女という、僕のようなフノメンには居い地の悪い空間です。"
                 />
 
@@ -175,7 +175,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
                 app:tint="@color/success_green"
-                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValidSentence().parseComplete}"
+                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().parseComplete}"
                 />
 
             <ImageView
@@ -187,7 +187,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
                 app:tint="@color/warning_orange"
-                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValidSentence().parseFailed}"
+                app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().parseFailed}"
                 tools:visibility="gone"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -246,7 +246,7 @@
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__previous_sentence"
-            android:enabled="@{viewModel.viewState.sentenceState.asValidSentence().previousSentence}"
+            android:enabled="@{viewModel.viewState.sentenceState.asValid().previousSentence}"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_before"
             app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
@@ -262,7 +262,7 @@
             android:layout_margin="5dp"
             android:clickable="true"
             android:contentDescription="@string/read_sentence__next_sentence"
-            android:enabled="@{viewModel.viewState.sentenceState.asValidSentence().nextSentenceStart}"
+            android:enabled="@{viewModel.viewState.sentenceState.asValid().nextSentenceStart}"
             android:focusable="true"
             android:src="@drawable/ic_baseline_navigate_next"
             app:layout_constraintBottom_toBottomOf="@id/placeholder_read_sentence__select_mode"
@@ -282,7 +282,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             tools:visibility="gone"
             />
 
@@ -308,7 +308,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:overlay_color="@color/translucent_white_overlay"
             app:view_to_frame_id="@id/text_read_sentence__sentence"
-            app:visibleOrGone="@{viewModel.viewState.choosingSnippetToEdit}"
+            app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().chooseSnippetToEditMenuOpen}"
             tools:visibility="gone"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

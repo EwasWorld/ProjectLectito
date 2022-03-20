@@ -29,7 +29,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_auto_with_colour"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <TextView
@@ -41,7 +41,7 @@
             app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_auto"
             app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_auto"
             app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_auto"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <ImageButton
@@ -53,7 +53,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_select"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <TextView
@@ -65,7 +65,7 @@
             app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_auto_with_colour"
             app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_auto_with_colour"
             app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_auto_with_colour"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <ImageButton
@@ -77,7 +77,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_type"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <TextView
@@ -89,7 +89,7 @@
             app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_select"
             app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_select"
             app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_select"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <ImageButton
@@ -101,7 +101,7 @@
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <TextView
@@ -113,17 +113,17 @@
             app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_type"
             app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_type"
             app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_type"
-            app:visibleOrGone="@{viewModel.viewState.selectModeMenuOpen}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
         <!-- Content description set in code -->
         <ImageButton
             android:id="@+id/fab_read_sentence__select_mode_main"
             style="@style/FloatingActionButton"
-            android:contentDescription="@{viewModel.viewState.selectedWordState.wordSelectMode.iconDescriptionId}"
+            android:contentDescription="@{viewModel.viewState.wordSelectionState.wordSelectMode.iconDescriptionId}"
             android:focusable="true"
             android:focusableInTouchMode="false"
-            android:src="@{viewModel.viewState.selectedWordState.wordSelectMode.iconId}"
+            android:src="@{viewModel.viewState.wordSelectionState.wordSelectMode.iconId}"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

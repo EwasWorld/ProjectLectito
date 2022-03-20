@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asTypeState}"
+        app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asTypeMode}"
         >
 
         <EditText

@@ -18,17 +18,16 @@ sealed class ReadSentenceIntent {
     }
 
     sealed class SelectedWordIntent : ReadSentenceIntent() {
+        data class OnWordSelectModeMenuStateChange(val isOpen: Boolean) : SelectedWordIntent()
         data class OnWordSelectModeChanged(val wordSelectMode: WordSelectMode) : SelectedWordIntent()
-        data class OnSpanSelected(val start: Int, val end: Int) : SelectedWordIntent()
+        data class OnSentenceTextSelected(val start: Int, val end: Int) : SelectedWordIntent()
         data class OnSimpleWordSelected(val word: String?) : SelectedWordIntent()
-        object OnSubmit : SelectedWordIntent()
     }
-
-    data class OnWordSelectModeMenuStateChange(val isOpen: Boolean) : ReadSentenceIntent()
 
     sealed class WordDefinitionIntent : ReadSentenceIntent() {
         object OnPreviousPressed : WordDefinitionIntent()
         object OnNextPressed : WordDefinitionIntent()
         object OnClosePressed : WordDefinitionIntent()
+        object OnSubmit : WordDefinitionIntent()
     }
 }

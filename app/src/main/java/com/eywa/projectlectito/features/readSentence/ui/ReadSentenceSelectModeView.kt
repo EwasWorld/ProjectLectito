@@ -44,7 +44,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
         }
 
         fab_read_sentence__select_mode_main.setOnClickListener {
-            viewModel.handle(ReadSentenceIntent.OnWordSelectModeMenuStateChange(!isOpen))
+            viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnWordSelectModeMenuStateChange(!isOpen))
         }
 
         listOf(
@@ -84,7 +84,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
 
     private fun setupListeners() {
         viewModel.viewState.observe(layout.lifecycleOwner!!, {
-            val menuOpen = it.isSelectModeMenuOpen
+            val menuOpen = it.wordSelectionState.isChangeWordSelectionModeMenuOpen
             if (menuOpen == isOpen) return@observe
 
             isOpen = menuOpen

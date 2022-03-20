@@ -34,7 +34,7 @@
             android:background="@color/general_aux_background"
             android:gravity="center"
             android:paddingVertical="20dp"
-            android:text="@{viewModel.viewState.selectedWordState.wordSelectMode.noDefinitionStringId}"
+            android:text="@{viewModel.viewState.wordSelectionState.wordSelectMode.noDefinitionStringId}"
             android:textColor="@color/general_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +42,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread_inside"
-            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.noneOrLoading}"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.hasNoDefinition}"
             tools:text="No word selected.\nClick on a word to show its definition."
             tools:visibility="gone"
             />

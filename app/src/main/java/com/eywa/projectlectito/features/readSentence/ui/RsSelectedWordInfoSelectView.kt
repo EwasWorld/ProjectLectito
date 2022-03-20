@@ -48,7 +48,7 @@ class RsSelectedWordInfoSelectView : ConstraintLayout {
 
     private fun setupListeners() {
         button_read_sentence__selected_info_select__submit.setOnClickListener {
-            viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSubmit)
+            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnSubmit)
         }
     }
 }

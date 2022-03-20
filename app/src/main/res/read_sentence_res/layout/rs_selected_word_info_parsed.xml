@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState}"
+        app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode}"
         >
 
         <TextView
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.originalWord}"
             tools:visibility="gone"
             />
 
@@ -45,14 +45,14 @@
             android:id="@+id/text_read_sentence__selected_parsed_word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
+            android:text="@{viewModel.viewState.wordSelectionState.asParsedMode.originalWord}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__selected_separator_1"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.originalWord}"
             tools:text="うまい"
             />
 
@@ -66,7 +66,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__dictionary_form"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_parsed_word"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.dictionaryForm}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -75,13 +75,13 @@
             android:id="@+id/text_read_sentence__dictionary_form"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
+            android:text="@{viewModel.viewState.wordSelectionState.asParsedMode.dictionaryForm}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/space_read_sentence_1"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_1"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.dictionaryForm}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.dictionaryForm}"
             tools:text="うまく"
             />
 
@@ -92,20 +92,20 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__parts_of_speech"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__dictionary_form"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.originalWord}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.originalWord}"
             />
 
         <TextView
             android:id="@+id/text_read_sentence__parts_of_speech"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.viewState.selectedWordState.asParsedState.partsOfSpeech}"
+            android:text="@{viewModel.viewState.wordSelectionState.asParsedMode.partsOfSpeech}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__selected_separator_2"
             app:layout_constraintStart_toEndOf="@+id/space_read_sentence_1"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.partsOfSpeech}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.partsOfSpeech}"
             tools:text="動詞"
             />
 
@@ -119,7 +119,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/text_read_sentence__pitch_accent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__parts_of_speech"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.pitchAccent}"
             tools:ignore="HardcodedText"
             tools:visibility="visible"
             />
@@ -128,13 +128,13 @@
             android:id="@+id/text_read_sentence__pitch_accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
+            android:text="@{viewModel.viewState.wordSelectionState.asParsedMode.pitchAccent}"
             android:textColor="@color/info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_read_sentence__selected_separator_2"
-            app:visibleOrGone="@{viewModel.viewState.selectedWordState.asParsedState.pitchAccent}"
+            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.asParsedMode.pitchAccent}"
             tools:text="1"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

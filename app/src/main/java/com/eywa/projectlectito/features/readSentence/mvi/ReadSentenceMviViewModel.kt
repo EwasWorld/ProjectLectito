@@ -1,7 +1,12 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
 import android.app.Application
+import android.graphics.Color
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import androidx.annotation.ColorInt
 import androidx.lifecycle.*
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.app.App
@@ -16,6 +21,7 @@ import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.*
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionRequester
+import com.eywa.projectlectito.utils.androidWrappers.UnformattedClickableSpan
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
@@ -30,7 +36,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
      * causes issues with selection. Namely, when [viewState] is updated, it generates a new sentence that has no
      * selection, thus clearing the selection immediately.
      */
-    val currentSentence = viewState.map { it.getSentence() }.distinctUntilChanged()
+    val currentSentence = viewState.map { it.getSentenceSpannableString() }.distinctUntilChanged()
 
     @Inject
     lateinit var db: LectitoRoomDatabase
@@ -46,12 +52,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         val currentState = viewState.value ?: ReadSentenceViewState()
         when (action) {
             is SelectedWordIntent -> handleSelectedWordChange(currentState, action)
-            is OnWordSelectModeMenuStateChange -> {
-                if (action.isOpen) {
-                    viewEffect.postValue(ReadSentenceEffect.ClearTextSelection)
-                }
-                _viewState.postValue(currentState.copy(isSelectModeMenuOpen = action.isOpen))
-            }
             is WordDefinitionIntent -> handleWordDefinitionChange(currentState, action)
             is SentenceIntent -> handleSentenceChange(currentState, action)
         }
@@ -70,24 +70,35 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
             is Initialise -> setNewSentence(currentState, action.textId, action.currentSnippetId)
             OnNextSentenceClicked -> updateSentence(
                     currentState,
-                    currentState.sentenceState.asValidSentence()?.nextSentenceStart
+                    currentState.sentenceState.asValid()?.nextSentenceStart
             )
             OnPreviousSentenceClicked -> updateSentence(
                     currentState,
-                    currentState.sentenceState.asValidSentence()?.previousSentenceStart
+                    currentState.sentenceState.asValid()?.previousSentenceStart
             )
             OnEditSentenceClicked -> {
-                val snippets =
-                        currentState.sentenceState.asValidSentence()?.sentence?.snippetsInCurrentSentence ?: return
+                val validSentence = currentState.sentenceState.asValid()
+                val snippets = validSentence?.sentence?.snippetsInCurrentSentence ?: return
                 when (snippets.size) {
                     0 -> throw IllegalStateException("No snippets found")
                     1 -> viewEffect.postValue(ReadSentenceEffect.NavigateTo.EditSnippet(snippets[0]))
-                    else -> _viewState.postValue(currentState.copy(isChoosingSnippetToEdit = true))
+                    else -> _viewState.postValue(
+                            currentState.copy(sentenceState = validSentence.copy(isChooseSnippetToEditMenuOpen = true))
+                    )
                 }
             }
-            OnEditOverlayClicked -> _viewState.postValue(currentState.copy(isChoosingSnippetToEdit = false))
+            OnEditOverlayClicked -> {
+                val validSentence = currentState.sentenceState.asValid()
+                if (validSentence == null) {
+                    viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_text_to_edit))
+                    return
+                }
+                _viewState.postValue(
+                        currentState.copy(sentenceState = validSentence.copy(isChooseSnippetToEditMenuOpen = false))
+                )
+            }
             OnViewFullTextClicked -> {
-                val firstSnippet = currentState.sentenceState.asValidSentence()
+                val firstSnippet = currentState.sentenceState.asValid()
                         ?.sentence?.snippetsInCurrentSentence
                         ?.takeIf { it.isNotEmpty() }
                         ?.get(0)
@@ -99,7 +110,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
 
     private fun updateSentence(currentState: ReadSentenceViewState, newRef: Sentence.IndexInfo?) {
         val sentenceState = currentState.sentenceState
-        if (sentenceState !is SentenceState.ValidSentence || newRef == null) {
+        if (sentenceState !is SentenceState.Valid || newRef == null) {
             viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_sentences))
             return
         }
@@ -123,13 +134,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun setNewSentence(
-            currentState: ReadSentenceViewState,
+            initialState: ReadSentenceViewState,
             textId: Int,
             currentSnippetId: Int?
     ) {
-        val sentenceState = currentState.sentenceState
         val job = Job()
-        _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job)))
+        _viewState.postValue(initialState.copy(sentenceState = SentenceState.Loading(job)))
         job.launch {
             snippetsRepo.getSnippetInfo(
                     textId,
@@ -138,107 +148,96 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
             ).asFlow().collect {
                 if (!job.isActive) return@collect
 
-                if (it != null) {
-                    _viewState.postValue(
-                            currentState.copy(
-                                    sentenceState = SentenceState.ValidSentence(
-                                            sentenceJob = job,
-                                            snippets = it.snippets,
-                                            text = it.text,
-                                            currentCharacter = it.text.currentCharacterIndex ?: 0,
-                                            previousSnippetCount = it.prevSnippetsCount
-                                    ),
-                                    parsedWordClickedListener = { word, parsedInfo ->
-                                        onUpToDateState { upToDateState ->
-                                            val newState = upToDateState.copy(
-                                                    selectedWordState = SelectedWordState.ParsedState(
-                                                            word,
-                                                            parsedInfo,
-                                                            upToDateState.selectedWordState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
-                                                    )
-                                            )
-                                            _viewState.postValue(newState)
-
-                                            // supplementary symbol (number, punctuation, etc.)
-                                            val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
-                                            if (isWord) {
-                                                searchForWord(newState)
-                                            }
-                                        }
-                                    },
-                                    onSnippetToEditClicked = { snippetInfo ->
-                                        viewEffect.postValue(ReadSentenceEffect.NavigateTo.EditSnippet(snippetInfo))
-                                    }
-                            )
-                    )
-                }
-                else if (sentenceState is SentenceState.LoadingSentence
-                        || sentenceState is SentenceState.ValidSentence
-                ) {
-                    if (!sentenceState.isJobEqualTo(job)) {
+                onUpToDateState { currentState ->
+                    val sentenceState = currentState.sentenceState
+                    if (it != null) {
                         _viewState.postValue(
-                                _viewState.value!!.copy(sentenceState = SentenceState.LoadingSentence(job))
+                                currentState.copy(
+                                        sentenceState = SentenceState.Valid(
+                                                sentenceJob = job,
+                                                snippets = it.snippets,
+                                                text = it.text,
+                                                currentCharacter = it.text.currentCharacterIndex ?: 0,
+                                                previousSnippetCount = it.prevSnippetsCount
+                                        )
+                                )
                         )
                     }
-                }
-                else {
-                    // TODO Log/toast error
-                    _viewState.postValue(_viewState.value!!.copy(sentenceState = SentenceState.Error))
+                    else if (sentenceState is SentenceState.Loading || sentenceState is SentenceState.Valid) {
+                        if (!sentenceState.isJobEqualTo(job)) {
+                            _viewState.postValue(currentState.copy(sentenceState = SentenceState.Loading(job)))
+                        }
+                    }
+                    else {
+                        // TODO Log/toast error
+                        _viewState.postValue(currentState.copy(sentenceState = SentenceState.Error))
+                    }
                 }
             }
         }
 
         // Clean up old state
-        if (sentenceState.isJobEqualTo(job)) {
-            sentenceState.cleanUp()
+        if (initialState.sentenceState.isJobEqualTo(job)) {
+            initialState.sentenceState.cleanUp()
         }
     }
 
     private fun handleWordDefinitionChange(currentState: ReadSentenceViewState, action: WordDefinitionIntent) {
         val currentWordDefinitionState = currentState.wordDefinitionState
         when (action) {
-            WordDefinitionIntent.OnClosePressed -> updateWordDefinitionState(currentState, WordDefinitionState.NoWord)
+            WordDefinitionIntent.OnClosePressed -> updateWordDefinitionState(currentState, WordDefinitionState.None)
             WordDefinitionIntent.OnNextPressed -> {
-                currentWordDefinitionState.getAsHasWord()!!.nextEntry()
+                currentWordDefinitionState.asHasWord()!!.nextEntry()
                         ?.let { next -> updateWordDefinitionState(currentState, next) }
                         ?: run {
                             viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
                         }
             }
             WordDefinitionIntent.OnPreviousPressed -> {
-                currentWordDefinitionState.getAsHasWord()!!.previousEntry()
+                currentWordDefinitionState.asHasWord()!!.previousEntry()
                         ?.let { prev -> updateWordDefinitionState(currentState, prev) }
                         ?: run {
                             viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
                         }
             }
+            is WordDefinitionIntent.OnSubmit -> {
+                searchForWord(currentState)
+            }
         }
     }
 
     private fun handleSelectedWordChange(currentState: ReadSentenceViewState, action: SelectedWordIntent) {
-        val currentWordState = currentState.selectedWordState
+        val currentWordState = currentState.wordSelectionState
         when (action) {
+            is SelectedWordIntent.OnWordSelectModeMenuStateChange -> {
+                if (action.isOpen) {
+                    viewEffect.postValue(ReadSentenceEffect.ClearTextSelection)
+                }
+                _viewState.postValue(
+                        currentState.copy(
+                                wordSelectionState = currentState.wordSelectionState.copyAbstract(action.isOpen)
+                        )
+                )
+            }
             is SelectedWordIntent.OnWordSelectModeChanged -> {
                 val newWordSelectMode = action.wordSelectMode
 
                 var shouldStartParse = false
                 val newSelectedWordState =
                         if (newWordSelectMode == currentWordState.wordSelectMode) {
-                            currentWordState
+                            currentWordState.copyAbstract(false)
                         }
-                        else if (newWordSelectMode.isAuto && currentWordState is SelectedWordState.ParsedState) {
-                            currentWordState.copy(
-                                    coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
-                            )
+                        else if (newWordSelectMode.isAuto && currentWordState is WordSelectionState.ParsedMode) {
+                            currentWordState.copy(coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR)
                         }
                         else {
                             when (newWordSelectMode) {
-                                WordSelectMode.SELECT -> SelectedWordState.SelectState()
-                                WordSelectMode.TYPE -> SelectedWordState.TypeState()
+                                WordSelectMode.SELECT -> WordSelectionState.SelectMode()
+                                WordSelectMode.TYPE -> WordSelectionState.TypeMode()
                                 WordSelectMode.AUTO,
                                 WordSelectMode.AUTO_WITH_COLOUR -> {
                                     shouldStartParse = true
-                                    SelectedWordState.ParsedState(
+                                    WordSelectionState.ParsedMode(
                                             null,
                                             null,
                                             newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
@@ -246,32 +245,27 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                 }
                             }
                         }
-                _viewState.postValue(
-                        currentState.copy(
-                                selectedWordState = newSelectedWordState,
-                                isSelectModeMenuOpen = false
-                        )
-                )
+                _viewState.postValue(currentState.copy(wordSelectionState = newSelectedWordState))
                 if (shouldStartParse) {
-                    currentState.sentenceState.asValidSentence()?.let { startSentenceParse(currentState, it) }
+                    currentState.sentenceState.asValid()?.let { startSentenceParse(currentState, it) }
                 }
             }
             is SelectedWordIntent.OnSimpleWordSelected -> {
-                _viewState.postValue(currentState.copy(selectedWordState = SelectedWordState.TypeState(action.word)))
+                if (currentState.wordSelectionState !is WordSelectionState.TypeMode) return
+                _viewState.postValue(currentState.copy(wordSelectionState = WordSelectionState.TypeMode(action.word)))
             }
-            is SelectedWordIntent.OnSubmit -> {
-                searchForWord(currentState)
-            }
-            is SelectedWordIntent.OnSpanSelected -> {
-                currentWordState.getAsSelectState()?.takeIf {
+            is SelectedWordIntent.OnSentenceTextSelected -> {
+                currentWordState.asSelectMode()?.takeIf {
                     action.start != it.selectionStart || action.end != it.selectionEnd
                 } ?: return
 
-                val newSelection = currentState.getSentence()?.toString()?.substring(action.start, action.end)
-                        .takeIf { !it.isNullOrBlank() } ?: return
+                val currentSentence = currentState.getSentenceSpannableString()?.toString() ?: return
+                val start = action.start.takeIf { it in currentSentence.indices } ?: return
+                val end = action.end.takeIf { it in currentSentence.indices } ?: return
+                val newSelection = currentSentence.substring(start, end).takeIf { it.isNotBlank() } ?: return
                 _viewState.postValue(
                         currentState.copy(
-                                selectedWordState = SelectedWordState.SelectState(
+                                wordSelectionState = WordSelectionState.SelectMode(
                                         newSelection,
                                         action.start,
                                         action.end
@@ -282,12 +276,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    private fun startSentenceParse(currentState: ReadSentenceViewState, validSentence: SentenceState.ValidSentence) {
+    private fun startSentenceParse(currentState: ReadSentenceViewState, validSentence: SentenceState.Valid) {
         fun updateState(parsedInfo: List<ParsedInfo>?) {
             onUpToDateState { newState ->
-                val newValidSentence = newState.sentenceState.asValidSentence() ?: return@onUpToDateState
+                val newValidSentence = newState.sentenceState.asValid() ?: return@onUpToDateState
                 val actualSentence = newValidSentence.sentence.currentSentence
-                val expectedSentence = currentState.sentenceState.asValidSentence()?.sentence?.currentSentence
+                val expectedSentence = currentState.sentenceState.asValid()?.sentence?.currentSentence
                 if (actualSentence == expectedSentence) {
                     _viewState.postValue(
                             newState.copy(
@@ -326,11 +320,11 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun searchForWord(currentState: ReadSentenceViewState) {
-        val searchWord = currentState.selectedWordState.wordToSearch
+        val searchWord = currentState.wordSelectionState.wordToSearch
         if (searchWord.isNullOrBlank()) {
             viewEffect.postValue(
                     Toast.ResIdToast(
-                            currentState.selectedWordState.nullWordSearchedMessage
+                            currentState.wordSelectionState.nullWordSearchedMessage
                                     ?: throw IllegalStateException("No error message for null word")
                     )
             )
@@ -353,7 +347,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     updateWordDefinitionState(WordDefinitionState.Error)
                 }
         )
-        updateWordDefinitionState(WordDefinitionState.LoadingWord(requester))
+        updateWordDefinitionState(WordDefinitionState.Loading(requester))
         viewModelScope.launch {
             requester.getDefinition()
         }
@@ -376,6 +370,80 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         _viewState.postValue(currentState.copy(wordDefinitionState = wordDefinitionState))
     }
 
+    private fun ReadSentenceViewState.getSentenceSpannableString(): SpannableString? {
+        fun SpannableString.setAlternatingColourSpan(span: IntRange, index: Int, @ColorInt color: Int = Color.RED) =
+                index.takeIf { it % 2 == 1 }
+                        ?.let { setSpan(ForegroundColorSpan(color), span.first, span.last, SPAN_FLAGS) }
+
+        val validSentence = (sentenceState as? SentenceState.Valid) ?: return null
+        val wordSelectMode = wordSelectionState
+        val content = validSentence.sentence.currentSentence ?: return null
+
+        val spannableString = SpannableString(content)
+        if (sentenceState.isChooseSnippetToEditMenuOpen) {
+            /*
+             * Select a snippet from a sentence which spans multiple snippets
+             */
+            val snippets = validSentence.sentence.snippetsInCurrentSentence
+            snippets.forEachIndexed { index, snippetInfo ->
+                spannableString.setSpan(
+                        UnformattedClickableSpan {
+                            viewEffect.postValue(ReadSentenceEffect.NavigateTo.EditSnippet(snippetInfo))
+                        },
+                        snippetInfo.currentSentenceStartIndex,
+                        snippetInfo.currentSentenceEndIndex,
+                        SPAN_FLAGS
+                )
+                spannableString.setAlternatingColourSpan(
+                        snippetInfo.currentSentenceStartIndex..snippetInfo.currentSentenceEndIndex,
+                        index
+                )
+            }
+            return spannableString
+        }
+
+        if (wordSelectMode !is WordSelectionState.ParsedMode || !sentenceState.isParseComplete) {
+            return spannableString
+        }
+
+        /*
+         * Select a word from a parsed sentence
+         */
+        validSentence.parsedInfo!!.forEachIndexed { index, parsedInfo ->
+            val spanStartIndex = parsedInfo.startCharacterIndex
+            val spanEndIndex = parsedInfo.endCharacterIndex
+
+            spannableString.setSpan(
+                    UnformattedClickableSpan {
+                        onUpToDateState { upToDateState ->
+                            val newState = upToDateState.copy(
+                                    wordSelectionState = WordSelectionState.ParsedMode(
+                                            content.substring(spanStartIndex, spanEndIndex),
+                                            parsedInfo,
+                                            upToDateState.wordSelectionState.wordSelectMode == WordSelectMode.AUTO_WITH_COLOUR
+                                    )
+                            )
+                            _viewState.postValue(newState)
+
+                            // supplementary symbol (number, punctuation, etc.)
+                            val isWord = parsedInfo.partsOfSpeech[0] != "補助記号"
+                            if (isWord) {
+                                searchForWord(newState)
+                            }
+                        }
+                    },
+                    spanStartIndex,
+                    spanEndIndex,
+                    SPAN_FLAGS
+            )
+            if (wordSelectMode.coloured) {
+                spannableString.setAlternatingColourSpan(spanStartIndex..spanEndIndex, index)
+            }
+        }
+
+        return spannableString
+    }
+
     class ViewEffect {
         private var viewEffect: MutableLiveData<ReadSentenceEffect?> = MutableLiveData(null)
 
@@ -392,5 +460,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     companion object {
         private const val LOG_TAG = "ReadSentenceMviViewMode"
         private const val SURROUNDING_SNIPPETS_TO_RETRIEVE = 1
+        private const val SPAN_FLAGS = Spanned.SPAN_INCLUSIVE_EXCLUSIVE
     }
 }
