@@ -9,15 +9,42 @@ plugins {
     id "androidx.navigation.safeargs.kotlin"
 }
 
+ext.minimumSdkVersion = 21 // 2 digits
+ext.versionMajor = 0 // 2 digits
+ext.versionMinor = 0 // 2 digits
+ext.versionPatch = 1 // 2 digits
+ext.extraInfo = 0 // 1 digit (currently unused)
+ext.versionClassifier = null // Extra info to be appended to version name e.g. alpha (used for version name)
+ext.isSnapshot = false // Will append SNAPSHOT to version name
+
+@SuppressWarnings('GrMethodMayBeStatic')
+private Integer generateVersionCode() {
+    // There is one digit spare between min sdk and major version
+    return ext.minimumSdkVersion * 10000000 + ext.extraInfo * 1000000 + ext.versionMajor * 10000 + ext.versionMinor * 100 + ext.versionPatch
+}
+
+@SuppressWarnings('GrMethodMayBeStatic')
+private String generateVersionName() {
+    String versionName = "${ext.versionMajor}.${ext.versionMinor}.${ext.versionPatch}"
+    if (ext.versionClassifier == null && ext.isSnapshot) {
+        ext.versionClassifier = "SNAPSHOT"
+    }
+
+    if (ext.versionClassifier != null) {
+        versionName += "-" + ext.versionClassifier
+    }
+    return versionName
+}
+
 android {
     compileSdk 31
 
     defaultConfig {
         applicationId "com.eywa.projectlectito"
-        minSdk 21
+        minSdk project.ext.minimumSdkVersion
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode generateVersionCode()
+        versionName generateVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
