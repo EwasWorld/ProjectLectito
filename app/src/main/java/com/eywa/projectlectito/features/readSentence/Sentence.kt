@@ -110,7 +110,6 @@ class Sentence(
             var snippetEndIndex: Int?
     )
 
-    fun getCurrentSentenceStart() = currentSentenceStart.toIndexInfo()
     fun getNextSentenceStart() = nextSentenceStart?.toIndexInfo()
     fun getPreviousSentenceStart() = previousSentenceStart?.toIndexInfo()
 
@@ -165,7 +164,7 @@ class Sentence(
      * Searches backwards unless:
      * - [currentSentenceStart] is currently on a [sentenceStops]
      * - [currentSnippet] is empty
-     * - [currentSentenceStart] is larger than [currentSnippet.length]
+     * - [currentSentenceStart] is larger than [currentSnippet] length
      *
      * Throws an error if:
      * - [currentSentenceStart] != [CURRENT_SNIPPET_RELATIVE_ID]
@@ -181,6 +180,7 @@ class Sentence(
         val currentSnippetContent = currentSnippet?.content
         if (!currentSnippetContent.isNullOrBlank() && currentSentenceStart.startIndex < currentSnippetContent.length
                 && !sentenceStops.contains(currentSnippetContent[currentSentenceStart.startIndex])
+                && !ignoreCharacters.contains(currentSnippetContent[currentSentenceStart.startIndex])
         ) {
             currentSentenceStart =
                     findPreviousSentenceStart(currentSentenceStart.relativeSnippet, currentSentenceStart.startIndex)
@@ -434,10 +434,6 @@ class Sentence(
         if (parseJob.isActive || parseJob.isCompleted) {
             parseJob.cancel(CancellationException("New job created"))
         }
-    }
-
-    fun substring(start: Int, end: Int): String? {
-        return currentSentence?.substring(start, end)
     }
 
     private data class RelativeIndexInfo(val startIndex: Int, val relativeSnippet: Int)

@@ -151,17 +151,19 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 onUpToDateState { currentState ->
                     val sentenceState = currentState.sentenceState
                     if (it != null) {
-                        _viewState.postValue(
-                                currentState.copy(
-                                        sentenceState = SentenceState.Valid(
-                                                sentenceJob = job,
-                                                snippets = it.snippets,
-                                                text = it.text,
-                                                currentCharacter = it.text.currentCharacterIndex ?: 0,
-                                                previousSnippetCount = it.prevSnippetsCount
-                                        )
-                                )
+                        val newSentenceState = SentenceState.Valid(
+                                sentenceJob = job,
+                                snippets = it.snippets,
+                                text = it.text,
+                                currentCharacter = it.text.currentCharacterIndex ?: 0,
+                                previousSnippetCount = it.prevSnippetsCount
                         )
+                        _viewState.postValue(currentState.copy(sentenceState = newSentenceState))
+
+                        val initialSentence = initialState.sentenceState.asValid()?.sentence
+                        if (newSentenceState.sentence.currentSentence == initialSentence?.currentSentence) {
+                            Log.w(LOG_TAG, "Possible issue when moving to a new sentence")
+                        }
                     }
                     else if (sentenceState is SentenceState.Loading || sentenceState is SentenceState.Valid) {
                         if (!sentenceState.isJobEqualTo(job)) {
@@ -228,7 +230,10 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                             currentWordState.copyAbstract(false)
                         }
                         else if (newWordSelectMode.isAuto && currentWordState is WordSelectionState.ParsedMode) {
-                            currentWordState.copy(coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR)
+                            currentWordState.copy(
+                                    coloured = newWordSelectMode == WordSelectMode.AUTO_WITH_COLOUR,
+                                    isChangeWordSelectionModeMenuOpen = false
+                            )
                         }
                         else {
                             when (newWordSelectMode) {

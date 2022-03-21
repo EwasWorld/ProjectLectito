@@ -185,7 +185,7 @@ data class ReadSentenceViewState(
 
             fun getCurrentDefinition() = allDefinitions[currentIndex]
             override fun hasPreviousEntry() = currentIndex > 0
-            override fun hasNextEntry() = currentIndex != 0 && allDefinitions.size < currentIndex + 1
+            override fun hasNextEntry() = allDefinitions.size > currentIndex + 1
             fun nextEntry() = if (hasNextEntry()) copy(currentIndex = currentIndex + 1) else null
             fun previousEntry() = if (hasPreviousEntry()) copy(currentIndex = currentIndex - 1) else null
         }

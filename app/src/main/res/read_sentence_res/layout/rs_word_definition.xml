@@ -77,35 +77,38 @@
             app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord}"
             >
 
-            <TextView
-                android:id="@+id/text_read_sentence__reading"
+            <LinearLayout
+                android:id="@+id/layout_read_sentence__word_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
-                android:textColor="@color/general_text"
-                android:textSize="@dimen/small_text"
-                app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__word"
-                app:layout_constraintEnd_toEndOf="@id/text_read_sentence__word"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="@id/text_read_sentence__word"
+                android:orientation="vertical"
                 app:layout_constraintTop_toTopOf="parent"
-                app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
-                tools:text="ふつう"
-                />
-
-            <TextView
-                android:id="@+id/text_read_sentence__word"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.word}"
-                android:textColor="@color/general_text"
-                android:textSize="@dimen/large_text"
-                app:layout_constraintBottom_toTopOf="@+id/layout_read_sentence__english_definitions_scroll"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__reading"
-                tools:text="普通"
-                />
+                android:gravity="center"
+                >
+
+                <TextView
+                    android:id="@+id/text_read_sentence__reading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/small_text"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                    tools:text="ふつう"
+                    />
+
+                <TextView
+                    android:id="@+id/text_read_sentence__word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.word}"
+                    android:textColor="@color/general_text"
+                    android:textSize="@dimen/large_text"
+                    tools:text="普通"
+                    />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layout_read_sentence__jlpt_and_tags"
@@ -165,7 +168,7 @@
                 app:layout_constraintHeight_default="wrap"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__word"
+                app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__word_main"
                 >
 
                 <LinearLayout

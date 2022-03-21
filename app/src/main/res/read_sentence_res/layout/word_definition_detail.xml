@@ -60,6 +60,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/general_text"
         android:textSize="@dimen/small_text"
+        android:textStyle="italic"
         app:layout_constraintStart_toEndOf="@+id/text_definition_detail__index_separator"
         app:layout_constraintTop_toBottomOf="@id/text_definition_detail__definition"
         tools:text="Usually written using kana alone"

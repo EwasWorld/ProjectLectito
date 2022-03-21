@@ -12,9 +12,7 @@ class SentenceUnitTests {
     fun `test current sentence - simple`() {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえおかきくけこたちつてとさしすせそはひふへほ", 1, 1),
-                0,
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                0
         )
         Assert.assertEquals("あいうえおかきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -25,9 +23,7 @@ class SentenceUnitTests {
     fun `test current sentence - simple mid-sentence start`() {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえおかきくけこたちつてとさしすせそはひふへほ", 1, 1),
-                5,
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                5
         )
         Assert.assertEquals("あいうえおかきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -38,9 +34,7 @@ class SentenceUnitTests {
     fun `test current sentence - current on break char`() {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえおかきくけこ\n\n。たちつてとさしすせそはひふへほ", 1, 1),
-                10,
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                10
         )
         Assert.assertEquals("たちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals("あいうえおかきくけこ。", sentence.previousSentence)
@@ -52,9 +46,7 @@ class SentenceUnitTests {
         Assert.assertThrows(IllegalArgumentException::class.java) {
             Sentence(
                     TextSnippet(1, "あいうえおかきくけこ\n\n。", 1, 1),
-                    11,
-                    parserSuccessCallback = {},
-                    parserFailCallback = {}
+                    11
             )
         }
     }
@@ -65,9 +57,7 @@ class SentenceUnitTests {
             Sentence(
                     TextSnippet(1, "あいうえおかきくけこ\n\n。", 1, 1),
                     11,
-                    nextSnippets = listOf(TextSnippet(2, "たちつてとさしすせそはひふへほ", 1, 2)),
-                    parserSuccessCallback = {},
-                    parserFailCallback = {}
+                    nextSnippets = listOf(TextSnippet(2, "たちつてとさしすせそはひふへほ", 1, 2))
             )
         }
     }
@@ -76,9 +66,7 @@ class SentenceUnitTests {
     fun `test current sentence - up to first break`() {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお\n。かきくけこたちつてとさしすせそはひふへほ", 1, 1),
-                0,
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                0
         )
         Assert.assertEquals("あいうえお。", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -90,9 +78,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお。", 1, 1),
                 0,
-                nextSnippets = listOf(TextSnippet(2, "かきくけこたちつてとさしすせそはひふへほ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                nextSnippets = listOf(TextSnippet(2, "かきくけこたちつてとさしすせそはひふへほ", 1, 2))
         )
         Assert.assertEquals("あいうえお。", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -104,9 +90,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお", 1, 1),
                 0,
-                nextSnippets = listOf(TextSnippet(2, "。かきくけこたちつてとさしすせそはひふへほ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                nextSnippets = listOf(TextSnippet(2, "。かきくけこたちつてとさしすせそはひふへほ", 1, 2))
         )
         Assert.assertEquals("あいうえお。", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -118,9 +102,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお\n", 1, 1),
                 0,
-                nextSnippets = listOf(TextSnippet(2, "かきくけこたちつてとさしすせそはひふへほ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                nextSnippets = listOf(TextSnippet(2, "かきくけこたちつてとさしすせそはひふへほ", 1, 2))
         )
         Assert.assertEquals("あいうえおかきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -132,9 +114,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお", 1, 1),
                 0,
-                nextSnippets = listOf(TextSnippet(2, "かきくけこ\nたちつてとさしすせそはひふへほ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                nextSnippets = listOf(TextSnippet(2, "かきくけこ\nたちつてとさしすせそはひふへほ", 1, 2))
         )
         Assert.assertEquals("あいうえおかきくけこ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -146,9 +126,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "たちつてとさしすせそはひふへほ", 1, 1),
                 0,
-                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ", 1, 2))
         )
         Assert.assertEquals("あいうえおかきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -160,9 +138,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "たちつてとさしすせそはひふへほ", 1, 1),
                 0,
-                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ。", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ。", 1, 2))
         )
         Assert.assertEquals("たちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals("あいうえおかきくけこ。", sentence.previousSentence)
@@ -174,9 +150,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "たちつてとさしすせそはひふへほ", 1, 1),
                 0,
-                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ\n  \n  ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                previousSnippets = listOf(TextSnippet(2, "あいうえおかきくけこ\n  \n  ", 1, 2))
         )
         Assert.assertEquals("あいうえおかきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals(null, sentence.previousSentence)
@@ -188,9 +162,7 @@ class SentenceUnitTests {
         val sentence = Sentence(
                 TextSnippet(1, "たちつてとさしすせそはひふへほ", 1, 1),
                 0,
-                previousSnippets = listOf(TextSnippet(2, "あいうえお。かきくけこ", 1, 2)),
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                previousSnippets = listOf(TextSnippet(2, "あいうえお。かきくけこ", 1, 2))
         )
         Assert.assertEquals("かきくけこたちつてとさしすせそはひふへほ", sentence.currentSentence)
         Assert.assertEquals("あいうえお。", sentence.previousSentence)
@@ -198,16 +170,25 @@ class SentenceUnitTests {
     }
 
     @Test
-    fun `test current sentence - starts with ignore character`() {
+    fun `test current sentence - hard stop and next sentence starts with ignore character`() {
         val sentence = Sentence(
                 TextSnippet(1, "あいうえお。\n「かきくけこ」", 1, 1),
-                6,
-                parserSuccessCallback = {},
-                parserFailCallback = {}
+                6
         )
         Assert.assertEquals("「かきくけこ」", sentence.currentSentence)
         Assert.assertEquals("あいうえお。", sentence.previousSentence)
         Assert.assertEquals(null, sentence.getNextSentenceStart())
+    }
+
+    @Test
+    fun `test current sentence - soft stop and next sentence starts on an ignore character`() {
+        val sentence = Sentence(
+                TextSnippet(1, "あいうえお\n「かきくけこ」\n。\nたちつてと", 1, 1),
+                6
+        )
+        Assert.assertEquals("「かきくけこ」。", sentence.currentSentence)
+        Assert.assertEquals("あいうえお", sentence.previousSentence)
+        Assert.assertEquals(Sentence.IndexInfo(16, 1), sentence.getNextSentenceStart())
     }
 
     @Suppress("unused")
@@ -218,12 +199,7 @@ class SentenceUnitTests {
             var currentChar: Int? = 0
 
             while (currentChar != null && currentChar >= 0 && currentChar < content.length) {
-                val sentence = Sentence(
-                        snippet,
-                        currentChar,
-                        parserFailCallback = {},
-                        parserSuccessCallback = {}
-                )
+                val sentence = Sentence(snippet, currentChar)
                 println(sentence.currentSentence)
                 currentChar = sentence.getNextSentenceStart()?.startIndex
             }

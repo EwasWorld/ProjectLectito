@@ -76,7 +76,7 @@ class WordDefinitionRequester(
 
     fun cancelParse() {
         // TODO CLEANUP Do I need this guard?
-        if (requestWordDefinitionJob.isActive || requestWordDefinitionJob.isCompleted) {
+        if (requestWordDefinitionJob.isActive) {
             requestWordDefinitionJob.cancel(CancellationException("New job created"))
         }
     }
