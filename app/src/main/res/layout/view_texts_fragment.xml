@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/general_background"
+    android:background="?general_background"
     >
 
     <androidx.recyclerview.widget.RecyclerView
@@ -18,7 +18,7 @@
         tools:listitem="@layout/view_texts_list_item"
         />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/button_vt__add_text"
         style="@style/FloatingActionButton"
         android:layout_marginEnd="25dp"

@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:gravity="end|center_vertical"
             android:text="@string/add_snippet__page"
-            android:textColor="@color/general_text"
+            android:textColor="?general_text"
             android:textSize="@dimen/medium_text"
             />
 
@@ -37,7 +37,7 @@
             android:gravity="start|center_vertical"
             android:importantForAutofill="no"
             android:inputType="numberSigned"
-            android:textColor="@color/general_text"
+            android:textColor="?general_text"
             tools:hint="1"
             tools:ignore="LabelFor"
             />
@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="@color/warning_red"
+        android:textColor="?warning_red"
         android:textSize="@dimen/small_text"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

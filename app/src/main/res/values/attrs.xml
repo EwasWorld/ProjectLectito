@@ -16,4 +16,37 @@
         <attr name="view_to_frame_id" format="reference" />
         <attr name="overlay_color" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="AppColors">
+        <attr name="general_background" format="color" />
+        <attr name="general_aux_background" format="color" />
+        <attr name="general_text" format="color" />
+        <attr name="general_text_light" format="color" />
+
+        <attr name="success_green" format="color" />
+        <attr name="warning_orange" format="color" />
+        <attr name="warning_red" format="color" />
+
+        <attr name="edit_text_text_colour" format="color" />
+        <attr name="edit_text_selected_stroke" format="color" />
+        <attr name="edit_text_stroke" format="color" />
+        <attr name="edit_text_fill" format="color" />
+
+        <attr name="general_button_background" format="color" />
+        <attr name="general_button_text" format="color" />
+        <attr name="alert_dialog_primary_button" format="color" />
+
+        <attr name="fab_background" format="color" />
+        <attr name="fab_tint" format="color" />
+        <attr name="fab_disabled_tint" format="color" />
+        <attr name="fab_mini_background" format="color" />
+        <attr name="fab_mini_tint" format="color" />
+
+        <attr name="db_text_info_banner_background" format="color" />
+        <attr name="snippet_info_banner_background" format="color" />
+        <attr name="rs_selected_word_info_banner_background" format="color" />
+        <attr name="info_banner_text" format="color" />
+
+        <attr name="translucent_overlay" format="color" />
+    </declare-styleable>
 </resources>

@@ -16,7 +16,7 @@
         android:id="@+id/layout_rs_selected_word_info_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/rs_selected_word_info_banner_background"
+        android:background="?rs_selected_word_info_banner_background"
         android:paddingStart="20dp"
         android:paddingEnd="15dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,7 +32,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{viewModel.viewState.wordSelectionState.asSelectMode.selectedWord}"
-            android:textColor="@color/info_banner_text"
+            android:textColor="?info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_select__submit"
@@ -47,7 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/read_sentence__select_word_hint"
-            android:textColor="@color/info_banner_text"
+            android:textColor="?info_banner_text"
             android:textSize="@dimen/small_text"
             app:invertVisibility="@{true}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +68,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/info_banner_text"
+            app:tint="?info_banner_text"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

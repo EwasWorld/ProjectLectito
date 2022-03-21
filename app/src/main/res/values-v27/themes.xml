@@ -1,0 +1,10 @@
+<resources>
+
+    <style name="Theme.ProjectLectito" parent="BaseTheme">
+        <item name="android:statusBarColor">?attr/general_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:navigationBarColor">?attr/general_background</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

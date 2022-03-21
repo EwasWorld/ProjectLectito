@@ -3,21 +3,21 @@
 
     <style name="FloatingActionButton" parent="android:Widget.Material.Button">
         <item name="android:background">@drawable/fab_background</item>
-        <item name="android:backgroundTint">@color/fab_background</item>
-        <item name="android:tint">@color/fab_tint</item>
+        <item name="android:backgroundTint">?fab_background</item>
+        <item name="android:tint">@color/fab_tint_states</item>
         <item name="android:layout_width">56dp</item>
         <item name="android:layout_height">56dp</item>
     </style>
 
     <style name="GeneralButton">
         <item name="android:backgroundTintMode">src_over</item>
-        <item name="android:backgroundTint">@color/general_button_background</item>
-        <item name="android:textColor">@color/general_button_text</item>
+        <item name="android:backgroundTint">?general_button_background</item>
+        <item name="android:textColor">?general_button_text</item>
     </style>
 
     <style name="FloatingActionButton.Mini" parent="FloatingActionButton">
-        <item name="android:tint">@color/fab_mini_tint</item>
-        <item name="android:backgroundTint">@color/fab_mini_background</item>
+        <item name="android:tint">?fab_mini_tint</item>
+        <item name="android:backgroundTint">?fab_mini_background</item>
         <item name="android:layout_width">40dp</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:padding">200dp</item>
@@ -33,6 +33,23 @@
         <item name="android:paddingStart">10dp</item>
         <item name="android:paddingEnd">10dp</item>
         <item name="android:elevation">5dp</item>
-        <item name="android:textColor">@color/general_text</item>
+        <item name="android:textColor">?general_text</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?general_text_light</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?alert_dialog_primary_button</item>
+    </style>
+
+    <style name="TranslucentOverlayAlpha">
+        <item name="android:alpha">0.7</item>
     </style>
 </resources>

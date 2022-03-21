@@ -1,0 +1,15 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.ProjectLectito" parent="BaseTheme">
+        <!-- Customize your theme here. -->
+        <item name="general_background">#191919</item>
+        <item name="general_aux_background">#2C2C2C</item>
+        <item name="general_text">#D1D1D1</item>
+        <item name="general_text_light">#919191</item>
+
+        <item name="fab_background">#043E27</item>
+        <item name="fab_tint">?general_text</item>
+        <item name="fab_mini_background">#052719</item>
+        <item name="fab_mini_tint">#127A51</item>
+    </style>
+</resources>

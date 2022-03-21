@@ -10,33 +10,4 @@
     <color name="black">#FF000000</color>
     <color name="grey_1">#6A6A6A</color>
     <color name="white">#FFFFFFFF</color>
-
-    <color name="general_background">#FFFFFF</color>
-    <color name="general_aux_background">#D6D6D6</color>
-    <color name="general_text">#6A6A6A</color>
-
-    <color name="success_green">#4CAF50</color>
-    <color name="warning_orange">#FF9800</color>
-    <color name="warning_red">#FF5722</color>
-
-    <color name="edit_text_text_colour">@color/general_text</color>
-    <color name="edit_text_selected_stroke">#97BFCF</color>
-    <color name="edit_text_stroke">#CBE5EF</color>
-    <color name="edit_text_fill">#FAFAFA</color>
-
-    <color name="general_button_background">@color/purple_700</color>
-    <color name="general_button_text">@color/white</color>
-
-    <color name="fab_background">@color/teal_200</color>
-    <color name="fab_tint">@color/black</color>
-    <color name="fab_mini_background">@color/teal_light</color>
-    <color name="fab_mini_tint">@color/teal_700_low_alpha</color>
-
-    <color name="db_text_info_banner_background">#DECFFF</color>
-    <color name="snippet_info_banner_background">#D8FFCF</color>
-    <color name="rs_selected_word_info_banner_background">#CFE5FF</color>
-    <color name="info_banner_text">@color/general_text</color>
-
-    <color name="translucent_white_overlay">#B3FFFFFF</color>
-
 </resources>

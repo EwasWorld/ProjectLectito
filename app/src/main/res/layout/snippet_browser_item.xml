@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="3dp"
-    android:background="@color/snippet_info_banner_background"
+    android:background="?snippet_info_banner_background"
     android:paddingHorizontal="20dp"
     android:paddingVertical="5dp"
     >
@@ -14,7 +14,7 @@
         android:id="@+id/text_sbi__chapter_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/info_banner_text"
+        android:textColor="?info_banner_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

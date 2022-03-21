@@ -15,7 +15,7 @@
         android:hint="@string/add_texts__name_hint"
         android:importantForAutofill="no"
         android:inputType="text"
-        android:textColor="@color/general_text"
+        android:textColor="?general_text"
         android:textSize="@dimen/medium_text"
         tools:text="@tools:sample/lorem/random"
         />

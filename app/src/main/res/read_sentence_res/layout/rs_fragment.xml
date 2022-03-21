@@ -16,7 +16,7 @@
         android:id="@+id/layout_read_sentence__top_level_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/general_background"
+        android:background="?general_background"
         >
 
         <com.eywa.projectlectito.features.readSentence.ui.RsWordDefinitionView
@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:background="@color/db_text_info_banner_background"
+                android:background="?db_text_info_banner_background"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -66,7 +66,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="@{viewModel.viewState.sentenceState.asValid().getTextName}"
-                    android:textColor="@color/info_banner_text"
+                    android:textColor="?info_banner_text"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__chapter_page"
@@ -81,7 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{viewModel.viewState.sentenceState.asValid().chapterPage}"
-                    android:textColor="@color/info_banner_text"
+                    android:textColor="?info_banner_text"
                     android:textSize="@dimen/small_text"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +138,7 @@
                 android:maxLines="7"
                 android:singleLine="false"
                 android:text="@{viewModel.viewState.sentenceState.asValid().previousSentence}"
-                android:textColor="@color/general_text"
+                android:textColor="?general_text"
                 android:textSize="@dimen/small_text"
                 app:layout_constraintBottom_toTopOf="@id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -155,7 +155,7 @@
                 android:layout_marginVertical="5dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="15dp"
-                android:textColor="@color/general_text"
+                android:textColor="?general_text"
                 android:textIsSelectable="@{viewModel.viewState.sentenceSelectable}"
                 android:textSize="@dimen/large_text"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -174,7 +174,7 @@
                 android:src="@drawable/ic_check"
                 app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
-                app:tint="@color/success_green"
+                app:tint="?success_green"
                 app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().parseComplete}"
                 />
 
@@ -186,7 +186,7 @@
                 android:src="@drawable/ic_warning_triangle_filled"
                 app:layout_constraintBottom_toBottomOf="@+id/text_read_sentence__sentence"
                 app:layout_constraintEnd_toEndOf="@+id/text_read_sentence__sentence"
-                app:tint="@color/warning_orange"
+                app:tint="?warning_orange"
                 app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().parseFailed}"
                 tools:visibility="gone"
                 />
@@ -209,7 +209,7 @@
             tools:visibility="visible"
             />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/button_read_sentence__full_text"
             style="@style/FloatingActionButton"
             android:layout_margin="5dp"
@@ -224,7 +224,7 @@
             app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
             />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/button_read_sentence__edit_sentence"
             style="@style/FloatingActionButton"
             android:layout_margin="5dp"
@@ -240,7 +240,7 @@
             app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
             />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/button_read_sentence__previous_sentence"
             style="@style/FloatingActionButton"
             android:layout_margin="5dp"
@@ -256,7 +256,7 @@
             app:layout_constraintTop_toTopOf="@id/placeholder_read_sentence__select_mode"
             />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/button_read_sentence__next_sentence"
             style="@style/FloatingActionButton"
             android:layout_margin="5dp"
@@ -274,9 +274,10 @@
 
         <View
             android:id="@+id/overlay_read_sentence__select_mode"
+            style="@style/TranslucentOverlayAlpha"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/translucent_white_overlay"
+            android:background="?general_background"
             android:elevation="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -299,6 +300,7 @@
 
         <com.eywa.projectlectito.features.readSentence.ui.HighlightOverlayView
             android:id="@+id/overlay_read_sentence__sentence"
+            style="@style/TranslucentOverlayAlpha"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="10dp"
@@ -306,7 +308,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:overlay_color="@color/translucent_white_overlay"
+            app:overlay_color="?general_background"
             app:view_to_frame_id="@id/text_read_sentence__sentence"
             app:visibleOrGone="@{viewModel.viewState.sentenceState.asValid().chooseSnippetToEditMenuOpen}"
             tools:visibility="gone"

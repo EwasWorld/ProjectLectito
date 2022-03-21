@@ -16,7 +16,7 @@
         android:id="@+id/layout_rs_selected_word_info_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/rs_selected_word_info_banner_background"
+        android:background="?rs_selected_word_info_banner_background"
         android:paddingStart="20dp"
         android:paddingEnd="15dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,7 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
-            android:textColor="@color/info_banner_text"
+            android:textColor="?info_banner_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_read_sentence__selected_info_type__submit"
@@ -54,7 +54,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/info_banner_text"
+            app:tint="?info_banner_text"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
