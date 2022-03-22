@@ -6,13 +6,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.ColorRes
+import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
 import com.eywa.projectlectito.utils.asVisibility
-import com.eywa.projectlectito.utils.getColorByTheme
+import com.eywa.projectlectito.utils.getColor
 
 class AddSnippetDetail : ConstraintLayout {
     private lateinit var valueEditText: EditText
@@ -75,19 +75,13 @@ class AddSnippetDetail : ConstraintLayout {
 
             errorTextView.visibility = (errors != null).asVisibility()
             valueEditText.setTextColor(
-                    resources.getColorByTheme(
+                    context.theme.getColor(
                             errors?.level.let { level ->
                                 if (level == Validator.ErrorLevel.ERROR) level.color else R.attr.general_text
-                            },
-                            context.theme
+                            }
                     )
             )
-            errorTextView.setTextColor(
-                    resources.getColorByTheme(
-                            (errors?.level ?: Validator.ErrorLevel.ERROR).color,
-                            context.theme
-                    )
-            )
+            errorTextView.setTextColor(context.theme.getColor((errors?.level ?: Validator.ErrorLevel.ERROR).color))
             errorTextView.text = errors?.getMessage(resources)
         }
     }
@@ -112,7 +106,7 @@ class AddSnippetDetail : ConstraintLayout {
             }
         }
 
-        enum class ErrorLevel(@ColorRes val color: Int) {
+        enum class ErrorLevel(@AttrRes val color: Int) {
             ERROR(R.attr.warning_red),
             WARNING(R.attr.warning_orange)
         }

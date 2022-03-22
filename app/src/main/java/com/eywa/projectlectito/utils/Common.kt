@@ -1,8 +1,12 @@
 package com.eywa.projectlectito.utils
 
 import android.content.res.Resources
+import android.util.TypedValue
 import android.view.View
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
 import androidx.core.content.res.ResourcesCompat
+
 
 fun Boolean.asVisibility(invisibleInsteadOfGone: Boolean = false) = when {
     this -> View.VISIBLE
@@ -21,13 +25,19 @@ fun <T> List<T>.replaceElementAt(index: Int, newItem: T): List<T> {
             ?: listOf(newItem)
 }
 
-fun Resources.getColorByTheme(colourResourceId: Int, theme: Resources.Theme): Int {
+fun Resources.getColorByTheme(@ColorRes colourResourceId: Int, theme: Resources.Theme): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
         this.getColor(colourResourceId, theme)
     }
     else {
         ResourcesCompat.getColor(this, colourResourceId, theme)
     }
+}
+
+fun Resources.Theme.getColor(@AttrRes colourResourceId: Int): Int {
+    val typedValue = TypedValue()
+    resolveAttribute(colourResourceId, typedValue, true)
+    return typedValue.data
 }
 
 const val JAPANESE_LIST_DELIMINATOR = "・"

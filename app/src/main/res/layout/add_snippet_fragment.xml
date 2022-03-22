@@ -61,7 +61,7 @@
         android:fillViewport="true"
         android:paddingHorizontal="20dp"
         android:paddingVertical="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/button_add_snippet__submit"
+        app:layout_constraintBottom_toTopOf="@+id/text_add_snippet__content_warning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +107,6 @@
         app:layout_constraintEnd_toStartOf="@id/button_add_snippet__submit_and_another"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scroll_add_snippet__content"
         />
 
     <Button
