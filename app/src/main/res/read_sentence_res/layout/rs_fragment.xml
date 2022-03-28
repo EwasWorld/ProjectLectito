@@ -90,21 +90,8 @@
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoSelectView
-                android:id="@+id/layout_read_sentence__selected_word_info_select"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="10dp"
-                app:layout_constraintBottom_toTopOf="@id/text_read_sentence__context"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__text_info"
-                tools:visibility="gone"
-                />
-
-            <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoTypeView
-                android:id="@+id/layout_read_sentence__selected_word_info_type"
+            <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoManualView
+                android:id="@+id/layout_read_sentence__selected_word_info_manual"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"

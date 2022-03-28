@@ -13,7 +13,7 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsFragmentBinding
 import com.eywa.projectlectito.features.editSnippet.EditSnippetFragment
 import com.eywa.projectlectito.features.readFullText.ReadFullTextFragment
-import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceEffect.*
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.SentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
@@ -59,21 +59,20 @@ class ReadSentenceFragment : Fragment() {
         binding.viewModel = readSentenceMviViewModel
         layout_read_sentence__word_definition.setLifecycleInfo(this, this)
 
-        layout_read_sentence__selected_word_info_select.setLifecycleInfo(this, this)
-        layout_read_sentence__selected_word_info_type.setLifecycleInfo(this, this)
+        layout_read_sentence__selected_word_info_manual.setLifecycleInfo(this, this)
         layout_read_sentence__selected_word_info_parsed.setLifecycleInfo(this, this)
         button_read_sentence__select_mode.setLifecycleInfo(this, this)
 
         readSentenceMviViewModel.viewEffect.getViewEffect().observe(viewLifecycleOwner, { effect ->
             when (effect) {
-                is ReadSentenceEffect.Toast -> ToastSpamPrevention.displayToast(
+                is Toast -> ToastSpamPrevention.displayToast(
                         requireContext(),
                         effect.getMessage(requireContext())
                 )
-                ReadSentenceEffect.ClearTextSelection -> text_read_sentence__sentence.clearFocus()
+                ClearTextSelection -> text_read_sentence__sentence.clearFocus()
                 null -> {
                 }
-                is ReadSentenceEffect.NavigateTo.EditSnippet -> {
+                is NavigateTo.EditSnippet -> {
                     EditSnippetFragment.navigateTo(
                             findNavController(),
                             effect.snippetInfo.snippetId,
@@ -81,7 +80,7 @@ class ReadSentenceFragment : Fragment() {
                             effect.snippetInfo.snippetEndIndex
                     )
                 }
-                is ReadSentenceEffect.NavigateTo.ReadFullText -> {
+                is NavigateTo.ReadFullText -> {
                     ReadFullTextFragment.navigateTo(
                             findNavController(),
                             args.textId,

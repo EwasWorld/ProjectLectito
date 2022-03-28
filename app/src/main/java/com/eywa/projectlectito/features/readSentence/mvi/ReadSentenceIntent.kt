@@ -21,7 +21,7 @@ sealed class ReadSentenceIntent {
         data class OnWordSelectModeMenuStateChange(val isOpen: Boolean) : SelectedWordIntent()
         data class OnWordSelectModeChanged(val wordSelectMode: WordSelectMode) : SelectedWordIntent()
         data class OnSentenceTextSelected(val start: Int, val end: Int) : SelectedWordIntent()
-        data class OnSimpleWordSelected(val word: String?) : SelectedWordIntent()
+        data class OnSimpleWordTyped(val word: String?) : SelectedWordIntent()
     }
 
     sealed class WordDefinitionIntent : ReadSentenceIntent() {

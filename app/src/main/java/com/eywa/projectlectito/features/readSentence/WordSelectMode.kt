@@ -20,16 +20,10 @@ enum class WordSelectMode(
             R.string.read_sentence__no_definition_auto,
             true
     ),
-    SELECT(
+    MANUAL(
             R.drawable.ic_touch,
-            R.string.read_sentence__select_mode_select,
-            R.string.read_sentence__no_definition_select,
-            false
-    ),
-    TYPE(
-            R.drawable.ic_text_fields,
-            R.string.read_sentence__select_mode_type,
-            R.string.read_sentence__no_definition_type,
+            R.string.read_sentence__select_mode_manual,
+            R.string.read_sentence__no_definition_manual,
             false
     )
 }

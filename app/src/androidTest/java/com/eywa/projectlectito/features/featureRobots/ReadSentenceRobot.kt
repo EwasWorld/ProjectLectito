@@ -29,11 +29,11 @@ class ReadSentenceRobot : Robot() {
     }
 
     fun setSelectModeSelect() {
-        changeWordSelectionMode(R.id.fab_read_sentence__select_mode_select)
+        changeWordSelectionMode(R.id.fab_read_sentence__select_mode_manual)
     }
 
     fun setSelectModeType() {
-        changeWordSelectionMode(R.id.fab_read_sentence__select_mode_type)
+        changeWordSelectionMode(R.id.fab_read_sentence__select_mode_manual)
     }
 
     fun clickViewFullText(): ReadFullTextRobot {

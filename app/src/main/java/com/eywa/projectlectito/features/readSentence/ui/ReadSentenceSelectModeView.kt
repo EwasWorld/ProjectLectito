@@ -21,7 +21,7 @@ class ReadSentenceSelectModeView : ConstraintLayout {
     private lateinit var viewModel: ReadSentenceMviViewModel
 
     private var isOpen = false
-    var selectMenuOpenedListener: (() -> Unit)? = null
+    private var selectMenuOpenedListener: (() -> Unit)? = null
 
     constructor(context: Context) : super(context) {
         initialise(context)
@@ -59,14 +59,9 @@ class ReadSentenceSelectModeView : ConstraintLayout {
                         WordSelectMode.AUTO_WITH_COLOUR
                 ),
                 ModeButton(
-                        fab_read_sentence__select_mode_select,
-                        text_read_sentence__select_mode_select,
-                        WordSelectMode.SELECT
-                ),
-                ModeButton(
-                        fab_read_sentence__select_mode_type,
-                        text_read_sentence__select_mode_type,
-                        WordSelectMode.TYPE
+                        fab_read_sentence__select_mode_manual,
+                        text_read_sentence__select_mode_manual,
+                        WordSelectMode.MANUAL
                 )
         ).forEach { button ->
             button.fab.setOnClickListener { onButtonPressed(button.mode) }

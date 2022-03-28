@@ -15,14 +15,12 @@
     <string name="read_sentence__next_sentence">Next sentence</string>
     <string name="read_sentence__no_definition">No word selected.\n%s</string>
     <string name="read_sentence__no_definition_auto">Click on a word to show its definition.</string>
-    <string name="read_sentence__no_definition_select">Select a word and click the arrow to show its definition.</string>
-    <string name="read_sentence__no_definition_type">Type in a word and click the arrow to show its definition.</string>
+    <string name="read_sentence__no_definition_manual">Select or type a word and click the arrow to show its definition.</string>
     <string name="read_sentence__parse_success">Sentence parsed succeeded</string>
     <string name="read_sentence__parse_failed">Sentence parse failed</string>
     <string name="read_sentence__select_mode_auto">Auto</string>
     <string name="read_sentence__select_mode_auto_with_colour">Auto (coloured)</string>
-    <string name="read_sentence__select_mode_select">Select</string>
-    <string name="read_sentence__select_mode_type">Type</string>
+    <string name="read_sentence__select_mode_manual">Manual</string>
 
     <string name="err_read_sentence__no_more_sentences">No more sentences</string>
     <string name="err_read_sentence__no_more_definitions">No more definitions</string>
@@ -34,6 +32,5 @@
     <string name="read_sentence__no_content_to_edit">No content to edit</string>
 
     <string name="read_sentence__simple_selected__submit_bad_type">Internal error</string>
-    <string name="read_sentence__simple_selected__submit_no_word_select">No word selected</string>
-    <string name="read_sentence__simple_selected__submit_no_word_type">No word entered</string>
+    <string name="read_sentence__simple_selected__submit_manual_no_word">No word entered</string>
 </resources>

@@ -237,8 +237,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         }
                         else {
                             when (newWordSelectMode) {
-                                WordSelectMode.SELECT -> WordSelectionState.SelectMode()
-                                WordSelectMode.TYPE -> WordSelectionState.TypeMode()
+                                WordSelectMode.MANUAL -> WordSelectionState.ManualMode.TypeMode()
                                 WordSelectMode.AUTO,
                                 WordSelectMode.AUTO_WITH_COLOUR -> {
                                     shouldStartParse = true
@@ -255,14 +254,23 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     currentState.sentenceState.asValid()?.let { startSentenceParse(currentState, it) }
                 }
             }
-            is SelectedWordIntent.OnSimpleWordSelected -> {
-                if (currentState.wordSelectionState !is WordSelectionState.TypeMode) return
-                _viewState.postValue(currentState.copy(wordSelectionState = WordSelectionState.TypeMode(action.word)))
+            is SelectedWordIntent.OnSimpleWordTyped -> {
+                if (currentState.wordSelectionState !is WordSelectionState.ManualMode) return
+                _viewState.postValue(
+                        currentState.copy(
+                                wordSelectionState = WordSelectionState.ManualMode.TypeMode(
+                                        action.word
+                                )
+                        )
+                )
             }
             is SelectedWordIntent.OnSentenceTextSelected -> {
-                currentWordState.asSelectMode()?.takeIf {
-                    action.start != it.selectionStart || action.end != it.selectionEnd
-                } ?: return
+                val currentMode = currentWordState.asSelectMode()
+                if (currentMode != null) {
+                    currentMode.takeIf {
+                        action.start != it.selectionStart || action.end != it.selectionEnd
+                    } ?: return
+                }
 
                 val currentSentence = currentState.getSentenceSpannableString()?.toString() ?: return
                 val start = action.start.takeIf { it in currentSentence.indices } ?: return
@@ -270,7 +278,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 val newSelection = currentSentence.substring(start, end).takeIf { it.isNotBlank() } ?: return
                 _viewState.postValue(
                         currentState.copy(
-                                wordSelectionState = WordSelectionState.SelectMode(
+                                wordSelectionState = WordSelectionState.ManualMode.SelectMode(
                                         newSelection,
                                         action.start,
                                         action.end

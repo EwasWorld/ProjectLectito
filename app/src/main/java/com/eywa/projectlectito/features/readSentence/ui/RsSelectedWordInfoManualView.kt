@@ -8,13 +8,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.eywa.projectlectito.R
-import com.eywa.projectlectito.databinding.RsSelectedWordInfoSelectBinding
+import com.eywa.projectlectito.databinding.RsSelectedWordInfoManualBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import kotlinx.android.synthetic.main.rs_selected_word_info_select.view.*
+import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
+import kotlinx.android.synthetic.main.rs_selected_word_info_manual.view.*
 
-class RsSelectedWordInfoSelectView : ConstraintLayout {
-    private lateinit var layout: RsSelectedWordInfoSelectBinding
+class RsSelectedWordInfoManualView : ConstraintLayout {
+    private lateinit var layout: RsSelectedWordInfoManualBinding
     private lateinit var viewModel: ReadSentenceMviViewModel
 
     constructor(context: Context) : super(context) {
@@ -31,10 +32,10 @@ class RsSelectedWordInfoSelectView : ConstraintLayout {
 
     private fun initialise(context: Context) {
         if (isInEditMode) {
-            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_select, this, true)
+            LayoutInflater.from(context).inflate(R.layout.rs_selected_word_info_manual, this, true)
         }
         else {
-            layout = RsSelectedWordInfoSelectBinding.inflate(LayoutInflater.from(context), this, true)
+            layout = RsSelectedWordInfoManualBinding.inflate(LayoutInflater.from(context), this, true)
         }
     }
 
@@ -43,13 +44,22 @@ class RsSelectedWordInfoSelectView : ConstraintLayout {
         layout.lifecycleOwner = lifecycleOwner
         layout.viewModel = viewModel
 
-        setupListeners()
-    }
+        input_text_read_sentence__selected_info_type__word.addTextChangedListener(TextChangedListener {
+            viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSimpleWordTyped(it?.toString()))
+        })
 
-    private fun setupListeners() {
-        button_read_sentence__selected_info_select__submit.setOnClickListener {
+        button_read_sentence__selected_info_type__submit.setOnClickListener {
             viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnSubmit)
         }
+
+        viewModel.viewState.observe(lifecycleOwner, { state ->
+            // Only update the text if a word was selected (not when it was typed)
+            state.wordSelectionState.asSelectMode()?.wordToSearch?.takeIf { it.isNotBlank() }?.let { word ->
+                if (input_text_read_sentence__selected_info_type__word.text.toString() != word) {
+                    input_text_read_sentence__selected_info_type__word.setText(word)
+                }
+            }
+        })
     }
 }
 

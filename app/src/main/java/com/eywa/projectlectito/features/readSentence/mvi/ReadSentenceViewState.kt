@@ -15,10 +15,10 @@ import kotlinx.coroutines.Job
 data class ReadSentenceViewState(
         val sentenceState: SentenceState = SentenceState.None,
         val wordDefinitionState: WordDefinitionState = WordDefinitionState.None,
-        val wordSelectionState: WordSelectionState = WordSelectionState.SelectMode()
+        val wordSelectionState: WordSelectionState = WordSelectionState.ManualMode.TypeMode()
 ) {
     fun isSentenceSelectable() =
-            wordSelectionState is WordSelectionState.SelectMode && !wordSelectionState.isChangeWordSelectionModeMenuOpen
+            wordSelectionState is WordSelectionState.ManualMode && !wordSelectionState.isChangeWordSelectionModeMenuOpen
 
     sealed class SentenceState {
         object None : SentenceState()
@@ -80,39 +80,37 @@ data class ReadSentenceViewState(
          */
         abstract val isChangeWordSelectionModeMenuOpen: Boolean
 
-        data class SelectMode(
-                val selectedWord: String?,
-                val selectionStart: Int?,
-                val selectionEnd: Int?,
-                override val isChangeWordSelectionModeMenuOpen: Boolean = false
+        sealed class ManualMode(
+                wordToSearch: String?
         ) : WordSelectionState(
-                WordSelectMode.SELECT,
-                selectedWord,
-                R.string.read_sentence__simple_selected__submit_no_word_select
+                WordSelectMode.MANUAL,
+                wordToSearch,
+                R.string.read_sentence__simple_selected__submit_manual_no_word
         ) {
-            constructor() : this(null, null, null)
-
-            override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
-                return copy(
-                        isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
-                                ?: this.isChangeWordSelectionModeMenuOpen
-                )
+            data class SelectMode(
+                    val selectedWord: String?,
+                    val selectionStart: Int?,
+                    val selectionEnd: Int?,
+                    override val isChangeWordSelectionModeMenuOpen: Boolean = false
+            ) : ManualMode(selectedWord) {
+                override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
+                    return copy(
+                            isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
+                                    ?: this.isChangeWordSelectionModeMenuOpen
+                    )
+                }
             }
-        }
 
-        data class TypeMode(
-                val typedWord: String? = null,
-                override val isChangeWordSelectionModeMenuOpen: Boolean = false
-        ) : WordSelectionState(
-                WordSelectMode.TYPE,
-                typedWord,
-                R.string.read_sentence__simple_selected__submit_no_word_type
-        ) {
-            override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
-                return copy(
-                        isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
-                                ?: this.isChangeWordSelectionModeMenuOpen
-                )
+            data class TypeMode(
+                    val typedWord: String? = null,
+                    override val isChangeWordSelectionModeMenuOpen: Boolean = false
+            ) : ManualMode(typedWord) {
+                override fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean?): WordSelectionState {
+                    return copy(
+                            isChangeWordSelectionModeMenuOpen = isChangeWordSelectionModeMenuOpen
+                                    ?: this.isChangeWordSelectionModeMenuOpen
+                    )
+                }
             }
         }
 
@@ -137,8 +135,8 @@ data class ReadSentenceViewState(
             }
         }
 
-        fun asSelectMode() = getDataOrNull<SelectMode>()
-        fun asTypeMode() = getDataOrNull<TypeMode>()
+        fun asManualMode() = getDataOrNull<ManualMode>()
+        fun asSelectMode() = getDataOrNull<ManualMode.SelectMode>()
         fun asParsedMode() = getDataOrNull<ParsedMode>()
 
         abstract fun copyAbstract(isChangeWordSelectionModeMenuOpen: Boolean? = null): WordSelectionState

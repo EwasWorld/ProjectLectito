@@ -50,7 +50,7 @@
             android:layout_marginVertical="@dimen/activity_vertical_margin"
             android:contentDescription="@string/read_sentence__select_mode_auto"
             android:src="@drawable/ic_auto_fix"
-            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_select"
+            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_manual"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
             app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
@@ -69,35 +69,11 @@
             />
 
         <ImageButton
-            android:id="@+id/fab_read_sentence__select_mode_select"
+            android:id="@+id/fab_read_sentence__select_mode_manual"
             style="@style/FloatingActionButton.Mini"
             android:layout_marginVertical="@dimen/activity_vertical_margin"
-            android:contentDescription="@string/read_sentence__select_mode_select"
+            android:contentDescription="@string/read_sentence__select_mode_manual"
             android:src="@drawable/ic_touch"
-            app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_type"
-            app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
-            app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
-            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
-            />
-
-        <TextView
-            android:id="@+id/text_read_sentence__select_mode_select"
-            style="@style/FloatingActionButtonText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/read_sentence__select_mode_select"
-            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_select"
-            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_select"
-            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_select"
-            app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
-            />
-
-        <ImageButton
-            android:id="@+id/fab_read_sentence__select_mode_type"
-            style="@style/FloatingActionButton.Mini"
-            android:layout_marginVertical="@dimen/activity_vertical_margin"
-            android:contentDescription="@string/read_sentence__select_mode_type"
-            android:src="@drawable/ic_text_fields"
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintEnd_toEndOf="@id/fab_read_sentence__select_mode_main"
             app:layout_constraintStart_toStartOf="@id/fab_read_sentence__select_mode_main"
@@ -105,14 +81,14 @@
             />
 
         <TextView
-            android:id="@+id/text_read_sentence__select_mode_type"
+            android:id="@+id/text_read_sentence__select_mode_manual"
             style="@style/FloatingActionButtonText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/read_sentence__select_mode_type"
-            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_type"
-            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_type"
-            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_type"
+            android:text="@string/read_sentence__select_mode_manual"
+            app:layout_constraintBottom_toBottomOf="@id/fab_read_sentence__select_mode_manual"
+            app:layout_constraintStart_toEndOf="@id/fab_read_sentence__select_mode_manual"
+            app:layout_constraintTop_toTopOf="@id/fab_read_sentence__select_mode_manual"
             app:visibleOrGone="@{viewModel.viewState.wordSelectionState.changeWordSelectionModeMenuOpen}"
             />
 
