@@ -4,30 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:background="?snippet_info_banner_background"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="5dp"
+    android:id="@+id/main_sib"
     >
 
-    <com.eywa.projectlectito.features.SnippetInfoBannerView
-        android:id="@+id/text_rfti__snippet_info"
+    <TextView
+        android:id="@+id/text_sib__chapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?info_banner_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="第２章・Volume 2"
         />
 
     <TextView
-        android:id="@+id/text_rfti__content"
+        android:id="@+id/text_sib__page"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="5dp"
-        android:textColor="?general_text"
-        android:textSize="@dimen/small_text"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?info_banner_text"
+        android:textSize="@dimen/medium_text"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_rfti__snippet_info"
-        tools:maxLines="15"
-        tools:text="@tools:sample/lorem/random"
+        app:layout_constraintTop_toBottomOf="@id/text_sib__chapter"
+        tools:text="３０ページ・状況を確認してみました"
         />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

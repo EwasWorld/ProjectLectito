@@ -10,6 +10,10 @@
     <declare-styleable name="AddSnippetDetail">
         <attr name="label" format="string" />
         <attr name="hint" format="string" />
+        <attr name="input_type" format="enum">
+            <enum name="text" value="0" />
+            <enum name="numberSigned" value="1" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="HighlightOverlayView">

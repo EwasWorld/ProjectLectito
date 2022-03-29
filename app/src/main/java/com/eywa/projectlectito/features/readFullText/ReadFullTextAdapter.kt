@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.features.SnippetInfoBannerView
 
 class ReadFullTextAdapter :
         ListAdapter<ReadFullTextAdapter.TextSnippetWithChar, ReadFullTextAdapter.RftSnippetViewHolder>(
@@ -41,7 +42,7 @@ class ReadFullTextAdapter :
 
     class RftSnippetViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: TextSnippetWithChar) {
-            itemView.findViewById<TextView>(R.id.text_rfti__snippet_info).text = item.snippet.getChapterPageString()
+            itemView.findViewById<SnippetInfoBannerView>(R.id.text_rfti__snippet_info).setSnippet(item.snippet, null)
 
             val snippetLength = item.snippet.content.length
             val spannableString = SpannableString(item.snippet.content)

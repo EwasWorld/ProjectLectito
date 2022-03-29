@@ -39,6 +39,7 @@
     <string name="add_snippet__title">Add page</string>
     <string name="add_snippet__chapter">Chapter:</string>
     <string name="add_snippet__page">Page:</string>
+    <string name="add_snippet__page_name">Page Name:</string>
     <string name="add_snippet__snippet_content_hint">Page text</string>
     <string name="add_snippet__submit">Add</string>
     <string name="add_snippet__submit_and_another">Add and add another</string>

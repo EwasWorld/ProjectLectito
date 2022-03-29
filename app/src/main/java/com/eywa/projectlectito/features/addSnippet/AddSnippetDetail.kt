@@ -2,6 +2,7 @@ package com.eywa.projectlectito.features.addSnippet
 
 import android.content.Context
 import android.content.res.Resources
+import android.text.InputType
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.EditText
@@ -40,6 +41,7 @@ class AddSnippetDetail : ConstraintLayout {
         val styledAttributes = context.obtainStyledAttributes(attrs, R.styleable.AddSnippetDetail)
         val label = styledAttributes.getString(R.styleable.AddSnippetDetail_label) ?: ""
         val hint = styledAttributes.getString(R.styleable.AddSnippetDetail_hint) ?: ""
+        val inputType = styledAttributes.getInt(R.styleable.AddSnippetDetail_input_type, -1)
         styledAttributes.recycle()
 
         val layout = (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
@@ -48,6 +50,11 @@ class AddSnippetDetail : ConstraintLayout {
         layout.findViewById<TextView>(R.id.text_asd__label).text = label
         valueEditText = layout.findViewById(R.id.input_asd__value)
         valueEditText.hint = hint
+        valueEditText.inputType = when (inputType) {
+            0 -> InputType.TYPE_CLASS_TEXT
+            1 -> InputType.TYPE_NUMBER_FLAG_SIGNED
+            else -> InputType.TYPE_NULL
+        }
         errorTextView = layout.findViewById(R.id.text_asd__error)
 
         valueEditText.addTextChangedListener(TextChangedListener { newText ->

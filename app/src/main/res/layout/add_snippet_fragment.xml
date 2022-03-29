@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         app:hint="1"
         app:label="@string/add_snippet__chapter"
-        app:layout_constraintBottom_toTopOf="@+id/layout_add_snippet__page"
+        app:layout_constraintBottom_toTopOf="@+id/layout_add_snippet__page_number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,16 +40,29 @@
         />
 
     <com.eywa.projectlectito.features.addSnippet.AddSnippetDetail
-        android:id="@+id/layout_add_snippet__page"
+        android:id="@+id/layout_add_snippet__page_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hint="1"
         app:label="@string/add_snippet__page"
-        app:layout_constraintBottom_toTopOf="@+id/scroll_add_snippet__content"
+        app:layout_constraintBottom_toTopOf="@+id/layout_add_snippet__page_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__chapter"
+        />
+
+    <com.eywa.projectlectito.features.addSnippet.AddSnippetDetail
+        android:id="@+id/layout_add_snippet__page_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:hint="Page Name"
+        app:label="@string/add_snippet__page_name"
+        app:layout_constraintBottom_toTopOf="@+id/scroll_add_snippet__content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__page_number"
         />
 
     <ScrollView
@@ -65,7 +78,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__page"
+        app:layout_constraintTop_toBottomOf="@+id/layout_add_snippet__page_name"
         >
 
         <EditText

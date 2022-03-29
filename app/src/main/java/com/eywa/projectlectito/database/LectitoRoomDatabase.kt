@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.eywa.projectlectito.database.chapter.TextChapter
 import com.eywa.projectlectito.database.snippets.TextSnippet
 import com.eywa.projectlectito.database.snippets.TextSnippetsDao
 import com.eywa.projectlectito.database.texts.Text
@@ -12,9 +13,9 @@ import java.util.*
 
 @Database(
         entities = [
-            Text::class, TextSnippet::class
+            Text::class, TextChapter::class, TextSnippet::class
         ],
-        version = 2,
+        version = 3,
         exportSchema = true
 )
 @TypeConverters(LectitoRoomDatabase.Converters::class)

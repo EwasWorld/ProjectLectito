@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="3dp"
     >
 
     <LinearLayout
@@ -33,12 +32,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:ems="3"
             android:gravity="start|center_vertical"
             android:importantForAutofill="no"
-            android:inputType="numberSigned"
             android:textColor="?general_text"
-            tools:hint="1"
             tools:ignore="LabelFor"
             />
     </LinearLayout>
@@ -55,6 +51,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_asd__main"
         tools:text="Error: field is required"
-        tools:visibility="visible"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

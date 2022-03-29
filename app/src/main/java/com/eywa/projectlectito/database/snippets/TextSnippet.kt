@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.texts.Text
 import com.eywa.projectlectito.features.readSentence.Sentence
+import com.eywa.projectlectito.utils.JAPANESE_LIST_DELIMINATOR
 
 @Entity(
         tableName = TextSnippet.TABLE_NAME,
@@ -42,14 +43,23 @@ data class TextSnippet(
          * 1-indexed
          */
         val ordinal: Int = 1,
+
+        /**
+         * An arbitrary string a user may wish to give this snippet. E.g. if their snippets are chapters it may be the
+         * chapter name
+         */
+        val name: String? = null,
 ) {
 
     fun getChapterPageString(): String {
-        val chapter = if (chapterId != null) "第%d章".format(chapterId) else ""
-        val page = "%dページ".format(pageReference)
         val part = if (ordinal != 1) " パート%d".format(ordinal) else ""
-        return "%s%s%s".format(chapter, page, part)
+        return "%s%s%s".format(getChapterString(), getPageString(), part)
     }
+
+    fun getChapterString() = if (chapterId != null) "第%d章".format(chapterId) else ""
+    fun getPageString() = "%dページ".format(pageReference)
+    fun getPageStringWithName() =
+            getPageString() + (name.takeIf { !it.isNullOrBlank() }?.let { "$JAPANESE_LIST_DELIMINATOR$it" } ?: "")
 
     data class WithInt(
             @Embedded val snippet: TextSnippet,

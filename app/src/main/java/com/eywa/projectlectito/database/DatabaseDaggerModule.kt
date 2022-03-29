@@ -30,7 +30,8 @@ class DatabaseDaggerModule(application: Application) {
                 Room.databaseBuilder(application, LectitoRoomDatabase::class.java, LectitoRoomDatabase.DATABASE_NAME)
                         .addCallback(PopulateDatabaseCallback(MainScope()))
                         .addMigrations(
-                                DatabaseMigrations.MIGRATION_1_2
+                                DatabaseMigrations.MIGRATION_1_2,
+                                DatabaseMigrations.MIGRATION_2_3
                         )
                         .build()
         /*

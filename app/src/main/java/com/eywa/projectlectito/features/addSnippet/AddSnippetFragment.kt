@@ -47,8 +47,8 @@ class AddSnippetFragment : Fragment() {
         })
         viewModel.pageExists.observe(viewLifecycleOwner, {
             pageExists = it
-            if (layout_add_snippet__page.userHasTouched) {
-                layout_add_snippet__page.validate()
+            if (layout_add_snippet__page_number.userHasTouched) {
+                layout_add_snippet__page_number.validate()
             }
         })
 
@@ -67,11 +67,11 @@ class AddSnippetFragment : Fragment() {
     }
 
     private fun setupValidation() {
-        layout_add_snippet__page.textChangedListener = TextChangedListener {
+        layout_add_snippet__page_number.textChangedListener = TextChangedListener {
             val newValue = it?.toString()?.asInt()
             viewModel.pageReference.postValue(newValue)
         }
-        layout_add_snippet__page.validator = object : AddSnippetDetail.Validator {
+        layout_add_snippet__page_number.validator = object : AddSnippetDetail.Validator {
             override fun getErrorString(content: String?): AddSnippetDetail.Validator.Errors? {
                 if (content.isNullOrBlank()) {
                     return AddSnippetDetail.Validator.Errors(R.string.err__required_field)
@@ -114,7 +114,7 @@ class AddSnippetFragment : Fragment() {
     private fun submit(): Boolean {
         validateSnippetContent(text_add_snippet__snippet_content.text?.toString())
         var hasErrors = contentHasErrors
-        listOf(layout_add_snippet__page, layout_add_snippet__chapter).forEach {
+        listOf(layout_add_snippet__page_number, layout_add_snippet__chapter).forEach {
             it.validate()
             hasErrors = hasErrors || it.hasErrors
         }
@@ -124,15 +124,16 @@ class AddSnippetFragment : Fragment() {
             return false
         }
 
-        val pageReference = layout_add_snippet__page.getValue().asInt()!!
+        val pageReference = layout_add_snippet__page_number.getValue().asInt()!!
         viewModel.insert(
                 text_add_snippet__snippet_content.text.toString(),
                 pageReference,
-                layout_add_snippet__chapter.getValue().asInt()!!
+                layout_add_snippet__chapter.getValue().asInt()!!,
+                layout_add_snippet__page_name.getValue()
         )
 
         text_add_snippet__snippet_content.setText("")
-        layout_add_snippet__page.setValue((pageReference + 1).toString())
+        layout_add_snippet__page_number.setValue((pageReference + 1).toString())
         viewModel.pageReference.postValue(pageReference + 1)
         return true
     }

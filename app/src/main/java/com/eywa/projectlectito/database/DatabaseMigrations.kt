@@ -14,7 +14,7 @@ class DatabaseMigrations {
         val MIGRATION_BLANK = object : Migration(1, 1) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 val sqlStrings = mutableListOf<String>()
-
+                TODO()
                 executeMigrations(sqlStrings, database, startVersion, endVersion)
             }
         }
@@ -23,6 +23,24 @@ class DatabaseMigrations {
             override fun migrate(database: SupportSQLiteDatabase) {
                 val sqlStrings = mutableListOf<String>()
                 sqlStrings.add("DROP TABLE `parsed_info`")
+                executeMigrations(sqlStrings, database, startVersion, endVersion)
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                val sqlStrings = mutableListOf<String>()
+                sqlStrings.add("ALTER TABLE `text_snippets` ADD COLUMN `name` TEXT")
+                sqlStrings.add(
+                        """
+                            CREATE TABLE `text_chapters`(
+                                `chapterNumber` INTEGER NOT NULL, 
+                                `textId` INTEGER NOT NULL, 
+                                `name` TEXT NOT NULL, 
+                                CONSTRAINT PK_text_chapters PRIMARY KEY (textId, chapterNumber)
+                            )
+                        """
+                )
                 executeMigrations(sqlStrings, database, startVersion, endVersion)
             }
         }

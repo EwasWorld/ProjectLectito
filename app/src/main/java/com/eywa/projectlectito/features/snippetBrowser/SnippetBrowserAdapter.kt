@@ -1,17 +1,18 @@
 package com.eywa.projectlectito.features.snippetBrowser
 
 import android.app.AlertDialog
+import android.content.Context
 import android.view.*
-import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
+import com.eywa.projectlectito.features.SnippetInfoBannerView
 import com.eywa.projectlectito.features.readSentence.ReadSentenceFragment
 
-class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel) :
+class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel, private val context: Context) :
         ListAdapter<TextSnippet, SnippetBrowserAdapter.SbSnippetViewHolder>(
                 object : DiffUtil.ItemCallback<TextSnippet>() {
                     override fun areItemsTheSame(oldItem: TextSnippet, newItem: TextSnippet): Boolean {
@@ -24,17 +25,18 @@ class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel) :
                 }
         ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SbSnippetViewHolder {
-        return SbSnippetViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.snippet_browser_item, parent, false),
-                viewModel
-        )
+        val itemView = SnippetInfoBannerView(context)
+        itemView.layoutParams =
+                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        return SbSnippetViewHolder(itemView, viewModel)
     }
 
     override fun onBindViewHolder(holder: SbSnippetViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class SbSnippetViewHolder(view: View, val viewModel: SnippetBrowserViewModel) : RecyclerView.ViewHolder(view),
+    class SbSnippetViewHolder(view: SnippetInfoBannerView, val viewModel: SnippetBrowserViewModel) :
+            RecyclerView.ViewHolder(view),
             View.OnCreateContextMenuListener {
         lateinit var item: TextSnippet
 
@@ -44,7 +46,7 @@ class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel) :
 
         fun bind(item: TextSnippet) {
             this.item = item
-            itemView.findViewById<TextView>(R.id.text_sbi__chapter_page).text = item.getChapterPageString()
+            (itemView as SnippetInfoBannerView).setSnippet(item, null)
 
             itemView.setOnClickListener {
                 ReadSentenceFragment.navigateTo(it.findNavController(), item.textId, item.id, 0)

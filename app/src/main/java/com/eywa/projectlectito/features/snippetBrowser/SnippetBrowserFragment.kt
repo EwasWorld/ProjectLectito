@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.eywa.projectlectito.R
 import kotlinx.android.synthetic.main.snippet_browser_fragment.*
@@ -43,9 +45,18 @@ class SnippetBrowserFragment : Fragment() {
             }
         })
 
-        val adapter = SnippetBrowserAdapter(viewModel)
+        val adapter = SnippetBrowserAdapter(viewModel, requireContext())
         recycler_sb.adapter = adapter
         recycler_sb.layoutManager = LinearLayoutManager(context)
+        val itemDivider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        itemDivider.setDrawable(
+                ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.banner_vertical_divider,
+                        requireContext().theme
+                )!!
+        )
+        recycler_sb.addItemDecoration(itemDivider)
         viewModel.snippetsForText.observe(viewLifecycleOwner, { texts ->
             texts?.let {
                 adapter.submitList(it)

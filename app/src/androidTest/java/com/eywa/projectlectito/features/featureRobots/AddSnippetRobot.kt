@@ -29,7 +29,7 @@ class AddSnippetRobot : Robot() {
 
     fun inputPage(page: String) {
         checkRobotsScreenIsShown()
-        typeTextIntoDetail(R.id.layout_add_snippet__page, page)
+        typeTextIntoDetail(R.id.layout_add_snippet__page_number, page)
     }
 
     fun inputContent(content: String) {
