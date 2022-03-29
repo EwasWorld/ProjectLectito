@@ -31,6 +31,7 @@
         <item name="fab_mini_tint">@color/teal_700_low_alpha</item>
 
         <item name="db_text_info_banner_background">#209D00FF</item>
+        <item name="db_text_info_banner_background_aux">#2C9D00FF</item>
         <item name="snippet_info_banner_background">#2EFFD500</item>
         <item name="rs_selected_word_info_banner_background">#200075FF</item>
         <item name="info_banner_text">?general_text</item>

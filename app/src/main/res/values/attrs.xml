@@ -47,6 +47,7 @@
         <attr name="fab_mini_tint" format="color" />
 
         <attr name="db_text_info_banner_background" format="color" />
+        <attr name="db_text_info_banner_background_aux" format="color" />
         <attr name="snippet_info_banner_background" format="color" />
         <attr name="rs_selected_word_info_banner_background" format="color" />
         <attr name="info_banner_text" format="color" />

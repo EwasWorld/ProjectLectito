@@ -112,6 +112,11 @@ class Sentence(
 
     fun getNextSentenceStart() = nextSentenceStart?.toIndexInfo()
     fun getPreviousSentenceStart() = previousSentenceStart?.toIndexInfo()
+    fun getSnippetPercentageProgress(): Double {
+        val currentSnippetLength = currentSentenceStart.relativeSnippet.getSnippetFromId()
+                ?.content?.length ?: return 0.0
+        return currentSentenceStart.startIndex / currentSnippetLength.toDouble()
+    }
 
     var currentSentence: String? = null
         private set

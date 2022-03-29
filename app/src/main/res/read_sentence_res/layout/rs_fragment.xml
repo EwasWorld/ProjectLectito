@@ -51,43 +51,64 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:background="?db_text_info_banner_background"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 >
 
-                <TextView
-                    android:id="@+id/text_read_sentence__current_text_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@{viewModel.viewState.sentenceState.asValid().getTextName}"
-                    android:textColor="?info_banner_text"
-                    android:textSize="@dimen/small_text"
+                <!-- Width is temporary as it will be overwritten programmatically -->
+                <View
+                    android:id="@+id/overlay_read_sentence__snippet_progress_indicator"
+                    android:layout_width="100dp"
+                    android:layout_height="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__chapter_page"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:ignore="RtlSymmetry"
-                    tools:text="傭兵団の料理番"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="?db_text_info_banner_background_aux"
                     />
 
-                <TextView
-                    android:id="@+id/text_read_sentence__chapter_page"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.viewState.sentenceState.asValid().chapterPage}"
-                    android:textColor="?info_banner_text"
-                    android:textSize="@dimen/small_text"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="5dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/text_read_sentence__current_text_title"
-                    tools:text="第２章３０ページ"
-                    />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    >
+
+                    <TextView
+                        android:id="@+id/text_read_sentence__current_text_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@{viewModel.viewState.sentenceState.asValid().getTextName}"
+                        android:textColor="?info_banner_text"
+                        android:textSize="@dimen/small_text"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/text_read_sentence__chapter_page"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:ignore="RtlSymmetry"
+                        tools:text="傭兵団の料理番"
+                        />
+
+                    <TextView
+                        android:id="@+id/text_read_sentence__chapter_page"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.viewState.sentenceState.asValid().chapterPage}"
+                        android:textColor="?info_banner_text"
+                        android:textSize="@dimen/small_text"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/text_read_sentence__current_text_title"
+                        tools:text="第２章３０ページ"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.eywa.projectlectito.features.readSentence.ui.RsSelectedWordInfoManualView

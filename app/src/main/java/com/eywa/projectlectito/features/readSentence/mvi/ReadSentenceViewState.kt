@@ -56,6 +56,7 @@ data class ReadSentenceViewState(
             val previousSentence = sentence.previousSentence
             val nextSentenceStart = sentence.getNextSentenceStart()
             val previousSentenceStart = sentence.getPreviousSentenceStart()
+            val snippetPercentageProgress = sentence.getSnippetPercentageProgress()
 
             override fun cleanUp() {
                 sentenceJob.cancel()

@@ -19,6 +19,7 @@ import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent.Sent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.utils.androidWrappers.ToastSpamPrevention
 import kotlinx.android.synthetic.main.rs_fragment.*
+import kotlin.math.roundToInt
 
 
 class ReadSentenceFragment : Fragment() {
@@ -41,6 +42,8 @@ class ReadSentenceFragment : Fragment() {
 
     private lateinit var binding: RsFragmentBinding
     private lateinit var readSentenceMviViewModel: ReadSentenceMviViewModel
+
+    private var currentSnippetProgressWidth = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = LayoutInflater.from(context).inflate(R.layout.rs_fragment, container, false)
@@ -88,6 +91,17 @@ class ReadSentenceFragment : Fragment() {
                             effect.snippetInfo.snippetStartIndex
                     )
                 }
+            }
+        })
+
+        readSentenceMviViewModel.viewState.observe(viewLifecycleOwner, { state ->
+            val snippetPercentProgress = state.sentenceState.asValid()?.snippetPercentageProgress ?: 0.0
+            val maxWidth = layout_read_sentence__text_info.width
+            val newWidth = (snippetPercentProgress * maxWidth).roundToInt()
+            if (currentSnippetProgressWidth != newWidth) {
+                overlay_read_sentence__snippet_progress_indicator.layoutParams.width = newWidth
+                overlay_read_sentence__snippet_progress_indicator.requestLayout()
+                currentSnippetProgressWidth = newWidth
             }
         })
 
