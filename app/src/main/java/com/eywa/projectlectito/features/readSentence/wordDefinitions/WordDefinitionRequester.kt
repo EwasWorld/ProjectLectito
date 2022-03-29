@@ -27,14 +27,14 @@ class WordDefinitionRequester(
         requestWordDefinitionJob = Job()
         requestWordDefinitionJob.invokeOnCompletion {
             it?.let { e ->
-                if (e is CancellationException) {
+                if ((e.cause ?: e) is CancellationException) {
                     Log.d(LOG_TAG, "Word definition job cancelled")
                     return@invokeOnCompletion
                 }
 
                 var message = e.message
                 if (message.isNullOrBlank()) {
-                    message = "Unknown cancellation error"
+                    message = "Unknown http error"
                 }
                 Log.e(LOG_TAG, message)
 
@@ -51,7 +51,14 @@ class WordDefinitionRequester(
                     Request.Builder().url("https://jisho.org/api/v1/search/words?keyword=$word")
                             .build()
             val httpClient = OkHttpClient()
-            val response = httpClient.newCall(request).await()
+            val response: Response
+            try {
+                response = httpClient.newCall(request).await()
+            }
+            catch (e: Throwable) {
+                requestWordDefinitionJob.cancel("Network error", e)
+                return@withContext
+            }
 
             Log.d(LOG_TAG, "Request returned")
             ensureActive()

@@ -28,11 +28,7 @@ class ReadSentenceRobot : Robot() {
         changeWordSelectionMode(R.id.fab_read_sentence__select_mode_auto_with_colour)
     }
 
-    fun setSelectModeSelect() {
-        changeWordSelectionMode(R.id.fab_read_sentence__select_mode_manual)
-    }
-
-    fun setSelectModeType() {
+    fun setSelectModeManual() {
         changeWordSelectionMode(R.id.fab_read_sentence__select_mode_manual)
     }
 

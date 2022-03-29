@@ -146,8 +146,16 @@ data class ReadSentenceViewState(
     sealed class WordDefinitionState {
         object None : WordDefinitionState()
 
-        // TODO loading and errors
-        object Error : WordDefinitionState()
+        // TODO loading states
+
+        data class Error(private val errorType: ErrorType = ErrorType.UNKNOWN) : WordDefinitionState() {
+            override fun getErrorMessageId() = errorType.messageId
+        }
+
+        enum class ErrorType(@StringRes val messageId: Int) {
+            NO_INTERNET(R.string.err_read_sentence__definition_fetch_internet_error),
+            UNKNOWN(R.string.err_read_sentence__definition_fetch_error)
+        }
 
         data class Loading(val requester: WordDefinitionRequester) : WordDefinitionState() {
             override fun cancel() {
@@ -191,12 +199,12 @@ data class ReadSentenceViewState(
 
         open fun hasPreviousEntry() = false
         open fun hasNextEntry() = false
+        open fun getErrorMessageId(): Int? = null
 
         open fun cancel() = run { }
 
         fun asHasWord() = getDataOrNull<HasWord>()
-        fun asError() = getDataOrNull<Error>()
-        fun hasNoDefinition() = asHasWord() == null && asError() == null
+        fun hasNoDefinition() = asHasWord() == null && this !is Error
     }
 
     companion object {

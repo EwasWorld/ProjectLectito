@@ -56,15 +56,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 >
 
-                <!-- Width is temporary as it will be overwritten programmatically -->
                 <View
                     android:id="@+id/overlay_read_sentence__snippet_progress_indicator"
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:background="?db_text_info_banner_background_aux"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:background="?db_text_info_banner_background_aux"
+                    tools:layout_width="100dp"
                     />
 
                 <androidx.constraintlayout.widget.ConstraintLayout

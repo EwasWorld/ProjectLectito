@@ -50,6 +50,17 @@ object BindingAdapters {
         }
     }
 
+    @BindingAdapter("text")
+    @JvmStatic
+    fun TextView.setAppText(@StringRes resId: Int?) {
+        if (resId == null || resId == ResourcesCompat.ID_NULL) {
+            text = ""
+        }
+        else {
+            setText(resId)
+        }
+    }
+
     @BindingAdapter("spannableText")
     @JvmStatic
     fun TextView.setSpannableText(spannableString: SpannableString?) {

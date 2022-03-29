@@ -24,6 +24,7 @@ import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinit
 import com.eywa.projectlectito.utils.androidWrappers.UnformattedClickableSpan
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(application) {
@@ -349,7 +350,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                 word = searchWord,
                 successCallback = { response ->
                     val newState = if (response.meta.status != 200) {
-                        WordDefinitionState.Error
+                        WordDefinitionState.Error()
                     }
                     else {
                         WordDefinitionState.HasWord(response.data, 0)
@@ -357,7 +358,11 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     updateWordDefinitionState(newState)
                 },
                 failCallback = {
-                    updateWordDefinitionState(WordDefinitionState.Error)
+                    val error = when (it) {
+                        is UnknownHostException -> WordDefinitionState.Error(WordDefinitionState.ErrorType.NO_INTERNET)
+                        else -> WordDefinitionState.Error()
+                    }
+                    updateWordDefinitionState(error)
                 }
         )
         updateWordDefinitionState(WordDefinitionState.Loading(requester))

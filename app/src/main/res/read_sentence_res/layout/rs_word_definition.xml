@@ -54,7 +54,7 @@
             android:background="?general_aux_background"
             android:gravity="center"
             android:paddingVertical="20dp"
-            android:text="@string/err_read_sentence__definition_fetch_error"
+            app:text="@{viewModel.viewState.wordDefinitionState.errorMessageId}"
             android:textColor="?general_text"
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,7 +62,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread_inside"
-            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asError}"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.errorMessageId}"
             tools:text="No word selected.\nClick on a word to show its definition."
             tools:visibility="gone"
             />
@@ -92,10 +92,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord().reading}"
                     android:textColor="?general_text"
                     android:textSize="@dimen/small_text"
-                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.reading}"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().reading}"
                     tools:text="ふつう"
                     />
 
@@ -103,7 +103,7 @@
                     android:id="@+id/text_read_sentence__word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.word}"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord().word}"
                     android:textColor="?general_text"
                     android:textSize="@dimen/large_text"
                     tools:text="普通"
@@ -127,17 +127,17 @@
                     android:text="@string/read_sentence__common"
                     android:textColor="?general_text"
                     android:textSize="@dimen/small_text"
-                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.isCommon()}"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().isCommon()}"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.jlpt}"
+                    android:text="@{viewModel.viewState.wordDefinitionState.asHasWord().jlpt}"
                     android:textColor="?general_text"
                     android:textSize="@dimen/small_text"
-                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.jlpt}"
+                    app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().jlpt}"
                     tools:text="N4"
                     />
             </LinearLayout>
@@ -147,12 +147,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.tags}"
+                android:text="@{viewModel.viewState.wordDefinitionState.asHasWord().tags}"
                 android:textColor="?general_text"
                 android:textSize="@dimen/small_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
-                app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.tags}"
+                app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().tags}"
                 tools:text="wanikani31"
                 />
 
@@ -215,20 +215,20 @@
                         app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
-                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
+                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().otherForms}"
                         />
 
                     <TextView
                         android:id="@+id/text_read_sentence__other_forms"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
+                        android:text="@{viewModel.viewState.wordDefinitionState.asHasWord().otherForms}"
                         android:textColor="?general_text"
                         android:textSize="@dimen/small_text"
                         app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
-                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord.otherForms}"
+                        app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord().otherForms}"
                         tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
                         />
                 </LinearLayout>
