@@ -165,6 +165,9 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                         if (newSentenceState.sentence.currentSentence == initialSentence?.currentSentence) {
                             Log.w(LOG_TAG, "Possible issue when moving to a new sentence")
                         }
+                        if (currentState.wordSelectionState is WordSelectionState.ParsedMode) {
+                            startSentenceParse(currentState, newSentenceState)
+                        }
                     }
                     else if (sentenceState is SentenceState.Loading || sentenceState is SentenceState.Valid) {
                         if (!sentenceState.isJobEqualTo(job)) {
