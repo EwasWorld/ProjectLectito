@@ -133,6 +133,7 @@ class AddSnippetFragment : Fragment() {
         )
 
         text_add_snippet__snippet_content.setText("")
+        layout_add_snippet__page_name.setValue("")
         layout_add_snippet__page_number.setValue((pageReference + 1).toString())
         viewModel.pageReference.postValue(pageReference + 1)
         return true
