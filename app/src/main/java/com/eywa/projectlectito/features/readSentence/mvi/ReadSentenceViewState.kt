@@ -154,6 +154,7 @@ data class ReadSentenceViewState(
 
         enum class ErrorType(@StringRes val messageId: Int) {
             NO_INTERNET(R.string.err_read_sentence__definition_fetch_internet_error),
+            NO_DEFINITIONS(R.string.err_read_sentence__definition_fetch_no_defs_error),
             UNKNOWN(R.string.err_read_sentence__definition_fetch_error)
         }
 

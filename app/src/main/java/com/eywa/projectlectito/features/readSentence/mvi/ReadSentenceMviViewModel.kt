@@ -352,11 +352,10 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         val requester = WordDefinitionRequester(
                 word = searchWord,
                 successCallback = { response ->
-                    val newState = if (response.meta.status != 200) {
-                        WordDefinitionState.Error()
-                    }
-                    else {
-                        WordDefinitionState.HasWord(response.data, 0)
+                    val newState = when {
+                        response.meta.status != 200 -> WordDefinitionState.Error()
+                        response.data.isEmpty() -> WordDefinitionState.Error(WordDefinitionState.ErrorType.NO_DEFINITIONS)
+                        else -> WordDefinitionState.HasWord(response.data, 0)
                     }
                     updateWordDefinitionState(newState)
                 },
