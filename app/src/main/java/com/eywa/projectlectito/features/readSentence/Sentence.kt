@@ -58,6 +58,12 @@ class Sentence(
     private var nextSentenceStart: RelativeIndexInfo? = null
     private var previousSentenceStart: RelativeIndexInfo? = null
 
+    private val allSnippets = listOf(
+            previousSnippets ?: listOf(),
+            listOf(currentSnippet),
+            nextSnippets ?: listOf()
+    ).flatten().filterNotNull()
+
     /**
      * Details of the snippets in this sentence
      * Triple<start char in first snippet, end char in last snippet (null for entire last snippet), all snippet ids)
@@ -116,6 +122,34 @@ class Sentence(
         val currentSnippetLength = currentSentenceStart.relativeSnippet.getSnippetFromId()
                 ?.content?.length ?: return 0.0
         return currentSentenceStart.startIndex / currentSnippetLength.toDouble()
+    }
+
+    /**
+     * Returns the snippet that has just been started (if at the beginning of a snippet)
+     *
+     * @return If this sentence is the start of a snippet, return the snippet.
+     * If it contains multiple snippets, return the second snippet.
+     * Otherwise return null
+     */
+    fun getNewSnippetStarted(): TextSnippet? {
+        // Check for multiple snippets - the end of one into the start of another
+        val currentSnippets = snippetsInCurrentSentence
+        if (currentSnippets.size > 1) {
+            return allSnippets.find { it.id == currentSnippets[1].snippetId }!!
+        }
+
+        // Check whether there's text before the start of this sentence
+        val previousTextChar = FindType.LAST_NON_STOP.find(
+                endIndex = currentSentenceStart.startIndex,
+                relativeSnippetId = currentSentenceStart.relativeSnippet
+        )
+
+        // Has text means this is not the start of a snippet
+        if (previousTextChar != null) {
+            return null
+        }
+
+        return currentSentenceStart.relativeSnippet.getSnippetFromId()!!
     }
 
     var currentSentence: String? = null
