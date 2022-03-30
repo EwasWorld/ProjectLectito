@@ -52,8 +52,8 @@ class AddSnippetDetail : ConstraintLayout {
         valueEditText.hint = hint
         valueEditText.inputType = when (inputType) {
             0 -> InputType.TYPE_CLASS_TEXT
-            1 -> InputType.TYPE_NUMBER_FLAG_SIGNED
-            else -> InputType.TYPE_NULL
+            1 -> InputType.TYPE_CLASS_NUMBER.or(InputType.TYPE_NUMBER_FLAG_SIGNED)
+            else -> throw IllegalArgumentException("Invalid edit text input type")
         }
         errorTextView = layout.findViewById(R.id.text_asd__error)
 
