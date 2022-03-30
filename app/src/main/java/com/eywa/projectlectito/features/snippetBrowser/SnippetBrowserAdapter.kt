@@ -66,22 +66,17 @@ class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel, priv
                 }
             },
             DELETE_TEXT(R.string.view_texts__delete_text) {
-                private var confirmDeleteDialog: AlertDialog? = null
-
                 override fun onClick(view: View, item: TextSnippet, viewModel: SnippetBrowserViewModel) {
-                    if (confirmDeleteDialog == null) {
-                        confirmDeleteDialog = AlertDialog.Builder(view.context)
-                                .setTitle(R.string.view_texts__confirm_delete_dialog_title)
-                                .setMessage(
-                                        view.resources.getString(R.string.view_texts__confirm_delete_dialog_body)
-                                                .format(item.getChapterPageString())
-                                )
-                                .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(item.id) }
-                                .setNegativeButton(R.string.cancel) { _, _ -> }
-                                .create()
-                    }
-
-                    confirmDeleteDialog!!.show()
+                    AlertDialog.Builder(view.context)
+                            .setTitle(R.string.view_texts__confirm_delete_dialog_title)
+                            .setMessage(
+                                    view.resources.getString(R.string.view_texts__confirm_delete_dialog_body)
+                                            .format(item.getPageStringWithName())
+                            )
+                            .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(item.id) }
+                            .setNegativeButton(R.string.cancel) { _, _ -> }
+                            .create()
+                            .show()
                 }
             };
 

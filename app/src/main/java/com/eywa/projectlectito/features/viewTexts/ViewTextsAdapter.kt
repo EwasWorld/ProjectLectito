@@ -120,22 +120,17 @@ class ViewTextsAdapter(private val viewModel: ViewTextsViewModel) :
                 }
             },
             DELETE_TEXT(R.string.view_texts__delete_text) {
-                private var confirmDeleteDialog: AlertDialog? = null
-
                 override fun onClick(view: View, item: Text.WithCurrentSnippetInfo, viewModel: ViewTextsViewModel) {
-                    if (confirmDeleteDialog == null) {
-                        confirmDeleteDialog = AlertDialog.Builder(view.context)
-                                .setTitle(R.string.view_texts__confirm_delete_dialog_title)
-                                .setMessage(
-                                        view.resources.getString(R.string.view_texts__confirm_delete_dialog_body)
-                                                .format(item.text.name)
-                                )
-                                .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(item.text.id) }
-                                .setNegativeButton(R.string.cancel) { _, _ -> }
-                                .create()
-                    }
-
-                    confirmDeleteDialog!!.show()
+                    AlertDialog.Builder(view.context)
+                            .setTitle(R.string.view_texts__confirm_delete_dialog_title)
+                            .setMessage(
+                                    view.resources.getString(R.string.view_texts__confirm_delete_dialog_body)
+                                            .format(item.text.name)
+                            )
+                            .setPositiveButton(R.string.delete) { _, _ -> viewModel.delete(item.text.id) }
+                            .setNegativeButton(R.string.cancel) { _, _ -> }
+                            .create()
+                            .show()
                 }
             };
 
