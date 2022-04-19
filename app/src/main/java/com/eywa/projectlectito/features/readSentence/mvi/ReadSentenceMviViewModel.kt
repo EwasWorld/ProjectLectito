@@ -39,6 +39,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
      */
     val currentSentence = viewState.map { it.getSentenceSpannableString() }.distinctUntilChanged()
 
+    /**
+     * Separated from viewState because it derives from [viewState] but updating it every time [viewState] updates
+     * causes the definitions on screen to disappear and reappear which looks weird.
+     */
+    val hasWord = viewState.map { it.wordDefinitionState.asHasWord() }.distinctUntilChanged()
+
     @Inject
     lateinit var db: LectitoRoomDatabase
 
@@ -192,20 +198,6 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         val currentWordDefinitionState = currentState.wordDefinitionState
         when (action) {
             WordDefinitionIntent.OnClosePressed -> updateWordDefinitionState(currentState, WordDefinitionState.None)
-            WordDefinitionIntent.OnNextPressed -> {
-                currentWordDefinitionState.asHasWord()!!.nextEntry()
-                        ?.let { next -> updateWordDefinitionState(currentState, next) }
-                        ?: run {
-                            viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
-                        }
-            }
-            WordDefinitionIntent.OnPreviousPressed -> {
-                currentWordDefinitionState.asHasWord()!!.previousEntry()
-                        ?.let { prev -> updateWordDefinitionState(currentState, prev) }
-                        ?: run {
-                            viewEffect.postValue(Toast.ResIdToast(R.string.err_read_sentence__no_more_definitions))
-                        }
-            }
             is WordDefinitionIntent.OnSubmit -> {
                 searchForWord(currentState)
             }
@@ -355,7 +347,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     val newState = when {
                         response.meta.status != 200 -> WordDefinitionState.Error()
                         response.data.isEmpty() -> WordDefinitionState.Error(WordDefinitionState.ErrorType.NO_DEFINITIONS)
-                        else -> WordDefinitionState.HasWord(response.data, 0)
+                        else -> WordDefinitionState.HasWord(response.data)
                     }
                     updateWordDefinitionState(newState)
                 },

@@ -4,15 +4,18 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import com.eywa.projectlectito.features.readSentence.wordDefinitions.JishoWordDefinitions
-import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState
+import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionPageView
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
 
 class RsWordDefinitionView : ConstraintLayout {
@@ -22,8 +25,6 @@ class RsWordDefinitionView : ConstraintLayout {
 
     private lateinit var layout: RsWordDefinitionBinding
     private lateinit var viewModel: ReadSentenceMviViewModel
-
-    private var currentDefinition: JishoWordDefinitions.JishoEntry? = null
 
     constructor(context: Context) : super(context) {
         initialise(context)
@@ -55,36 +56,26 @@ class RsWordDefinitionView : ConstraintLayout {
     }
 
     private fun setupListeners() {
-        viewModel.viewState.observe(layout.lifecycleOwner!!, { viewState ->
-            currentDefinition = viewState.wordDefinitionState.asHasWord()?.getCurrentDefinition()
-            displayDefinition()
+        viewModel.viewState.observe(layout.lifecycleOwner!!, {
+            pager_read_sentence.requestLayout()
+        })
+        viewModel.hasWord.observe(layout.lifecycleOwner!!, { hasWord ->
+            hasWord ?: return@observe
+            pager_read_sentence.adapter =
+                    ScreenSlidePagerAdapter(FragmentManager.findFragment(this@RsWordDefinitionView), hasWord)
         })
 
-        button_read_sentence__next_definition.setOnClickListener {
-            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnNextPressed)
-        }
-        button_read_sentence__previous_definition.setOnClickListener {
-            viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnPreviousPressed)
-        }
         button_read_sentence__close_definition.setOnClickListener {
             viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnClosePressed)
         }
     }
 
-    private fun displayDefinition() {
-        currentDefinition?.let { definition ->
-            layout_read_sentence__english_definitions.removeAllViews()
-            var index = 1
-            for (item in definition.senses) {
-                val wordDefinitionView = WordDefinitionDetailView(context)
-                layout_read_sentence__english_definitions.addView(wordDefinitionView)
-
-                wordDefinitionView.updateDefinition(item.english_definitions.joinToString("; "))
-                wordDefinitionView.updatePartsOfSpeech(item.parts_of_speech.joinToString("; "))
-                wordDefinitionView.updateTags(item.tags.joinToString("; "))
-                wordDefinitionView.updateIndex(index++)
-            }
-        }
+    private inner class ScreenSlidePagerAdapter(
+            activity: Fragment,
+            private val data: ReadSentenceViewState.WordDefinitionState.HasWord
+    ) : FragmentStateAdapter(activity) {
+        override fun getItemCount(): Int = data.getDefinitionCount()
+        override fun createFragment(position: Int): Fragment = WordDefinitionPageView(data.getDataForIndex(position))
     }
 }
 

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="viewState"
+            type="com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.WordDefinitionState.HasWord.JishoEntryForDisplay"
+            />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <LinearLayout
+            android:id="@+id/layout_read_sentence__word_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <TextView
+                android:id="@+id/text_read_sentence__reading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@{viewState.reading}"
+                android:textColor="?general_text"
+                android:textSize="@dimen/small_text"
+                app:visibleOrGone="@{viewState.reading}"
+                tools:text="ふつう"
+                />
+
+            <TextView
+                android:id="@+id/text_read_sentence__word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewState.word}"
+                android:textColor="?general_text"
+                android:textSize="@dimen/large_text"
+                tools:text="普通"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_read_sentence__jlpt_and_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/read_sentence__common"
+                android:textColor="?general_text"
+                android:textSize="@dimen/small_text"
+                app:visibleOrGone="@{viewState.common}"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@{viewState.jlpt}"
+                android:textColor="?general_text"
+                android:textSize="@dimen/small_text"
+                app:visibleOrGone="@{viewState.jlpt}"
+                tools:text="N4"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_read_sentence__tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@{viewState.tags}"
+            android:textColor="?general_text"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_read_sentence__jlpt_and_tags"
+            app:visibleOrGone="@{viewState.tags}"
+            tools:text="wanikani31"
+            />
+
+        <ScrollView
+            android:id="@+id/layout_read_sentence__english_definitions_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginVertical="10dp"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_default="wrap"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__word_main"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                >
+
+                <LinearLayout
+                    android:id="@+id/layout_read_sentence__english_definitions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical"
+                    >
+
+                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:definition="normal; ordinary; regular; usual; common; average"
+                        app:index="1"
+                        app:parts_of_speech="Na-adjective"
+                        app:tags="Usually written using kana alone"
+                        />
+
+                    <com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionDetailView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:definition="normally; ordinarily; usually; generally; commonly"
+                        app:index="2"
+                        app:parts_of_speech="Adverb (fukushi)"
+                        app:tags=""
+                        />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/text_read_sentence__other_forms_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/read_sentence__other_forms_label"
+                    android:textColor="?general_text"
+                    android:textSize="@dimen/small_text"
+                    app:layout_constraintBottom_toTopOf="@+id/text_read_sentence__other_forms"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__english_definitions_scroll"
+                    app:visibleOrGone="@{viewState.otherForms}"
+                    />
+
+                <TextView
+                    android:id="@+id/text_read_sentence__other_forms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewState.otherForms}"
+                    android:textColor="?general_text"
+                    android:textSize="@dimen/small_text"
+                    app:layout_constraintBottom_toTopOf="@+id/button_read_sentence__previous_definition"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_read_sentence__other_forms_label"
+                    app:visibleOrGone="@{viewState.otherForms}"
+                    tools:text="旨く[うまく]・巧く[うまく]・甘く[うまく]"
+                    />
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
