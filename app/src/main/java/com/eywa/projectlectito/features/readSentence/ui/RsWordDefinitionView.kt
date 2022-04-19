@@ -14,9 +14,11 @@ import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.*
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionPageView
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
+import kotlinx.android.synthetic.main.rs_word_definition_page.view.*
+
 
 class RsWordDefinitionView : ConstraintLayout {
     companion object {
@@ -58,11 +60,7 @@ class RsWordDefinitionView : ConstraintLayout {
     private fun setupListeners() {
         viewModel.viewState.observe(layout.lifecycleOwner!!, {
             pager_read_sentence.requestLayout()
-        })
-        viewModel.hasWord.observe(layout.lifecycleOwner!!, { hasWord ->
-            hasWord ?: return@observe
-            pager_read_sentence.adapter =
-                    ScreenSlidePagerAdapter(FragmentManager.findFragment(this@RsWordDefinitionView), hasWord)
+            it.wordDefinitionState.asHasWord().setPagerAdapter()
         })
 
         button_read_sentence__close_definition.setOnClickListener {
@@ -70,9 +68,15 @@ class RsWordDefinitionView : ConstraintLayout {
         }
     }
 
+    private fun WordDefinitionState.HasWord?.setPagerAdapter() {
+        this ?: return
+        pager_read_sentence.adapter =
+                ScreenSlidePagerAdapter(FragmentManager.findFragment(this@RsWordDefinitionView), this)
+    }
+
     private inner class ScreenSlidePagerAdapter(
             activity: Fragment,
-            private val data: ReadSentenceViewState.WordDefinitionState.HasWord
+            private val data: WordDefinitionState.HasWord
     ) : FragmentStateAdapter(activity) {
         override fun getItemCount(): Int = data.getDefinitionCount()
         override fun createFragment(position: Int): Fragment = WordDefinitionPageView(data.getDataForIndex(position))

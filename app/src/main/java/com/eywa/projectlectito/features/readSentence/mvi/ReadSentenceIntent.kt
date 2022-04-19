@@ -25,8 +25,6 @@ sealed class ReadSentenceIntent {
     }
 
     sealed class WordDefinitionIntent : ReadSentenceIntent() {
-        object OnPreviousPressed : WordDefinitionIntent()
-        object OnNextPressed : WordDefinitionIntent()
         object OnClosePressed : WordDefinitionIntent()
         object OnSubmit : WordDefinitionIntent()
     }

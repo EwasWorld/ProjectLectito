@@ -51,6 +51,8 @@
         <attr name="snippet_info_banner_background" format="color" />
         <attr name="rs_selected_word_info_banner_background" format="color" />
         <attr name="info_banner_text" format="color" />
+        <attr name="definition_commonness_pill" format="color" />
+        <attr name="definition_jlpt_pill" format="color" />
 
         <attr name="translucent_overlay" format="color" />
     </declare-styleable>

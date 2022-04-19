@@ -22,6 +22,10 @@
     <string name="read_sentence__select_mode_auto_with_colour">Auto (coloured)</string>
     <string name="read_sentence__select_mode_manual">Manual</string>
 
+    <string name="read_sentence__more_definition_button">More definition actions</string>
+    <string name="read_sentence__expand_definition_button">Show full definition</string>
+    <string name="read_sentence__contract_definition_button">Show short definition</string>
+
     <string name="err_read_sentence__no_more_sentences">No more sentences</string>
     <string name="err_read_sentence__no_more_definitions">No more definitions</string>
 

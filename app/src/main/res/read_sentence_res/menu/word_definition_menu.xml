@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu>
+    <!--    <item-->
+    <!--        android:id="@+id/word_definition_menu__close"-->
+    <!--        android:orderInCategory="10"-->
+    <!--        android:title="@string/action_bar__help"-->
+    <!--        android:icon="@drawable/ic_help_icon"-->
+    <!--        app:showAsAction="ifRoom"-->
+    <!--        />-->
+</menu>

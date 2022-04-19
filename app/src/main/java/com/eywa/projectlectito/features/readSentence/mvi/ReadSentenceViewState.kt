@@ -15,7 +15,11 @@ import kotlinx.coroutines.Job
 data class ReadSentenceViewState(
         val sentenceState: SentenceState = SentenceState.None,
         val wordDefinitionState: WordDefinitionState = WordDefinitionState.None,
-        val wordSelectionState: WordSelectionState = WordSelectionState.ManualMode.TypeMode()
+        val wordSelectionState: WordSelectionState = WordSelectionState.ManualMode.TypeMode(),
+        /**
+         * Not currently working :(
+         */
+        val isWordDefinitionExpanded: Boolean = true
 ) {
     fun isSentenceSelectable() =
             wordSelectionState is WordSelectionState.ManualMode && !wordSelectionState.isChangeWordSelectionModeMenuOpen

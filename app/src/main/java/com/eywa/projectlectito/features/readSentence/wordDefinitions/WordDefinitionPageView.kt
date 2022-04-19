@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsWordDefinitionPageBinding
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.WordDefinitionState
 
 class WordDefinitionPageView(private val data: WordDefinitionState.HasWord.JishoEntryForDisplay) : Fragment() {
-    lateinit var binding: RsWordDefinitionPageBinding
+    private lateinit var binding: RsWordDefinitionPageBinding
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -26,8 +28,11 @@ class WordDefinitionPageView(private val data: WordDefinitionState.HasWord.Jisho
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val readSentenceMviViewModel = ViewModelProvider(this)[ReadSentenceMviViewModel::class.java]
+
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewState = data
+        binding.viewModel = readSentenceMviViewModel
 
         val definitionsLinearLayout =
                 view.findViewById<LinearLayout>(R.id.layout_read_sentence__english_definitions)

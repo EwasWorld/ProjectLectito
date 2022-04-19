@@ -195,12 +195,9 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun handleWordDefinitionChange(currentState: ReadSentenceViewState, action: WordDefinitionIntent) {
-        val currentWordDefinitionState = currentState.wordDefinitionState
         when (action) {
             WordDefinitionIntent.OnClosePressed -> updateWordDefinitionState(currentState, WordDefinitionState.None)
-            is WordDefinitionIntent.OnSubmit -> {
-                searchForWord(currentState)
-            }
+            is WordDefinitionIntent.OnSubmit -> searchForWord(currentState)
         }
     }
 

@@ -19,7 +19,6 @@
         android:background="?general_aux_background"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="wrap"
         app:layout_constraintHorizontal_bias="0.5"
@@ -33,6 +32,7 @@
             android:layout_height="wrap_content"
             android:background="?general_aux_background"
             android:gravity="center"
+            android:padding="15dp"
             android:paddingVertical="20dp"
             android:text="@{viewModel.viewState.wordSelectionState.wordSelectMode.noDefinitionStringId}"
             android:textColor="?general_text"
@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:background="?general_aux_background"
             android:gravity="center"
+            android:padding="15dp"
             android:paddingVertical="20dp"
             android:textColor="?general_text"
             android:textSize="@dimen/small_text"
@@ -82,6 +83,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:orientation="vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="5dp"
                 app:layout_constraintBottom_toTopOf="@id/button_read_sentence__close_definition"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="wrap"
@@ -93,24 +97,13 @@
                     android:id="@+id/pager_read_sentence"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toTopOf="@id/button_read_sentence__close_definition"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_default="wrap"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     />
 
                 <include
                     layout="@layout/rs_word_definition_page"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="10dp"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/button_read_sentence__close_definition"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_default="wrap"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible"
                     />
             </LinearLayout>
@@ -118,31 +111,46 @@
             <ImageButton
                 android:id="@+id/button_read_sentence__close_definition"
                 style="@style/FloatingActionButton"
-                android:layout_margin="5dp"
-                android:clickable="true"
-                android:contentDescription="@string/read_sentence__previous_definition"
-                android:focusable="true"
+                android:layout_width="@dimen/definition_button"
+                android:layout_height="@dimen/definition_button"
+                android:background="@null"
+                android:contentDescription="@string/read_sentence__more_definition_button"
                 android:src="@drawable/ic_cross"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/spinner_read_sentence__state"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__definitions"
                 />
 
-            <!-- TODO Implement learning state -->
-            <Spinner
-                android:id="@+id/spinner_read_sentence__state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__close_definition"
-                app:layout_constraintEnd_toEndOf="parent"
+            <ImageButton
+                android:id="@+id/button_read_sentence__expand_definition"
+                style="@style/FloatingActionButton"
+                android:layout_width="@dimen/definition_button"
+                android:layout_height="@dimen/definition_button"
+                android:background="@null"
+                android:contentDescription="@{viewModel.viewState.wordDefinitionExpanded ? @string/read_sentence__contract_definition_button : @string/read_sentence__expand_definition_button}"
+                android:src="@{viewModel.viewState.wordDefinitionExpanded ? @drawable/ic_expand_less : @drawable/ic_expand_more}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/button_read_sentence__close_definition"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/button_read_sentence__close_definition"
-                app:layout_constraintTop_toTopOf="@id/button_read_sentence__close_definition"
-                tools:entries="@array/card_state_array"
+                app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__definitions"
+                tools:src="@drawable/ic_expand_less"
+                android:visibility="gone"
                 />
+
+            <!-- TODO Implement learning state -->
+            <!--            <Spinner-->
+            <!--                android:id="@+id/spinner_read_sentence__state"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:visibility="gone"-->
+            <!--                app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__close_definition"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintHorizontal_bias="0.5"-->
+            <!--                app:layout_constraintStart_toEndOf="@+id/button_read_sentence__close_definition"-->
+            <!--                app:layout_constraintTop_toTopOf="@id/button_read_sentence__close_definition"-->
+            <!--                tools:entries="@array/card_state_array"-->
+            <!--                />-->
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
