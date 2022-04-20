@@ -41,9 +41,11 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
 
     /**
      * Separated from viewState because it derives from [viewState] but updating it every time [viewState] updates
-     * causes the definitions on screen to disappear and reappear which looks weird.
+     * causes all sorts of update issues with the current index and view pager heights.
      */
-    val hasWord = viewState.map { it.wordDefinitionState.asHasWord() }.distinctUntilChanged()
+    val wordDefinitionPagerInfo =
+            viewState.map { it.wordDefinitionState.asHasWord()?.toViewPagerInfo() }
+                    .distinctUntilChanged()
 
     @Inject
     lateinit var db: LectitoRoomDatabase
@@ -198,6 +200,12 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
         when (action) {
             WordDefinitionIntent.OnClosePressed -> updateWordDefinitionState(currentState, WordDefinitionState.None)
             is WordDefinitionIntent.OnSubmit -> searchForWord(currentState)
+            is WordDefinitionIntent.OnDefinitionPageChanged -> {
+                val state = currentState.wordDefinitionState.asHasWord() ?: return
+                _viewState.postValue(
+                        currentState.copy(wordDefinitionState = state.copy(selectedIndex = action.newPosition))
+                )
+            }
         }
     }
 
@@ -344,7 +352,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     val newState = when {
                         response.meta.status != 200 -> WordDefinitionState.Error()
                         response.data.isEmpty() -> WordDefinitionState.Error(WordDefinitionState.ErrorType.NO_DEFINITIONS)
-                        else -> WordDefinitionState.HasWord(response.data)
+                        else -> WordDefinitionState.HasWord(response.data, 0)
                     }
                     updateWordDefinitionState(newState)
                 },

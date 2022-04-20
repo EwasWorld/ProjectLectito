@@ -23,7 +23,7 @@
         <ImageButton
             android:id="@+id/fab_read_sentence__select_mode_auto"
             style="@style/FloatingActionButton.Mini"
-            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:layout_marginVertical="@dimen/fab_vertical_margin"
             android:contentDescription="@string/read_sentence__select_mode_auto"
             android:src="@drawable/ic_auto_fix"
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_auto_with_colour"
@@ -47,7 +47,7 @@
         <ImageButton
             android:id="@+id/fab_read_sentence__select_mode_auto_with_colour"
             style="@style/FloatingActionButton.Mini"
-            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:layout_marginVertical="@dimen/fab_vertical_margin"
             android:contentDescription="@string/read_sentence__select_mode_auto"
             android:src="@drawable/ic_auto_fix"
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_manual"
@@ -71,7 +71,7 @@
         <ImageButton
             android:id="@+id/fab_read_sentence__select_mode_manual"
             style="@style/FloatingActionButton.Mini"
-            android:layout_marginVertical="@dimen/activity_vertical_margin"
+            android:layout_marginVertical="@dimen/fab_vertical_margin"
             android:contentDescription="@string/read_sentence__select_mode_manual"
             android:src="@drawable/ic_touch"
             app:layout_constraintBottom_toTopOf="@id/fab_read_sentence__select_mode_main"

@@ -111,8 +111,8 @@
             <ImageButton
                 android:id="@+id/button_read_sentence__close_definition"
                 style="@style/FloatingActionButton"
-                android:layout_width="@dimen/definition_button"
-                android:layout_height="@dimen/definition_button"
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
                 android:background="@null"
                 android:contentDescription="@string/read_sentence__more_definition_button"
                 android:src="@drawable/ic_cross"
@@ -122,20 +122,68 @@
                 app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__definitions"
                 />
 
+            <com.eywa.projectlectito.features.readSentence.ui.DotIndicatorLayoutView
+                android:id="@+id/layout_read_sentence__definition_dots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/dot_padding"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                app:layout_constraintBottom_toBottomOf="@id/button_read_sentence__close_definition"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/button_read_sentence__close_definition"
+                >
+
+                <!-- Views will be removed programmatically, they're just here for the preview -->
+                <ImageView
+                    android:layout_width="@dimen/indicator_dot_size"
+                    android:layout_height="@dimen/indicator_dot_size"
+                    android:background="@drawable/default_dot"
+                    android:backgroundTint="?general_text"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription"
+                    tools:visibility="visible"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/indicator_dot_size"
+                    android:layout_height="@dimen/indicator_dot_size"
+                    android:alpha=".4"
+                    android:background="@drawable/default_dot"
+                    android:backgroundTint="?general_text"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription,ImageContrastCheck"
+                    tools:visibility="visible"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/mini_indicator_dot_size"
+                    android:layout_height="@dimen/mini_indicator_dot_size"
+                    android:alpha=".4"
+                    android:background="@drawable/default_dot"
+                    android:backgroundTint="?general_text"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription,ImageContrastCheck"
+                    tools:visibility="visible"
+                    />
+            </com.eywa.projectlectito.features.readSentence.ui.DotIndicatorLayoutView>
+
             <ImageButton
                 android:id="@+id/button_read_sentence__expand_definition"
                 style="@style/FloatingActionButton"
-                android:layout_width="@dimen/definition_button"
-                android:layout_height="@dimen/definition_button"
+                android:layout_width="@dimen/touch_target"
+                android:layout_height="@dimen/touch_target"
                 android:background="@null"
                 android:contentDescription="@{viewModel.viewState.wordDefinitionExpanded ? @string/read_sentence__contract_definition_button : @string/read_sentence__expand_definition_button}"
                 android:src="@{viewModel.viewState.wordDefinitionExpanded ? @drawable/ic_expand_less : @drawable/ic_expand_more}"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/button_read_sentence__close_definition"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintTop_toBottomOf="@+id/layout_read_sentence__definitions"
                 tools:src="@drawable/ic_expand_less"
-                android:visibility="gone"
                 />
 
             <!-- TODO Implement learning state -->

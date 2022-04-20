@@ -37,8 +37,10 @@
         <item name="info_banner_text">?general_text</item>
         <item name="translucent_overlay">?general_background</item>
 
-        <item name="definition_commonness_pill">#4D88FF00</item>
-        <item name="definition_jlpt_pill">#330055FF</item>
+        <item name="definition_commonness_pill">#4D11FF00</item>
+        <item name="definition_jlpt_pill">#330090FF</item>
+        <item name="definition_indicator_dot_selected">?general_text</item>
+        <item name="definition_indicator_dot">?general_text_light</item>
 
         <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
     </style>

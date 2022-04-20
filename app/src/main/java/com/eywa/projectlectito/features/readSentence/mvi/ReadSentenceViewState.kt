@@ -169,9 +169,20 @@ data class ReadSentenceViewState(
             }
         }
 
-        data class HasWord(private val allDefinitions: List<JishoWordDefinitions.JishoEntry>) : WordDefinitionState() {
-            fun getDefinitionCount() = allDefinitions.size
-            fun getDataForIndex(index: Int) = JishoEntryForDisplay(allDefinitions[index])
+        data class HasWord(
+                private val allDefinitions: List<JishoWordDefinitions.JishoEntry>,
+                val selectedIndex: Int
+        ) : WordDefinitionState() {
+            fun toViewPagerInfo() = ViewPagerInfo(allDefinitions)
+            val size = allDefinitions.size
+
+            /**
+             * Helper class to isolate allDefinitions from other info about the current definition
+             */
+            data class ViewPagerInfo(private val allDefinitions: List<JishoWordDefinitions.JishoEntry>) {
+                val size = allDefinitions.size
+                fun getDataForIndex(index: Int) = JishoEntryForDisplay(allDefinitions[index])
+            }
 
             class JishoEntryForDisplay(data: JishoWordDefinitions.JishoEntry) {
                 val word = data.let { definition ->

@@ -25,6 +25,7 @@ sealed class ReadSentenceIntent {
     }
 
     sealed class WordDefinitionIntent : ReadSentenceIntent() {
+        data class OnDefinitionPageChanged(val newPosition: Int) : WordDefinitionIntent()
         object OnClosePressed : WordDefinitionIntent()
         object OnSubmit : WordDefinitionIntent()
     }

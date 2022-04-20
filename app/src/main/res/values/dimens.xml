@@ -5,13 +5,14 @@
     <dimen name="large_text">25sp</dimen>
 
     <dimen name="touch_target">48dp</dimen>
-    <dimen name="definition_button">48dp</dimen>
-    <dimen name="pill_text_horizontal_padding">8dp</dimen>
-
-    <dimen name="activity_vertical_margin">14dp</dimen>
-
     <dimen name="edit_text_rounded_corner_radius">14dp</dimen>
 
+    <dimen name="pill_text_horizontal_padding">8dp</dimen>
+
+    <dimen name="indicator_dot_size">6dp</dimen>
+    <dimen name="mini_indicator_dot_size">4dp</dimen>
+
+    <dimen name="fab_vertical_margin">14dp</dimen>
     <dimen name="fab_elevation">5dp</dimen>
     <dimen name="fab_rise">3dp</dimen>
     <integer name="fab_duration">1000</integer>

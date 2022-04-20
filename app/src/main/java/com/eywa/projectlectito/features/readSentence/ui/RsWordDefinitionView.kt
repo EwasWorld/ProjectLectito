@@ -10,14 +10,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.databinding.RsWordDefinitionBinding
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
-import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.*
+import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceViewState.WordDefinitionState
 import com.eywa.projectlectito.features.readSentence.wordDefinitions.WordDefinitionPageView
 import kotlinx.android.synthetic.main.rs_word_definition.view.*
-import kotlinx.android.synthetic.main.rs_word_definition_page.view.*
 
 
 class RsWordDefinitionView : ConstraintLayout {
@@ -58,27 +58,34 @@ class RsWordDefinitionView : ConstraintLayout {
     }
 
     private fun setupListeners() {
+        viewModel.wordDefinitionPagerInfo.observe(layout.lifecycleOwner!!, {
+            it?.let { hasWord ->
+                pager_read_sentence.adapter = ScreenSlidePagerAdapter(FragmentManager.findFragment(this), hasWord)
+            }
+        })
         viewModel.viewState.observe(layout.lifecycleOwner!!, {
-            pager_read_sentence.requestLayout()
-            it.wordDefinitionState.asHasWord().setPagerAdapter()
+            it.wordDefinitionState.asHasWord()?.let { hasWord ->
+                layout_read_sentence__definition_dots.setView(hasWord.size, hasWord.selectedIndex)
+            }
+            requestLayout()
         })
 
         button_read_sentence__close_definition.setOnClickListener {
             viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnClosePressed)
         }
-    }
-
-    private fun WordDefinitionState.HasWord?.setPagerAdapter() {
-        this ?: return
-        pager_read_sentence.adapter =
-                ScreenSlidePagerAdapter(FragmentManager.findFragment(this@RsWordDefinitionView), this)
+        pager_read_sentence.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnDefinitionPageChanged(position))
+            }
+        })
     }
 
     private inner class ScreenSlidePagerAdapter(
             activity: Fragment,
-            private val data: WordDefinitionState.HasWord
+            private val data: WordDefinitionState.HasWord.ViewPagerInfo
     ) : FragmentStateAdapter(activity) {
-        override fun getItemCount(): Int = data.getDefinitionCount()
+        override fun getItemCount(): Int = data.size
         override fun createFragment(position: Int): Fragment = WordDefinitionPageView(data.getDataForIndex(position))
     }
 }
