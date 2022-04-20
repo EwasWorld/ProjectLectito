@@ -3,6 +3,7 @@ package com.eywa.projectlectito.features.readSentence.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +14,7 @@ import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceIntent
 import com.eywa.projectlectito.features.readSentence.mvi.ReadSentenceMviViewModel
 import com.eywa.projectlectito.utils.androidWrappers.TextChangedListener
 import kotlinx.android.synthetic.main.rs_selected_word_info_manual.view.*
+
 
 class RsSelectedWordInfoManualView : ConstraintLayout {
     private lateinit var layout: RsSelectedWordInfoManualBinding
@@ -47,6 +49,12 @@ class RsSelectedWordInfoManualView : ConstraintLayout {
         input_text_read_sentence__selected_info_type__word.addTextChangedListener(TextChangedListener {
             viewModel.handle(ReadSentenceIntent.SelectedWordIntent.OnSimpleWordTyped(it?.toString()))
         })
+        input_text_read_sentence__selected_info_type__word.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnSubmit)
+            }
+            false
+        }
 
         button_read_sentence__selected_info_type__submit.setOnClickListener {
             viewModel.handle(ReadSentenceIntent.WordDefinitionIntent.OnSubmit)

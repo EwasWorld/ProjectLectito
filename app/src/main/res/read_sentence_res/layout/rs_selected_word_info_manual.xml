@@ -31,6 +31,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:hint="@string/view_texts__type_word_hint"
+            android:imeOptions="actionDone"
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLines="1"
