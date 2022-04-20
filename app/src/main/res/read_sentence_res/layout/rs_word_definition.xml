@@ -15,8 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_rs__word_definition"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?general_aux_background"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +36,6 @@
             android:text="@{viewModel.viewState.wordSelectionState.wordSelectMode.noDefinitionStringId}"
             android:textColor="?general_text"
             android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -57,7 +55,6 @@
             android:paddingVertical="20dp"
             android:textColor="?general_text"
             android:textSize="@dimen/small_text"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -70,9 +67,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?general_aux_background"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_default="wrap"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.asHasWord}"
@@ -88,15 +85,16 @@
                 android:paddingBottom="5dp"
                 app:layout_constraintBottom_toTopOf="@id/button_read_sentence__close_definition"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_default="wrap"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="spread_inside"
                 >
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/pager_read_sentence"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    tools:visibility="gone"
                     />
 
                 <include

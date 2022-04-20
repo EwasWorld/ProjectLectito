@@ -25,7 +25,6 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/layout_read_sentence__text_contents"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_default="wrap"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
