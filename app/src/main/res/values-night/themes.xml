@@ -8,7 +8,8 @@
         <item name="general_text_light">#919191</item>
 
         <item name="fab_background">#043E27</item>
-        <item name="fab_tint">?general_text</item>
+        <item name="fab_tint">#D1D1D1</item>
+        <item name="fab_disabled_tint">#57D1D1D1</item>
         <item name="fab_mini_background">#052719</item>
         <item name="fab_mini_tint">#127A51</item>
     </style>

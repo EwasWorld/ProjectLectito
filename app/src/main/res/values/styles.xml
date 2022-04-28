@@ -5,6 +5,7 @@
         <item name="android:background">@drawable/fab_background</item>
         <item name="android:backgroundTint">?fab_background</item>
         <item name="android:tint">@color/fab_tint_states</item>
+        <item name="android:tintMode">multiply</item>
         <item name="android:layout_width">56dp</item>
         <item name="android:layout_height">56dp</item>
     </style>
