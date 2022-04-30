@@ -145,14 +145,14 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
     private fun setNewSentence(
             initialState: ReadSentenceViewState,
             textId: Int,
-            currentSnippetId: Int?
+            desiredSnippetId: Int?
     ) {
         val job = Job()
         _viewState.postValue(initialState.copy(sentenceState = SentenceState.Loading(job)))
         job.launch {
             snippetsRepo.getSnippetInfo(
                     textId,
-                    currentSnippetId,
+                    desiredSnippetId,
                     SURROUNDING_SNIPPETS_TO_RETRIEVE
             ).asFlow().collect {
                 if (!job.isActive) return@collect
@@ -168,6 +168,15 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                                 previousSnippetCount = it.prevSnippetsCount
                         )
                         _viewState.postValue(currentState.copy(sentenceState = newSentenceState))
+
+                        val currentSnippetId = newSentenceState.snippets[newSentenceState.previousSnippetCount].id
+                        if (it.text.currentSnippetId != currentSnippetId) {
+                            job.launch {
+                                textsRepo.update(
+                                        it.text.copy(currentSnippetId = currentSnippetId, currentCharacterIndex = 0)
+                                )
+                            }
+                        }
 
                         val initialSentence = initialState.sentenceState.asValid()?.sentence
                         if (newSentenceState.sentence.currentSentence == initialSentence?.currentSentence) {
