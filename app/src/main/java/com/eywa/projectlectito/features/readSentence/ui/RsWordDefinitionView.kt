@@ -64,6 +64,7 @@ class RsWordDefinitionView : ConstraintLayout {
             }
         })
         viewModel.viewState.observe(layout.lifecycleOwner!!, {
+            text_read_sentence__general_message.text = it.wordDefinitionState.getMessage(resources)
             it.wordDefinitionState.asHasWord()?.let { hasWord ->
                 layout_read_sentence__definition_dots.setView(hasWord.size, hasWord.selectedIndex)
             }

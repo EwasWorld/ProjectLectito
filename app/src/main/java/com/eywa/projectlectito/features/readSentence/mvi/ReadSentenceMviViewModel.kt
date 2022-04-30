@@ -364,7 +364,7 @@ class ReadSentenceMviViewModel(application: Application) : AndroidViewModel(appl
                     updateWordDefinitionState(error)
                 }
         )
-        updateWordDefinitionState(WordDefinitionState.Loading(requester))
+        updateWordDefinitionState(WordDefinitionState.Loading(searchWord, requester))
         viewModelScope.launch {
             requester.getDefinition()
         }

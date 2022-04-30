@@ -45,8 +45,9 @@
             tools:visibility="gone"
             />
 
+        <!-- Used to display loading or error states -->
         <TextView
-            android:id="@+id/text_read_sentence__error"
+            android:id="@+id/text_read_sentence__general_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?general_aux_background"
@@ -59,8 +60,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread_inside"
-            app:text="@{viewModel.viewState.wordDefinitionState.errorMessageId}"
-            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.errorMessageId}"
+            app:visibleOrGone="@{viewModel.viewState.wordDefinitionState.hasMessage()}"
             tools:text="No word selected.\nClick on a word to show its definition."
             tools:visibility="gone"
             />

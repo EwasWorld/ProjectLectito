@@ -1,5 +1,6 @@
 package com.eywa.projectlectito.features.readSentence.mvi
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import com.eywa.projectlectito.R
 import com.eywa.projectlectito.database.snippets.TextSnippet
@@ -154,7 +155,11 @@ data class ReadSentenceViewState(
         // TODO loading states
 
         data class Error(private val errorType: ErrorType = ErrorType.UNKNOWN) : WordDefinitionState() {
-            override fun getErrorMessageId() = errorType.messageId
+            override fun getMessage(resources: Resources): String {
+                return resources.getString(this.errorType.messageId)
+            }
+
+            override fun hasMessage() = true
         }
 
         enum class ErrorType(@StringRes val messageId: Int) {
@@ -163,10 +168,16 @@ data class ReadSentenceViewState(
             UNKNOWN(R.string.err_read_sentence__definition_fetch_error)
         }
 
-        data class Loading(val requester: WordDefinitionRequester) : WordDefinitionState() {
+        data class Loading(val word: String, val requester: WordDefinitionRequester) : WordDefinitionState() {
             override fun cancel() {
                 requester.cancelParse()
             }
+
+            override fun getMessage(resources: Resources): String {
+                return resources.getString(R.string.read_sentence__loading_definition).format(word)
+            }
+
+            override fun hasMessage() = true
         }
 
         data class HasWord(
@@ -211,9 +222,29 @@ data class ReadSentenceViewState(
             }
         }
 
-        open fun getErrorMessageId(): Int? = null
 
         open fun cancel() = run { }
+
+        /**
+         * Returns true if this state has a general message to display
+         * (no definition message is handled by [ReadSentenceViewState.WordDefinitionState.hasNoDefinition])
+         * (not used by [ReadSentenceViewState.WordDefinitionState.HasWord])
+         *
+         * If this is true then [ReadSentenceViewState.WordDefinitionState.getMessage] must be overridden
+         */
+        open fun hasMessage() = false
+
+        /**
+         * A general message that this state wants to display
+         *
+         * @throws NotImplementedError if [ReadSentenceViewState.WordDefinitionState.hasMessage] is true
+         */
+        open fun getMessage(resources: Resources) = if (hasMessage()) {
+            throw NotImplementedError("General message not implemented for " + this::class.simpleName)
+        }
+        else {
+            ""
+        }
 
         fun asHasWord() = getDataOrNull<HasWord>()
         fun hasNoDefinition() = asHasWord() == null && this !is Error

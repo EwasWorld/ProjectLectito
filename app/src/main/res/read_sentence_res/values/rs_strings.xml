@@ -21,6 +21,7 @@
     <string name="read_sentence__select_mode_auto">Auto</string>
     <string name="read_sentence__select_mode_auto_with_colour">Auto (coloured)</string>
     <string name="read_sentence__select_mode_manual">Manual</string>
+    <string name="read_sentence__loading_definition">Retrieving definition for %s</string>
 
     <string name="read_sentence__more_definition_button">More definition actions</string>
     <string name="read_sentence__expand_definition_button">Show full definition</string>
