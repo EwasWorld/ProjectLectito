@@ -65,7 +65,7 @@ class SnippetBrowserAdapter(private val viewModel: SnippetBrowserViewModel, priv
                     ReadSentenceFragment.navigateTo(view.findNavController(), item.textId, item.id, 0)
                 }
             },
-            DELETE_TEXT(R.string.view_texts__delete_text) {
+            DELETE_SNIPPET(R.string.delete) {
                 override fun onClick(view: View, item: TextSnippet, viewModel: SnippetBrowserViewModel) {
                     AlertDialog.Builder(view.context)
                             .setTitle(R.string.view_texts__confirm_delete_dialog_title)

@@ -8,10 +8,13 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.features.addSnippet.AddSnippetFragment
+import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.snippet_browser_fragment.*
 
 class SnippetBrowserFragment : Fragment() {
@@ -57,11 +60,19 @@ class SnippetBrowserFragment : Fragment() {
                 )!!
         )
         recycler_sb.addItemDecoration(itemDivider)
-        viewModel.snippetsForText.observe(viewLifecycleOwner, { texts ->
-            texts?.let {
+        viewModel.snippetsForText.observe(viewLifecycleOwner, { snippets ->
+            text_sb__no_content.visibility = (snippets.isNullOrEmpty()).asVisibility()
+            (snippets ?: listOf()).let {
                 adapter.submitList(it)
                 adapter.notifyDataSetChanged()
             }
         })
+
+        button_sb__add_snippet.setOnClickListener {
+            AddSnippetFragment.navigateTo(
+                    findNavController(),
+                    args.textId
+            )
+        }
     }
 }

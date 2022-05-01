@@ -38,19 +38,17 @@ data class Text(
     ) {
         val percentageRead: Double?
             get() {
-                when {
-                    text.isComplete -> return null
-                    text.currentSnippetId == null -> return null
-                    else -> {
-                        var progress = readSnippets.toDouble() / totalSnippets.toDouble()
-                        if (text.currentCharacterIndex != null) {
-                            val progressThroughCurrent =
-                                    text.currentCharacterIndex.toDouble() / currentSnippet!!.content.length.toDouble()
-                            progress += progressThroughCurrent / totalSnippets.toDouble()
-                        }
-                        return progress
-                    }
+                if (text.isComplete || text.currentSnippetId == null || currentSnippet == null) {
+                    return null
                 }
+
+                var progress = readSnippets.toDouble() / totalSnippets.toDouble()
+                if (text.currentCharacterIndex != null) {
+                    val progressThroughCurrent =
+                            text.currentCharacterIndex.toDouble() / currentSnippet.content.length.toDouble()
+                    progress += progressThroughCurrent / totalSnippets.toDouble()
+                }
+                return progress
             }
     }
 }

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.read_full_text_fragment.*
 
 class ReadFullTextFragment : Fragment() {
@@ -82,7 +83,8 @@ class ReadFullTextFragment : Fragment() {
         viewModel.snippetsForText.observe(viewLifecycleOwner, { snippets ->
             displayedSnippetIds = snippets?.map { it.id } ?: listOf()
 
-            snippets?.let {
+            text_rft__no_content.visibility = snippets.isNullOrEmpty().asVisibility()
+            (snippets ?: listOf()).let {
                 adapter.submitList(it.map { snippet ->
                     ReadFullTextAdapter.TextSnippetWithChar(
                             snippet,

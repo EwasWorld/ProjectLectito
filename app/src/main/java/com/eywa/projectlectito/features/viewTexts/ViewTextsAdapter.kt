@@ -67,7 +67,7 @@ class ViewTextsAdapter(private val viewModel: ViewTextsViewModel) :
 
             // No snippets
             if (item.totalSnippets == 0) {
-                currentView.text = itemView.resources.getString(R.string.view_texts__no_content)
+                currentView.text = itemView.resources.getString(R.string.view_texts__text_has_no_snippets)
                 progressView.visibility = false.asVisibility()
                 delimView.visibility = false.asVisibility()
                 return
@@ -83,8 +83,8 @@ class ViewTextsAdapter(private val viewModel: ViewTextsViewModel) :
             }
             currentView.text = when {
                 isTextStarted -> item.currentSnippet?.getChapterPageString()
-                item.text.isComplete -> itemView.resources.getString(R.string.view_texts__complete)
-                else -> itemView.resources.getString(R.string.view_texts__not_started)
+                item.text.isComplete -> itemView.resources.getString(R.string.view_texts__text_complete)
+                else -> itemView.resources.getString(R.string.view_texts__text_not_started)
             }
         }
 
@@ -119,7 +119,7 @@ class ViewTextsAdapter(private val viewModel: ViewTextsViewModel) :
                     AddSnippetFragment.navigateTo(view.findNavController(), item.text.id)
                 }
             },
-            DELETE_TEXT(R.string.view_texts__delete_text) {
+            DELETE_TEXT(R.string.delete) {
                 override fun onClick(view: View, item: Text.WithCurrentSnippetInfo, viewModel: ViewTextsViewModel) {
                     AlertDialog.Builder(view.context)
                             .setTitle(R.string.view_texts__confirm_delete_dialog_title)

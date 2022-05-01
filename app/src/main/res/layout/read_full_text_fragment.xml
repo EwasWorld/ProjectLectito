@@ -7,6 +7,20 @@
     android:background="?general_background"
     >
 
+    <TextView
+        android:id="@+id/text_rft__no_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/read_full_text__no_snippets"
+        android:gravity="center"
+        android:textSize="@dimen/large_text"
+        android:visibility="gone"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_rft"
         android:layout_width="match_parent"

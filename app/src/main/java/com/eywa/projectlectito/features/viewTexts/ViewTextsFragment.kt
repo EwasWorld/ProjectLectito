@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.eywa.projectlectito.R
+import com.eywa.projectlectito.utils.asVisibility
 import kotlinx.android.synthetic.main.view_texts_fragment.*
 
 class ViewTextsFragment : Fragment() {
@@ -24,7 +25,8 @@ class ViewTextsFragment : Fragment() {
         recycler_vt__texts.adapter = adapter
         recycler_vt__texts.layoutManager = LinearLayoutManager(context)
         viewModel.allTexts.observe(viewLifecycleOwner, { texts ->
-            texts?.let {
+            text_vt__no_content.visibility = texts.isNullOrEmpty().asVisibility()
+            (texts ?: listOf()).let {
                 adapter.submitList(it)
                 adapter.notifyDataSetChanged()
             }

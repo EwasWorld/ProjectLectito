@@ -14,14 +14,14 @@
 
     <!-- View Texts -->
     <string name="view_texts__title">All Texts</string>
-    <string name="view_texts__complete">Complete</string>
-    <string name="view_texts__not_started">Not started</string>
-    <string name="view_texts__no_content">No content</string>
+    <string name="view_texts__text_complete">Complete</string>
+    <string name="view_texts__text_not_started">Not started</string>
+    <string name="view_texts__text_has_no_snippets">No content</string>
+    <string name="view_texts__no_texts">No texts to show\nClick the + to add one</string>
     <string name="view_texts__no_content_error">Entry has no content, long press to add text</string>
     <string name="view_texts__submit_description">Search for word</string>
     <string name="view_texts__type_word_hint">Search for a word</string>
     <string name="view_texts__read_sentence">Read</string>
-    <string name="view_texts__delete_text">Delete</string>
     <string name="view_texts__confirm_delete_dialog_title">Confirm Deletion</string>
     <string name="view_texts__confirm_delete_dialog_body">Are you sure you want to delete %s?</string>
 
@@ -34,6 +34,7 @@
     <!-- Snippet Browser -->
     <string name="snippet_browser__title">Page browser</string>
     <string name="snippet_browser__read_page">Read this page</string>
+    <string name="snippet_browser__no_snippets">No pages to show\nClick the + to add one</string>
 
     <!-- Add Snippet -->
     <string name="add_snippet__title">Add page</string>
@@ -53,6 +54,7 @@
 
     <!-- Read Full Text -->
     <string name="read_full_text__title">Full content</string>
+    <string name="read_full_text__no_snippets">No pages to show\n\nNew pages can be added\nfrom the view texts screen</string>
 
     <!-- Misc -->
     <string-array name="card_state_array">
